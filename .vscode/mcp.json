@@ -1,0 +1,14 @@
+{
+  "servers": {
+    "fetchlocal": {
+			"command": "docker",
+			"args": [
+				"run",
+				"-i",
+				"--rm",
+				"mcp/fetch"
+			],
+			"type": "stdio"
+		}
+  }
+}
