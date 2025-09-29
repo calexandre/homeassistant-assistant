@@ -1,14 +1,23 @@
 {
-  "servers": {
-    "fetchlocal": {
-			"command": "docker",
-			"args": [
-				"run",
-				"-i",
-				"--rm",
-				"mcp/fetch"
-			],
-			"type": "stdio"
-		}
-  }
+			"servers": {
+				"homeassistant-cazita": {
+					"url": "https://${input:ha_host}/mcp_server/sse",
+					"type": "http",
+					"headers": {
+						"Authorization": "Bearer ${input:ha_bearer_token}"
+					}
+				}
+			},
+			"inputs": [
+				{
+					"id": "ha_bearer_token",
+					"type": "promptString",
+					"description": "Bearer token for Home Assistant MCP server"
+				},
+        {
+					"id": "ha_host",
+					"type": "promptString",
+					"description": "Host for Home Assistant server (without https://)"
+				}
+			]
 }
