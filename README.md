@@ -5,194 +5,232 @@
 [![VS Code](https://img.shields.io/badge/VS_Code-Extension-blue?style=flat-square&logo=visualstudiocode)](https://code.visualstudio.com/)
 [![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
 
-> An intelligent GitHub Copilot assistant toolset specifically designed to accelerate Home Assistant automation development
+> An intelligent GitHub Copilot enhancement that accelerates Home Assistant automation development through specialized chatmodes, live entity integration, and curated prompt templates.
 
-[Features](#features) • [Getting Started](#getting-started) • [Configuration](#configuration) • [Usage](#usage) • [Project Structure](#project-structure)
+[Features](#features) • [Getting Started](#getting-started) • [Usage](#usage) • [Examples](#examples) • [Troubleshooting](#troubleshooting)
 
 ---
 
 ## Overview
 
-Home Assistant Assistant is a comprehensive GitHub Copilot enhancement that transforms how you develop Home Assistant automations. By leveraging specialized chatmodes, prompts, and direct integration with your Home Assistant instance, this toolset provides contextual assistance that understands your specific setup and entity states.
+Home Assistant Assistant transforms GitHub Copilot into a specialized Home Assistant development companion. By integrating directly with your Home Assistant instance and providing expert-level guidance based on official documentation, this toolset enables rapid development of automations, scripts, and configurations.
 
-Whether you're building complex automations, troubleshooting configurations, or exploring new integrations, this assistant provides intelligent suggestions based on the official Home Assistant documentation and your live system state.
+The assistant provides real-time access to your entity states, intelligent code generation, and step-by-step troubleshooting guidance - all within your familiar VS Code environment.
 
 ## Features
 
-- **Live Entity Integration**: Direct connection to your Home Assistant instance for real-time entity state information
-- **Specialized Chat Mode**: Custom GitHub Copilot chatmode optimized for Home Assistant development
-- **Curated Prompt Library**: Ready-to-use prompts for common Home Assistant development tasks
-- **Documentation-First Approach**: All suggestions are based on official Home Assistant documentation
-- **Workflow Automation**: Streamlined development workflows with conventional commits and automated processes
-- **Template Generation**: Intelligent code generation for automations, scripts, and configurations
+### Live Home Assistant Integration
+
+- Real-time entity state monitoring through MCP (Model Context Protocol)
+- Direct connection to your Home Assistant instance
+- Automatic entity discovery and validation
+
+### Specialized GitHub Copilot Chatmode
+
+- Expert Home Assistant development guidance
+- Documentation-first approach using official HA docs
+- Intelligent YAML generation and validation
+
+### Curated Prompt Library
+
+- Ready-to-use templates for common development tasks
+- Conventional commit message generation
+- Workflow automation and documentation helpers
+
+### Development Acceleration
+
+- Context-aware automation suggestions
+- Template debugging and validation
+- Integration guidance with step-by-step instructions
 
 ## Getting Started
 
 ### Prerequisites
 
-- **VS Code with GitHub Copilot**: Ensure you have GitHub Copilot enabled in VS Code
-- **Home Assistant Instance**: A running Home Assistant installation with API access
-- **Bearer Token**: Long-lived access token from your Home Assistant instance
+- **VS Code with GitHub Copilot**: Active GitHub Copilot subscription
+- **Home Assistant Instance**: Running installation with API access
+- **Long-lived Access Token**: Generated from your Home Assistant profile
 
-### Installation
+### Quick Setup
 
-1. **Clone the repository**:
+1. **Clone the repository**
 
    ```bash
    git clone https://github.com/calexandre/homeassistant-assistant.git
    cd homeassistant-assistant
    ```
 
-2. **Set up VS Code workspace**: Open the project in VS Code to automatically load the custom prompts and chatmodes.
+2. **Open in VS Code**
 
-3. **Configure Home Assistant connection**:
-   - The MCP (Model Context Protocol) configuration will prompt you for:
-     - Your Home Assistant host URL
-     - Your Home Assistant bearer token
+   ```bash
+   code .
+   ```
+
+3. **Configure MCP Connection**
+   The workspace automatically prompts for:
+   - Home Assistant host URL (without `https://`)
+   - Bearer token for authentication
 
 > [!TIP]
-> To create a long-lived access token in Home Assistant, go to your profile settings and create a new token in the "Long-lived access tokens" section.
+> Generate a long-lived access token in Home Assistant: **Profile** → **Security** → **Long-lived access tokens** → **Create Token**
 
-### Quick Start
+### First Steps
 
-1. Open any file in VS Code within this workspace
-2. Start a new chat with GitHub Copilot
-3. Select the "Home Assistant" chatmode from the dropdown
-4. Ask questions like:
-   - "Show me all my light entities"
-   - "Create an automation to turn on lights at sunset"
-   - "Help me troubleshoot why my automation isn't working"
-
-## Configuration
-
-### MCP Server Setup
-
-The project includes a pre-configured MCP server connection that securely connects to your Home Assistant instance:
-
-```jsonc
-{
-  "servers": {
-    "homeassistant-cazita": {
-      "url": "https://${input:ha_host}/mcp_server/sse",
-      "type": "http",
-      "headers": {
-        "Authorization": "Bearer ${input:ha_bearer_token}"
-      }
-    }
-  }
-}
-```
-
-This configuration:
-
-- Uses input variables to avoid hardcoding sensitive information
-- Connects to your Home Assistant's MCP server endpoint
-- Provides secure authentication via bearer token
-
-### Security
-
-- **No Secrets in Git**: All sensitive configuration uses input prompts
-- **Local-Only Temp Files**: Generated code is stored in `.temp/` (ignored by Git)
-- **Token Security**: Bearer tokens are never committed to the repository
+1. Start a new GitHub Copilot chat in VS Code
+2. Select **"Home Assistant"** from the chatmode dropdown
+3. Try your first query: *"Show me all my light entities"*
 
 ## Usage
 
 ### Home Assistant Chatmode
 
-The specialized chatmode provides:
+The specialized chatmode provides context-aware assistance:
 
-1. **Entity Discovery**: Automatically fetches current entity states before making suggestions
-2. **Documentation Verification**: All responses are validated against official Home Assistant docs
-3. **Template Generation**: Creates working YAML configurations for your specific setup
-4. **Troubleshooting Guidance**: Step-by-step debugging help based on your actual configuration
+#### Entity Discovery
+
+- Automatically fetches current entity states before suggestions
+- Provides accurate entity IDs and current values
+- Validates entity availability in your instance
+
+#### Documentation-Verified Responses
+
+- All guidance based on official Home Assistant documentation
+- Links to relevant documentation sections
+- Version-specific syntax and best practices
+
+#### Intelligent Code Generation
+
+- Creates working YAML configurations for your setup
+- Provides modern syntax (2024.8+ action format)
+- Includes customization suggestions and alternatives
+
+### Example Interactions
+
+#### Query Entity States
+
+```text
+"What's the current temperature of all my climate entities?"
+```
+
+#### Generate Automations
+
+```text
+"Create an automation to turn on outdoor lights at sunset when someone is home"
+```
+
+#### Debug Issues
+
+```text
+"My motion automation isn't triggering, help me troubleshoot"
+```
 
 ### Available Prompts
 
-- **`conventional-commit.prompt.md`**: Generate standardized commit messages
-- **`prompt-builder.prompt.md`**: Create custom prompts for specific use cases  
-- **`readme-blueprint-generator.prompt.md`**: Generate documentation for your projects
-- **`remember.prompt.md`**: Store and recall important project context
-- **`boost-prompt.prompt.md`**: Enhance existing prompts with additional capabilities
+Access specialized prompts from the `.github/prompts/` directory:
 
-### Workflow Integration
-
-The project includes automated workflows for:
-
-- **Thought Logging**: Track Copilot's decision-making process
-- **Markdown Standardization**: Consistent documentation formatting  
-- **Safe Code Generation**: Temporary file handling for generated code
+- **`conventional-commit.prompt.md`** - Generate standardized commit messages
+- **`prompt-builder.prompt.md`** - Create custom development prompts
+- **`readme-blueprint-generator.prompt.md`** - Generate project documentation
+- **`remember.prompt.md`** - Store important project context
+- **`boost-prompt.prompt.md`** - Enhance existing prompts
 
 ## Examples
 
-### Creating an Automation
+### Automation Generation
+
+**Request:**
+> Create an automation for bedtime routine - turn off all lights except bedroom lamp, set to 10% brightness
+
+**Generated YAML:**
 
 ```yaml
-# Generated by Home Assistant Assistant
 automation:
-  - alias: "Sunset Lighting"
+  - alias: "Bedtime Routine"
     trigger:
-      platform: sun
-      event: sunset
-    condition:
-      condition: state
-      entity_id: binary_sensor.occupancy_living_room
-      state: 'on'
+      platform: time
+      at: "22:30:00"
     action:
-      service: light.turn_on
-      target:
-        entity_id: light.living_room_main
-      data:
-        brightness_pct: 75
+      - action: light.turn_off
+        target:
+          entity_id: all
+      - action: light.turn_on
+        target:
+          entity_id: light.bedroom_lamp
+        data:
+          brightness_pct: 10
 ```
 
 ### Entity State Query
 
-Ask: *"What's the current state of all my climate entities?"*
+**Request:**
+> Show me all motion sensors and their current states
 
-Response includes real-time data from your Home Assistant instance with current temperatures, modes, and settings.
+**Response:**
+
+```text
+🏠 Motion Sensors Status:
+
+Living Room:
+🤖 binary_sensor.living_room_motion: off (last_changed: 2 hours ago)
+
+Kitchen:
+🤖 binary_sensor.kitchen_motion: on (last_changed: 5 minutes ago)
+
+Bedroom:
+🤖 binary_sensor.bedroom_motion: off (last_changed: 8 hours ago)
+```
 
 ## Project Structure
 
 ```text
 homeassistant-assistant/
 ├── .github/
-│   ├── chatmodes/           # Custom Copilot chat modes
-│   ├── instructions/        # Workflow and formatting instructions  
-│   └── prompts/            # Reusable prompt templates
+│   ├── chatmodes/              # Custom Copilot chat modes
+│   │   └── homeassistant.chatmode.md
+│   ├── instructions/           # Development workflow guidance
+│   └── prompts/               # Reusable prompt templates
 ├── .vscode/
-│   └── mcp.json           # Home Assistant MCP server configuration
-├── .temp/                 # Generated code (Git ignored)
-└── README.md
+│   └── mcp.json              # MCP server configuration
+└── .temp/                    # Generated code (git ignored)
 ```
 
 ## Troubleshooting
 
 ### Connection Issues
 
-If you can't connect to your Home Assistant instance:
+#### Cannot connect to Home Assistant
 
-1. **Verify URL**: Ensure your Home Assistant URL is accessible from your development environment
-2. **Check Token**: Confirm your bearer token has the necessary permissions
-3. **Network Access**: Verify there are no firewalls blocking the connection
-4. **MCP Server**: Ensure the MCP server component is installed and running in Home Assistant
+1. Verify your Home Assistant URL is accessible
+2. Check bearer token permissions and validity
+3. Ensure MCP server add-on is installed and running
+4. Test connection: `curl -H "Authorization: Bearer YOUR_TOKEN" https://your-ha-url/api/`
+
+#### Entity not found errors
+
+1. Use the live context feature to get exact entity IDs
+2. Check entity availability in Home Assistant Developer Tools
+3. Verify integration is properly configured
 
 ### Common Problems
 
-- **Entity not found**: Use the live context feature to get exact entity IDs
-- **Automation not triggering**: Check the automation trace in Home Assistant
-- **Template errors**: Validate templates using Home Assistant's template developer tools
+#### Automation not triggering
 
-## Contributing
+- Check automation traces in Home Assistant
+- Validate trigger conditions using Developer Tools
+- Review Home Assistant logs for errors
 
-Contributions are welcome! This project follows conventional commit standards and includes automated workflows for consistent development.
+#### Template errors
 
-1. Fork the repository
-2. Create a feature branch
-3. Use the conventional commit prompts for commit messages
-4. Submit a pull request
+- Test templates in Developer Tools → Template tab
+- Verify entity states and attribute names
+- Check Jinja2 syntax and Home Assistant template functions
+
+> [!NOTE]
+> All troubleshooting follows official Home Assistant documentation. The chatmode provides step-by-step debugging guidance specific to your configuration.
 
 ## Resources
 
 - [Home Assistant Documentation](https://www.home-assistant.io/docs/)
 - [GitHub Copilot Documentation](https://docs.github.com/en/copilot)
-- [VS Code Extensions](https://marketplace.visualstudio.com/vscode)
+- [Model Context Protocol](https://modelcontextprotocol.io/)
+- [VS Code Extensions Marketplace](https://marketplace.visualstudio.com/vscode)
