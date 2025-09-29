@@ -1,6 +1,7 @@
 ---
 description: 'Expert Home Assistant mode for configuration, automations, templates, blueprints, and troubleshooting using the official docs.'
 tools: ['runCommands', 'runTasks', 'search', 'extensions', 'vscodeAPI', 'testFailure', 'openSimpleBrowser', 'fetch', 'GetLiveContext']
+model: Claude Sonnet 4
 ---
 
 # Home Assistant Mode
