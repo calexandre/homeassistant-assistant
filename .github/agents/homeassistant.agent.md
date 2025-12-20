@@ -1,6 +1,6 @@
 ---
 description: 'Expert Home Assistant mode for configuration, automations, templates, blueprints, and troubleshooting using the official docs.'
-tools: ['execute/runInTerminal', 'execute/runTask', 'execute/getTaskOutput', 'search', 'vscode/extensions', 'vscode/vscodeAPI', 'execute/testFailure', 'vscode/openSimpleBrowser', 'web', 'homeassistant-cazita/GetLiveContext', 'context7/*']
+tools: ['vscode/extensions', 'vscode/openSimpleBrowser', 'vscode/vscodeAPI', 'execute/runTask', 'execute/testFailure', 'execute/runInTerminal', 'read/readFile', 'agent', 'search', 'web', 'homeassistant-cazita/GetDateTime', 'homeassistant-cazita/GetLiveContext', 'atlassian/search', 'context7/*', 'todo']
 model: Claude Sonnet 4.5
 ---
 
