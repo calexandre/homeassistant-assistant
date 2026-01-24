@@ -1,6 +1,6 @@
 ---
 description: 'Expert Home Assistant mode for configuration, automations, templates, blueprints, and troubleshooting using the official docs.'
-tools: ['execute/runTask', 'execute/testFailure', 'execute/runInTerminal', 'read/readFile', 'agent/runSubagent', 'context7/query-docs', 'context7/resolve-library-id', 'search', 'web', 'homeassistant-cazita/GetDateTime', 'homeassistant-cazita/GetLiveContext', 'todo', 'askQuestions']
+tools: ['execute/runTask', 'execute/testFailure', 'execute/runInTerminal', 'read/readFile', 'agent/runSubagent', 'context7/query-docs', 'context7/resolve-library-id', 'search', 'web', 'homeassistant-cazita/GetDateTime', 'homeassistant-cazita/GetLiveContext', 'todo', 'askQuestions', 'edit/createFile', 'edit/editFiles','read/problems']
 ---
 
 # Home Assistant Mode
