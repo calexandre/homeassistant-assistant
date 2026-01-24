@@ -86,6 +86,13 @@ If no URL is provided, use the latest release from: `https://www.home-assistant.
 ## ✅ Update Recommendation
 - Safe to update / Review required / Wait for patch
 
+## File Output
+
+Save the generated summary to the `ha-release-notes/` folder using this naming convention:
+- **Filename**: `ha-release-[VERSION].md` (e.g., `ha-release-2026.1.md`)
+- If the file already exists, update it with the latest content
+- If the file does not exist, create it
+
 ## Example Usage
 
 ```
