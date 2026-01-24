@@ -23,11 +23,12 @@ If no URL is provided, use the latest release from: `https://www.home-assistant.
 2. **Fetch Release Notes**
    - Fetch the release notes page from the provided URL
    - Extract all highlights, new integrations, improvements, and breaking changes
+   - **Capture section anchors**: Note the HTML anchor IDs for each highlight section (e.g., `#home-dashboard-improvements`, `#new-integrations`)
 
 3. **Generate Personalized Summary**
 
    For each major highlight, provide:
-   - **Feature Name**: Brief description
+   - **Feature Name**: Brief description with a **clickable link** to the section anchor in the release notes (e.g., `[Home Dashboard Improvements](URL#home-dashboard-improvements)`)
    - **What's New**: 1-2 sentence explanation
    - **Hint for Your Setup**: How this feature could benefit your specific devices/areas
 
@@ -48,25 +49,41 @@ If no URL is provided, use the latest release from: `https://www.home-assistant.
 
 ## Output Format
 
-### 🏠 Release Summary for [Version]
+**IMPORTANT**: Use only headings and bullet points throughout the entire report. Do NOT use markdown tables in any section.
 
-#### Highlights
-| Feature | Description | Hint for Your Setup |
-|---------|-------------|---------------------|
-| ... | ... | ... |
+# 🏠 Release Summary for [Version]
 
-#### 🔌 New Integrations of Interest
-- List only those relevant to your setup
+## [Feature Name](URL#anchor)
+- **What's New**: 1-2 sentence explanation of the feature
+- **Hint for Your Setup**: How this could benefit your specific devices/areas
 
-#### 🔧 Improvements to Your Integrations
-- List improvements affecting your current integrations
+## [Another Feature](URL#anchor)
+- **What's New**: ...
+- **Hint for Your Setup**: ...
 
-#### ⚠️ Backward-Incompatible Changes
-| Integration | Affects You? | Action Required |
-|-------------|--------------|-----------------|
-| ... | Yes/No | ... |
+> Repeat for each major highlight. Feature names must be clickable links to the release notes section.
 
-#### ✅ Update Recommendation
+## 🔌 New Integrations of Interest
+- **[Integration Name](URL#anchor)**: Brief description and why it's relevant to your setup
+- Each integration name should link to its documentation or release section
+
+## 🔧 Improvements to Your Integrations
+- **[Integration Name](URL#anchor)**: Description of improvement and affected devices
+- Include links to the relevant section in the release notes
+
+## Backward-Incompatible Changes ✅ or ⚠️
+
+> Use ✅ if none of the breaking changes affect the user's setup. Use ⚠️ if there are considerations to be taken.
+
+**Summary**: Brief 1-2 sentence overview stating whether the user has problems or not based on their setup analysis.
+
+### [Integration Name](URL#anchor)
+- **Affects You?**: Yes/No
+- **Action Required**: What you need to do (if affected)
+
+> Repeat for each breaking change. Link each integration to its section in the release notes.
+
+## ✅ Update Recommendation
 - Safe to update / Review required / Wait for patch
 
 ## Example Usage
