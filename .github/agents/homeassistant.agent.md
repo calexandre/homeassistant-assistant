@@ -1,4 +1,5 @@
 ---
+name: Home Assistant Agent 🏠
 description: 'Expert Home Assistant mode for configuration, automations, templates, blueprints, and troubleshooting using the official docs.'
 tools: ['vscode/askQuestions', 'execute/testFailure', 'execute/runInTerminal', 'read/problems', 'read/readFile', 'agent', 'edit/createFile', 'edit/editFiles', 'search', 'web', 'homeassistant-cazita/GetDateTime', 'homeassistant-cazita/GetLiveContext', 'atlassian/search', 'context7/*', 'todo']
 ---
