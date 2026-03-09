@@ -20,32 +20,38 @@ If no URL is provided, use the latest release from: `https://www.home-assistant.
    - Use `GetLiveContext` to retrieve all devices, entities, and areas in my Home Assistant instance
    - Note the integrations, device types, and domains in use
 
-2. **Fetch Release Notes**
+2. **Fetch Home Assistant Configs**
+   - Run `scripts/fetch-ha-configs.sh` to download the latest automations, scenes, scripts, and configuration YAML from the live instance
+   - Read `ha-configs/automations.yaml`, `ha-configs/scenes.yaml`, `ha-configs/scripts.yaml`, and `ha-configs/configuration.yaml`
+   - Note all integrations, services, entity IDs, triggers, conditions, and actions referenced in the configs
+
+3. **Fetch Release Notes**
    - Fetch the release notes page from the provided URL
    - Extract all highlights, new integrations, improvements, and breaking changes
    - **Capture section anchors**: Note the HTML anchor IDs for each highlight section (e.g., `#home-dashboard-improvements`, `#new-integrations`)
 
-3. **Generate Personalized Summary**
+4. **Generate Personalized Summary**
 
    For each major highlight, provide:
    - **Feature Name**: Brief description with a **clickable link** to the section anchor in the release notes (e.g., `[Home Dashboard Improvements](URL#home-dashboard-improvements)`)
    - **What's New**: 1-2 sentence explanation
    - **Hint for Your Setup**: How this feature could benefit your specific devices/areas
 
-4. **New Integrations Review**
+5. **New Integrations Review**
    - List new integrations that could be relevant to your setup
    - Highlight any that match your existing device categories
 
-5. **Integration Improvements**
+6. **Integration Improvements**
    - Focus on improvements to integrations you currently use
    - Note any that affect your specific devices
 
-6. **Backward-Incompatible Changes Assessment**
+7. **Backward-Incompatible Changes Assessment**
 
-   For each breaking change:
+   Cross-reference each breaking change against **both** the live entity context (from `GetLiveContext`) **and** the fetched config files (from `ha-configs/`):
    - **Integration**: Name
-   - **Affected**: Yes/No based on your setup
-   - **Action Required**: If affected, what you need to do
+   - **Affected**: Yes/No — check if the integration, service, entity ID, or deprecated feature appears in automations, scenes, scripts, or configuration YAML
+   - **Config Impact**: List any automations, scenes, or scripts that reference the affected integration or deprecated functionality (by alias or entity ID)
+   - **Action Required**: If affected, what you need to do and which config files need updating
 
 ## Output Format
 
@@ -79,7 +85,8 @@ If no URL is provided, use the latest release from: `https://www.home-assistant.
 
 ### [Integration Name](URL#anchor)
 - **Affects You?**: Yes/No
-- **Action Required**: What you need to do (if affected)
+- **Config Impact**: List automations, scenes, or scripts that reference the affected integration (if any)
+- **Action Required**: What you need to do and which config files need updating (if affected)
 
 > Repeat for each breaking change. Link each integration to its section in the release notes.
 
