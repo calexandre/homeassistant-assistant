@@ -12,6 +12,7 @@ The agent fetches your live entities via MCP and uses official documentation wit
 - Home Assistant instance with API access
 - [MCP Server for Home Assistant](https://github.com/pdelfino/mcp-server-homeassistant) add-on installed
 - Long-lived access token
+- SSH access to Home Assistant with a host alias `homeassistant` configured in `~/.ssh/config` (passwordless login)
 
 ### Home Assistant MCP Server Setup
 
@@ -51,6 +52,25 @@ The MCP configuration is in [.vscode/mcp.json](.vscode/mcp.json):
     }
   }
 }
+```
+
+### Fetching Home Assistant Configs
+
+Automations, scenes, scripts, and `configuration.yaml` are **not** exposed by the MCP server.
+The following script assumes your homeassistant instance is accessible via SSH on host `homeassistant`.
+
+Use the fetch script to download them via SSH:
+
+```bash
+scripts/fetch-ha-configs.sh
+```
+
+Config files are saved to `ha-configs/` (gitignored).
+The script assumes the standard HAOS config path (`/config`).
+To override:
+
+```bash
+scripts/fetch-ha-configs.sh /custom/config/path
 ```
 
 ## Usage
