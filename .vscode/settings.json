@@ -1,6 +1,7 @@
 {
     "chat.tools.terminal.autoApprove": {
         "./scripts/fetch-ha-configs.sh": true,
-        "./scripts/fetch-ha-data.sh": true
+        "./scripts/fetch-ha-data.sh": true,
+        "scripts/fetch-ha-data.sh": true
     }
 }
