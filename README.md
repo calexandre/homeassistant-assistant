@@ -56,21 +56,21 @@ The MCP configuration is in [.vscode/mcp.json](.vscode/mcp.json):
 
 ### Fetching Home Assistant Configs
 
-Automations, scenes, scripts, and `configuration.yaml` are **not** exposed by the MCP server.
+Automations, scenes, scripts, `configuration.yaml`, and logs are **not** exposed by the MCP server.
 The following script assumes your homeassistant instance is accessible via SSH on host `homeassistant`.
 
 Use the fetch script to download them via SSH:
 
 ```bash
-scripts/fetch-ha-configs.sh
+scripts/fetch-ha-data.sh
 ```
 
-Config files are saved to `ha-configs/` (gitignored).
+Config files and logs are saved to `ha-data/` (gitignored).
 The script assumes the standard HAOS config path (`/config`).
 To override:
 
 ```bash
-scripts/fetch-ha-configs.sh /custom/config/path
+scripts/fetch-ha-data.sh /custom/config/path
 ```
 
 ## Usage

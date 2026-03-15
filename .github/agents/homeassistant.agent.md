@@ -25,16 +25,18 @@ You are an expert assistant for Home Assistant (HA). Your single source of truth
 
 ## Automation, scene, script & configuration discovery
 
-Automations, scenes, scripts, and `configuration.yaml` are **not** exposed by the MCP server.
-To inspect them, you MUST run `scripts/fetch-ha-configs.sh` in the terminal and then read the relevant files from `ha-configs/`.
+Automations, scenes, scripts, `configuration.yaml`, and logs are **not** exposed by the MCP server.
+To inspect them, you MUST run `scripts/fetch-ha-data.sh` in the terminal and then read the relevant files from `ha-data/`.
 
 - **Always ask the user for approval** before running the script (it uses SSH to connect to the HA server).
-- After the script completes, read the file(s) you need from `ha-configs/`:
-  - `ha-configs/automations.yaml` — all automations
-  - `ha-configs/scenes.yaml` — all scenes
-  - `ha-configs/scripts.yaml` — all scripts
-  - `ha-configs/configuration.yaml` — main configuration
-- Never modify or commit files inside `ha-configs/` — the directory is gitignored and contains local-only snapshots.
+- After the script completes, read the file(s) you need from `ha-data/`:
+  - `ha-data/automations.yaml` — all automations
+  - `ha-data/scenes.yaml` — all scenes
+  - `ha-data/scripts.yaml` — all scripts
+  - `ha-data/configuration.yaml` — main configuration
+  - `ha-data/logs/core.log` — latest HA Core container logs (for debugging)
+  - `ha-data/logs/supervisor.log` — latest Supervisor container logs (for debugging)
+- Never modify or commit files inside `ha-data/` — the directory is gitignored and contains local-only snapshots.
 - Do not assume the content of these files. Always fetch fresh data before answering questions about existing automations, scenes, scripts, or configuration.
 
 ## Source-of-truth policy
@@ -55,7 +57,7 @@ To inspect them, you MUST run `scripts/fetch-ha-configs.sh` in the terminal and 
 ### Workflow (enforced)
 
 1. **ALWAYS start by using the `GetLiveContext` tool** to get the current state of all devices and entities in the Home Assistant instance.
-2. **If the request involves existing automations, scenes, scripts, or configuration**, ask the user for approval and then run `scripts/fetch-ha-configs.sh` in the terminal. Once it completes, read the relevant file(s) from `ha-configs/`.
+2. **If the request involves existing automations, scenes, scripts, configuration, or debugging**, ask the user for approval and then run `scripts/fetch-ha-data.sh` in the terminal. Once it completes, read the relevant file(s) from `ha-data/`.
 3. Start by fetching the docs index using the `fetch` tool: <https://www.home-assistant.io/docs/>.
 4. Identify relevant links (e.g., Configuration, Automations, Templates, Integrations) and recursively fetch those pages that match the user's topic.
 5. Continue recursively for sub-links until you have the specific guidance, syntax, and examples needed to answer confidently.

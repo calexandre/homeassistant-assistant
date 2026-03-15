@@ -8,20 +8,20 @@ GitHub Copilot workspace for building Home Assistant automations, scripts, and c
 
 - Query live entities via the `homeassistant-cazita` MCP server (`GetLiveContext`)
 - Write runnable or scratch output to `.temp/` (gitignored)
-- Run `fetch-ha-configs.sh` to refresh local config snapshots (after approval, see below)
+- Run `fetch-ha-data.sh` to refresh local config snapshots and logs (after approval, see below)
 
 ⚠️ Ask first:
 
-- Any SSH interaction with the Home Assistant server (including `fetch-ha-configs.sh`)
+- Any SSH interaction with the Home Assistant server (including `fetch-ha-data.sh`)
 - Changes to `.github/agents/homeassistant.agent.md` — this is the core agent definition
 - Changes to `.vscode/mcp.json` — MCP connection config
 
 🚫 Never:
 
 - Assume entity IDs — always call `GetLiveContext` first
-- Query automations, scenes, scripts, or `configuration.yaml` via MCP — **these are not exposed by the MCP server**.
-  Run `scripts/fetch-ha-configs.sh` instead, then read from `ha-configs/`
-- Modify or commit files inside gitignored directories (`ha-configs/`, `ha-release-notes/`, `.temp/`)
+- Query automations, scenes, scripts, `configuration.yaml`, or logs via MCP — **these are not exposed by the MCP server**.
+  Run `scripts/fetch-ha-data.sh` instead, then read from `ha-data/`
+- Modify or commit files inside gitignored directories (`ha-data/`, `ha-release-notes/`, `.temp/`)
 - Read or analyze gitignored files for context without being asked — they contain local-only data
 - Reference files under `.github/instructions/.disabled/` — those are archived, not active
 - Bypass git hooks or use `--no-verify`
@@ -31,7 +31,8 @@ GitHub Copilot workspace for building Home Assistant automations, scripts, and c
 | What you need | Where to get it |
 |---|---|
 | Live entity states, devices, areas | MCP server → `GetLiveContext` tool |
-| Automations, scenes, scripts, configuration YAML | `scripts/fetch-ha-configs.sh` → read `ha-configs/*.yaml` |
+| Automations, scenes, scripts, configuration YAML | `scripts/fetch-ha-data.sh` → read `ha-data/*.yaml` |
+| Home Assistant logs (for debugging) | `scripts/fetch-ha-data.sh` → read `ha-data/logs/{core,supervisor}.log` |
 
 The fetch script uses SSH (host alias: `homeassistant`, passwordless login assumed).
 Always get human approval before running it.
@@ -39,11 +40,11 @@ Always get human approval before running it.
 ## Commands
 
 ```bash
-# Refresh local HA config snapshots (requires SSH + human approval)
-scripts/fetch-ha-configs.sh
+# Refresh local HA config snapshots and logs (requires SSH + human approval)
+scripts/fetch-ha-data.sh
 
 # Optional: override config directory (default: /config)
-scripts/fetch-ha-configs.sh /custom/path
+scripts/fetch-ha-data.sh /custom/path
 ```
 
 No build, test, lint, or format commands — this is a documentation-and-config workspace.
