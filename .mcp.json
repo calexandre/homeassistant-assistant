@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "homeassistant-cazita": {
+      "type": "sse",
+      "url": "https://${HA_HOST}/mcp_server/sse",
+      "tools": [
+        "*"
+      ],
+      "headers": {
+        "Authorization": "Bearer ${HA_BEARER_TOKEN}"
+      }
+    }
+  }
+}

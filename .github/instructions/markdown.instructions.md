@@ -44,6 +44,7 @@ Ensure compliance with the following validation requirements:
   - `categories`: The categories for the post. These categories must be from the list in /categories.txt.
   - `tags`: The tags for the post.
   - `ai_note`: Indicate if AI was used in the creation of the post.
+  - `ai_model`: If AI was used, specify the model used for content generation.
   - `summary`: A brief summary of the post. Recommend a summary based on the content when possible.
   - `post_date`: The publication date of the post.
 
