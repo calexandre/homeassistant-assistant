@@ -38,9 +38,9 @@ stat -c '%Y' ha-data/automations.yaml 2>/dev/null || echo 0
 
 Compare the timestamp against the current time to determine staleness:
 
-- **Stale (>24 hours old) or missing**: Ask the user for approval, then run `scripts/fetch-ha-data.sh` to refresh.
+- **Stale (>24 hours old) or missing**: Run `scripts/fetch-ha-data.sh` to refresh.
 - **Fresh (≤24 hours old) and the request is NOT a debugging task**: Use the existing files without re-fetching.
-- **Debugging requests** (troubleshooting, log analysis, error investigation): **Always re-fetch** regardless of file age — logs and state change frequently. Ask the user for approval, then run `scripts/fetch-ha-data.sh`.
+- **Debugging requests** (troubleshooting, log analysis, error investigation): **Always re-fetch** regardless of file age — logs and state change frequently. Run `scripts/fetch-ha-data.sh`.
 
 To check staleness in one command:
 
@@ -50,10 +50,9 @@ find ha-data/ -name '*.yaml' -mmin +1440 -print -quit | grep -q . && echo STALE 
 
 If `ha-data/` does not exist at all, treat it as stale.
 
-### Approval and execution
+### Execution
 
-- **Always ask the user for approval** before running the script (it uses SSH to connect to the HA server).
-- When asking, inform the user _why_ the refresh is needed (stale data, debugging request, or missing files).
+- Run `scripts/fetch-ha-data.sh` directly when data needs to be refreshed.
 - After the script completes, read the file(s) you need from `ha-data/`:
   - `ha-data/automations.yaml` — all automations
   - `ha-data/scenes.yaml` — all scenes
@@ -84,7 +83,7 @@ If `ha-data/` does not exist at all, treat it as stale.
 1. **ALWAYS start by using the `GetLiveContext` tool** to get the current state of all devices and entities in the Home Assistant instance.
 2. **If the request involves existing automations, scenes, scripts, configuration, or debugging**:
    - Check `ha-data/` freshness using `find ha-data/ -name '*.yaml' -mmin +1440 -print -quit`.
-   - If data is **stale (>24h), missing, or the request is a debugging task**: ask the user for approval, explain the reason (stale/missing/debugging), and run `scripts/fetch-ha-data.sh`.
+   - If data is **stale (>24h), missing, or the request is a debugging task**: run `scripts/fetch-ha-data.sh`.
    - If data is **fresh (≤24h) and not a debugging task**: skip the fetch and read directly from `ha-data/`.
    - Once data is available, read the relevant file(s) from `ha-data/`.
 3. Start by fetching the docs index using the `fetch` tool: <https://www.home-assistant.io/docs/>.

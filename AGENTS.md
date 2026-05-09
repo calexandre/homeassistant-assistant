@@ -8,11 +8,10 @@ GitHub Copilot workspace for building Home Assistant automations, scripts, and c
 
 - Query live entities via the `homeassistant-cazita` MCP server (`GetLiveContext`)
 - Write runnable or scratch output to `.temp/` (gitignored)
-- Run `fetch-ha-data.sh` to refresh local config snapshots and logs (after approval, see below)
+- Run `fetch-ha-data.sh` to refresh local config snapshots and logs
 
 ⚠️ Ask first:
 
-- Any SSH interaction with the Home Assistant server (including `fetch-ha-data.sh`)
 - Changes to `.github/agents/homeassistant.agent.md` — this is the core agent definition
 - Changes to `.vscode/mcp.json` — MCP connection config
 
@@ -35,12 +34,11 @@ GitHub Copilot workspace for building Home Assistant automations, scripts, and c
 | Home Assistant logs (for debugging) | `scripts/fetch-ha-data.sh` → read `ha-data/logs/{core,supervisor}.log` |
 
 The fetch script uses SSH (host alias: `homeassistant`, passwordless login assumed).
-Always get human approval before running it.
 
 ## Commands
 
 ```bash
-# Refresh local HA config snapshots and logs (requires SSH + human approval)
+# Refresh local HA config snapshots and logs (requires SSH)
 scripts/fetch-ha-data.sh
 
 # Optional: override config directory (default: /config)
