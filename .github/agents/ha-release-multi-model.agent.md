@@ -1,7 +1,7 @@
 ---
 name: HA Release Multi-Model 🧪
 description: Orchestrator that generates HA release note summaries across multiple AI models for comparison and benchmarking.
-tools: [vscode/askQuestions, read/readFile, agent, edit/createFile, web, todo]
+tools: [vscode/askQuestions, read/terminalSelection, read/terminalLastCommand, read/readFile, read/viewImage, agent, edit/createFile, web, todo]
 argument-hint: Release URL or version (e.g. 2026.5), optionally with model overrides
 agents: [Home Assistant Agent 🏠]
 ---
