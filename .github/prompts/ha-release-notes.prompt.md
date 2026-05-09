@@ -97,8 +97,25 @@ If no URL is provided, use the latest release from: `https://www.home-assistant.
 
 Save the generated summary to the `ha-release-notes/` folder using this naming convention:
 - **Filename**: `ha-release-[VERSION].md` (e.g., `ha-release-2026.1.md`)
+- The file MUST begin with this YAML front matter block before any headings:
+
+```yaml
+---
+author: "<name of the user who ran the query>"
+categories:
+  - home-assistant
+  - release-notes
+tags:
+  - ha-<VERSION>
+model: "<AI model that generated this file>"
+summary: "<one-sentence summary of the release impact on this setup>"
+date: "<YYYY-MM-DD date of generation>"
+---
+```
+
 - If the file already exists, update it with the latest content
-- If the file does not exist, create it
+- If the file already exists without front matter, prepend the YAML block before the first heading
+- If the file does not exist, create it with the front matter block first
 
 ## Example Usage
 
