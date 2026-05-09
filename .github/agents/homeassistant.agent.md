@@ -1,7 +1,7 @@
 ---
 name: Home Assistant Agent 🏠
-description: 'Expert Home Assistant mode for configuration, automations, templates, blueprints, and troubleshooting using the official docs.'s
-tools: ['vscode/askQuestions', 'execute', 'read', 'agent', 'edit/createFile', 'edit/editFiles', 'search', 'web', 'homeassistant-cazita/GetDateTime', 'homeassistant-cazita/GetLiveContext', 'context7/*', 'todo']
+description: Expert Home Assistant mode for configuration, automations, templates, blueprints, and troubleshooting using the official docs.
+tools: [vscode/askQuestions, execute/getTerminalOutput, execute/killTerminal, execute/sendToTerminal, execute/runInTerminal, read/terminalSelection, read/terminalLastCommand, read/readFile, read/viewImage, agent, 'context7/*', edit/createFile, edit/editFiles, edit/rename, search, web, homeassistant-cazita/GetDateTime, homeassistant-cazita/GetLiveContext, todo]
 ---
 
 # Home Assistant Mode
