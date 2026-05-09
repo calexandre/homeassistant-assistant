@@ -1,6 +1,7 @@
 ---
 description: 'Analyze Home Assistant release notes and provide personalized summaries based on your current smart home setup. Includes highlights, integration improvements, and backward-incompatible change impact assessment.'
 agent: 'Home Assistant Agent 🏠'
+model: GPT-
 ---
 
 # Home Assistant Release Notes Analyzer
@@ -57,6 +58,8 @@ If no URL is provided, use the latest release from: `https://www.home-assistant.
 
 **IMPORTANT**: Use only headings and bullet points throughout the entire report. Do NOT use markdown tables in any section.
 
+````markdown
+
 # 🏠 Release Summary for [Version]
 
 ## [Feature Name](URL#anchor)
@@ -112,6 +115,7 @@ summary: "<one-sentence summary of the release impact on this setup>"
 date: "<YYYY-MM-DD date of generation>"
 ---
 ```
+````
 
 - If the file already exists, update it with the latest content
 - If the file already exists without front matter, prepend the YAML block before the first heading

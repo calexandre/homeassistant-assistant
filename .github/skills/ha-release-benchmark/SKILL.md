@@ -22,31 +22,33 @@ Report which models were detected and stop.
 ```text
 User: benchmark the 2026.5 release note results
 → Skill detects .temp/2026.5/gemini31/ and .temp/2026.5/kimi26/
-→ Builds ground-truth spec → Scores both → Writes results
+→ Reuses existing ground-truth spec if present, otherwise builds it → Scores both → Writes results
 ```
 
 ## Workflow
 
-### Step 1 — Build ground-truth spec
+### Step 1 — Load or build ground-truth spec
 
 1. Accept HA release version from user (e.g. `2026.5`)
 2. Discover models: list dirs in `.temp/<version>/` with `ha-release-<version>.md`
-3. Fetch the release blog post from `https://www.home-assistant.io/blog/`
-4. Call `GetLiveContext` for live entity/device/area data
-5. Read `ha-data/automations.yaml`, `scenes.yaml`, `scripts.yaml`, `configuration.yaml`
-6. Extract from the release blog:
+3. Check for an existing spec at `.temp/<version>/ha-release-<version>-benchmark-spec.md`
+4. If the spec already exists, reuse it and skip the remaining ground-truth build steps unless the user explicitly asks to rebuild it
+5. If the spec does not exist, fetch the release blog post from `https://www.home-assistant.io/blog/`
+6. Call `GetLiveContext` for live entity/device/area data
+7. Read `ha-data/automations.yaml`, `scenes.yaml`, `scripts.yaml`, `configuration.yaml`
+8. Extract from the release blog:
    - Every feature highlight (with anchor IDs)
    - Every new integration
    - Every integration improvement
    - Every breaking change
-7. Cross-reference each item against the setup:
+9. Cross-reference each item against the setup:
    - **Relevant** — integration/entity/automation exists
    - **Potentially relevant** — related category exists
    - **Not relevant** — no overlap
-8. Identify known non-matches (things models must NOT claim exist)
-9. Identify automations using standard state `for:` triggers vs
+10. Identify known non-matches (things models must NOT claim exist)
+11. Identify automations using standard state `for:` triggers vs
    purpose-specific triggers (models must not confuse these)
-10. Write spec to `.temp/<version>/ha-release-<version>-benchmark-spec.md`
+12. Write spec to `.temp/<version>/ha-release-<version>-benchmark-spec.md`
 
 ### Step 2 — Score each model
 
@@ -82,6 +84,8 @@ output template in [REFERENCE.md](REFERENCE.md). Must include:
 
 - **Never fabricate ground truth.** Every fact must trace to the release blog,
   `GetLiveContext`, or `ha-data/*.yaml`.
+- **Reuse the existing spec when present.** Only rebuild `.temp/<version>/ha-release-<version>-benchmark-spec.md`
+  when it is missing or the user explicitly asks for a rebuild.
 - **Cite evidence.** Quote model text and ground-truth source when scoring.
 - **Distinguish trigger types.** Standard state triggers with `for:` are NOT
   purpose-specific triggers. Penalize models that confuse these in D4.
