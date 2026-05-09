@@ -2,33 +2,33 @@
 
 ## Scoring Rubrics
 
-### D1 — Coverage (15%)
+### D1 — 📊 Coverage (15%)
 
 How many release features, new integrations, integration improvements,
 and breaking changes did the model include?
 
-- **0** — Fewer than 30% of release highlights covered
-- **1** — 30-50% covered
-- **2** — 50-65% covered
-- **3** — 65-80% covered
-- **4** — 80-95% covered
-- **5** — 95%+ of all highlights, integrations, and breaking changes covered
+- **0** 🔴 — Fewer than 30% of release highlights covered
+- **1** 🟠 — 30-50% covered
+- **2** 🟡 — 50-65% covered
+- **3** 🟢 — 65-80% covered
+- **4** 🟢 — 80-95% covered
+- **5** 🏆 — 95%+ of all highlights, integrations, and breaking changes covered
 
 Count method: tally features in the release blog, then check which ones
 appear in the model's output. Calculate `covered / total`.
 
-### D2 — Factual Accuracy (25%)
+### D2 — 🎯 Factual Accuracy (25%)
 
 Are claims about the user's setup correct? Cross-reference every entity ID,
 automation alias, integration name, and device reference against
 `GetLiveContext` and `ha-data/*.yaml`.
 
-- **0** — Multiple fabricated setup details (hallucinated devices/integrations)
-- **1** — 1-2 fabricated details plus multiple minor inaccuracies
-- **2** — No fabrications but several incorrect claims
-- **3** — No fabrications, 1-2 minor inaccuracies
-- **4** — All setup references verified correct, minor imprecision in feature descriptions
-- **5** — Every claim about the setup and every feature description is verifiably accurate
+- **0** 🔴 — Multiple fabricated setup details (hallucinated devices/integrations)
+- **1** 🟠 — 1-2 fabricated details plus multiple minor inaccuracies
+- **2** 🟡 — No fabrications but several incorrect claims
+- **3** 🟢 — No fabrications, 1-2 minor inaccuracies
+- **4** 🟢 — All setup references verified correct, minor imprecision in feature descriptions
+- **5** 🏆 — Every claim about the setup and every feature description is verifiably accurate
 
 Key checks:
 
@@ -36,30 +36,30 @@ Key checks:
 - Are automation aliases spelled correctly and matched to the right behavior?
 - Are entity IDs valid and in the correct domain?
 
-### D3 — Personalization Depth (20%)
+### D3 — 🏠 Personalization Depth (20%)
 
 How specifically does the model connect release features to the user's
 actual automations, devices, and workflows?
 
-- **0** — Generic descriptions with no setup references
-- **1** — Mentions area/device names but no specific automations or entity IDs
-- **2** — References some automations by alias but doesn't explain the connection
-- **3** — Names specific automations/entities and explains how the feature relates
-- **4** — Provides actionable advice tied to specific automations with correct technical detail
-- **5** — Deep cross-referencing: names automations, quotes trigger/condition patterns,
+- **0** 🔴 — Generic descriptions with no setup references
+- **1** 🟠 — Mentions area/device names but no specific automations or entity IDs
+- **2** 🟡 — References some automations by alias but doesn't explain the connection
+- **3** 🟢 — Names specific automations/entities and explains how the feature relates
+- **4** 🟢 — Provides actionable advice tied to specific automations with correct technical detail
+- **5** 🏆 — Deep cross-referencing: names automations, quotes trigger/condition patterns,
   explains exactly what changes and why
 
-### D4 — Technical Correctness (15%)
+### D4 — 🔧 Technical Correctness (15%)
 
 When the model explains how a feature applies to the setup, is the
 technical reasoning sound?
 
-- **0** — Fundamental misunderstanding of HA concepts
-- **1** — Multiple technical errors in feature-to-setup mapping
-- **2** — Mostly correct but misclassifies trigger types or misapplies feature scope
-- **3** — Sound reasoning with 1-2 edge-case errors
-- **4** — Technically correct throughout, minor imprecision
-- **5** — Flawless technical analysis
+- **0** 🔴 — Fundamental misunderstanding of HA concepts
+- **1** 🟠 — Multiple technical errors in feature-to-setup mapping
+- **2** 🟡 — Mostly correct but misclassifies trigger types or misapplies feature scope
+- **3** 🟢 — Sound reasoning with 1-2 edge-case errors
+- **4** 🟢 — Technically correct throughout, minor imprecision
+- **5** 🏆 — Flawless technical analysis
 
 Common pitfalls to check:
 
@@ -68,39 +68,39 @@ Common pitfalls to check:
 - Confusing `delay` actions with trigger durations
 - Misattributing entity domains
 
-### D5 — Breaking Changes Rigor (10%)
+### D5 — ⚠️ Breaking Changes Rigor (10%)
 
 How thoroughly does the model assess backward-incompatible changes?
 
-- **0** — Breaking changes section missing or copy-pasted
-- **1** — Lists breaking changes but doesn't check against setup
-- **2** — Checks some breaking changes, misses others
-- **3** — Checks all, provides Yes/No but limited explanation
-- **4** — Checks all, explains why each does/doesn't apply with config references
-- **5** — Checks all, cites specific YAML lines/entities, explains migration path
+- **0** 🔴 — Breaking changes section missing or copy-pasted
+- **1** 🟠 — Lists breaking changes but doesn't check against setup
+- **2** 🟡 — Checks some breaking changes, misses others
+- **3** 🟢 — Checks all, provides Yes/No but limited explanation
+- **4** 🟢 — Checks all, explains why each does/doesn't apply with config references
+- **5** 🏆 — Checks all, cites specific YAML lines/entities, explains migration path
 
-### D6 — Actionability (10%)
+### D6 — ✅ Actionability (10%)
 
 Does the output tell the user what to do after updating?
 
-- **0** — No action items
-- **1** — Generic "safe to update" without specifics
-- **2** — Mentions a few things to check post-update
-- **3** — Lists concrete follow-up actions tied to setup
-- **4** — Prioritized action list with specific automations/entities to review
-- **5** — Step-by-step post-update checklist with entities, expected new features,
+- **0** 🔴 — No action items
+- **1** 🟠 — Generic "safe to update" without specifics
+- **2** 🟡 — Mentions a few things to check post-update
+- **3** 🟢 — Lists concrete follow-up actions tied to setup
+- **4** 🟢 — Prioritized action list with specific automations/entities to review
+- **5** 🏆 — Step-by-step post-update checklist with entities, expected new features,
   and optional improvements
 
-### D7 — Format Compliance (5%)
+### D7 — 📝 Format Compliance (5%)
 
 Does the output follow the `ha-release-notes` prompt's format spec?
 
-- **0** — Ignores the format entirely
-- **1** — Partial structure, missing major sections
-- **2** — All sections present but uses tables where bullet points are required
-- **3** — Correct structure, minor formatting issues
-- **4** — Fully compliant, all section links work, proper markdown
-- **5** — Perfect compliance: correct headings, linked feature names, no tables,
+- **0** 🔴 — Ignores the format entirely
+- **1** 🟠 — Partial structure, missing major sections
+- **2** 🟡 — All sections present but uses tables where bullet points are required
+- **3** 🟢 — Correct structure, minor formatting issues
+- **4** 🟢 — Fully compliant, all section links work, proper markdown
+- **5** 🏆 — Perfect compliance: correct headings, linked feature names, no tables,
   proper front matter
 
 Format spec requirements (from the prompt):
@@ -129,22 +129,22 @@ models_detected:
 ## Features in Release
 
 <!-- Every highlight section from the release blog -->
-- [ ] Feature 1 (`#anchor-id`) — Relevant / Potentially relevant / Not relevant
+- [ ] Feature 1 (`#anchor-id`) — 🟢 Relevant / 🟡 Potentially relevant / ⚪ Not relevant
 - [ ] Feature 2 (`#anchor-id`) — ...
 
 ## New Integrations in Release
 
-- [ ] Integration 1 — Relevant / Not relevant — reason
+- [ ] Integration 1 — 🟢 Relevant / ⚪ Not relevant — reason
 - [ ] Integration 2 — ...
 
 ## Integration Improvements in Release
 
-- [ ] Integration 1: description — Relevant / Not relevant — reason
+- [ ] Integration 1: description — 🟢 Relevant / ⚪ Not relevant — reason
 - [ ] Integration 2: ...
 
 ## Breaking Changes in Release
 
-- [ ] Breaking change 1 — Affects setup: Yes/No — evidence
+- [ ] Breaking change 1 — Affects setup: ❌ Yes / ✅ No — evidence
 - [ ] Breaking change 2 — ...
 
 ## Setup Cross-Reference
@@ -197,16 +197,16 @@ spec_file: "ha-release-<VERSION>-benchmark-spec.md"
 
 | Dimension | Score (0-5) | Weight | Weighted |
 |---|---|---|---|
-| D1 Coverage | X | 15% | X.X |
-| D2 Factual Accuracy | X | 25% | X.X |
-| D3 Personalization Depth | X | 20% | X.X |
-| D4 Technical Correctness | X | 15% | X.X |
-| D5 Breaking Changes Rigor | X | 10% | X.X |
-| D6 Actionability | X | 10% | X.X |
-| D7 Format Compliance | X | 5% | X.X |
+| 📊 D1 Coverage | X | 15% | X.X |
+| 🎯 D2 Factual Accuracy | X | 25% | X.X |
+| 🏠 D3 Personalization Depth | X | 20% | X.X |
+| 🔧 D4 Technical Correctness | X | 15% | X.X |
+| ⚠️ D5 Breaking Changes Rigor | X | 10% | X.X |
+| ✅ D6 Actionability | X | 10% | X.X |
+| 📝 D7 Format Compliance | X | 5% | X.X |
 | **Total** | | | **X.X / 100** |
 
-### D1 Coverage Notes
+### 📊 D1 Coverage Notes
 
 - Features covered: X / Y
 - New integrations covered: X / Y
@@ -214,50 +214,50 @@ spec_file: "ha-release-<VERSION>-benchmark-spec.md"
 - Breaking changes covered: X / Y
 - Notable omissions: ...
 
-### D2 Factual Accuracy Notes
+### 🎯 D2 Factual Accuracy Notes
 
 - Fabricated claims: ...
 - Incorrect references: ...
 - Verified correct references: ...
 
-### D3 Personalization Depth Notes
+### 🏠 D3 Personalization Depth Notes
 
 - Automations named: ...
 - Entity IDs referenced: ...
 - Quality of mapping: ...
 
-### D4 Technical Correctness Notes
+### 🔧 D4 Technical Correctness Notes
 
 - Trigger type errors: ...
 - Feature scope misapplications: ...
 - Correct technical insights: ...
 
-### D5 Breaking Changes Notes
+### ⚠️ D5 Breaking Changes Notes
 
 - Breaking changes checked: X / Y
 - False negatives: ...
 - False positives: ...
 
-### D6 Actionability Notes
+### ✅ D6 Actionability Notes
 
 - Post-update actions listed: ...
 - Specificity: ...
 
-### D7 Format Compliance Notes
+### 📝 D7 Format Compliance Notes
 
 - Missing sections: ...
 - Link quality: ...
 - Table/bullet compliance: ...
 
-### Strengths
+### 💪 Strengths
 
 - ...
 
-### Weaknesses
+### 👎 Weaknesses
 
 - ...
 
-### Notable Hallucinations
+### 🚨 Notable Hallucinations
 
 - ...
 
@@ -265,33 +265,33 @@ spec_file: "ha-release-<VERSION>-benchmark-spec.md"
 
 <!-- Repeat the above block for each model -->
 
-## Comparative Summary
+## 🏁 Comparative Summary
 
 ### Final Scores
 
-| Model | D1 | D2 | D3 | D4 | D5 | D6 | D7 | Total |
+| Model | 📊 D1 | 🎯 D2 | 🏠 D3 | 🔧 D4 | ⚠️ D5 | ✅ D6 | 📝 D7 | Total |
 |---|---|---|---|---|---|---|---|---|
 | model_1 | X.X | X.X | X.X | X.X | X.X | X.X | X.X | X.X / 100 |
 | model_2 | X.X | X.X | X.X | X.X | X.X | X.X | X.X | X.X / 100 |
 
-### Ranking
+### 🥇 Ranking
 
 1. **Model X** — Total: XX.X/100 — [1-sentence verdict]
 2. **Model Y** — Total: XX.X/100 — [1-sentence verdict]
 
-### Dimension Winners
+### 🏅 Dimension Winners
 
 | Dimension | Best Model | Why |
 |---|---|---|
-| D1 Coverage | | |
-| D2 Factual Accuracy | | |
-| D3 Personalization | | |
-| D4 Technical Correctness | | |
-| D5 Breaking Changes | | |
-| D6 Actionability | | |
-| D7 Format Compliance | | |
+| 📊 D1 Coverage | | |
+| 🎯 D2 Factual Accuracy | | |
+| 🏠 D3 Personalization | | |
+| 🔧 D4 Technical Correctness | | |
+| ⚠️ D5 Breaking Changes | | |
+| ✅ D6 Actionability | | |
+| 📝 D7 Format Compliance | | |
 
-### Key Observations
+### 💡 Key Observations
 
 - ...
 - ...
