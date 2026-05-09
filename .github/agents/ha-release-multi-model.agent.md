@@ -118,8 +118,24 @@ After reporting results, use `askQuestions` to ask the user:
 - **Question**: "Do you want to benchmark the generated results now?"
 - **Options**: "Yes" (recommended), "No"
 
-If the user selects "Yes", tell the user to invoke the `ha-release-benchmark` skill with the version number.
-The orchestrator does not run the benchmark itself.
+If the user selects "Yes", immediately call `runSubagent` once to run the benchmark workflow.
+
+Use this tool call:
+
+```
+runSubagent(
+  agentName: "Home Assistant Agent 🏠",
+  description: "HA release benchmark <VERSION>",
+  prompt: "benchmark <VERSION>"
+)
+```
+
+If the benchmark subagent succeeds, report:
+
+- `.temp/<VERSION>/ha-release-<VERSION>-benchmark-results.md`
+
+If it fails, report the error.
+Do not tell the user to invoke the benchmark manually.
 
 ## Rules
 
@@ -128,6 +144,7 @@ The orchestrator does not run the benchmark itself.
 - **Call runSubagent for EVERY provided model.** If 3 models are in the list, make 3 separate runSubagent calls.
 - **Never use minor or patch versions.** Only major releases (e.g., `2026.5`, not `2026.5.1`).
 - **Skip failures, continue.** If a subagent errors out, log it and move to the next model.
+- **If the user says yes to benchmarking,** run exactly one benchmark subagent after the multi-model summary.
 - **Output to `.temp/` only.** Never write benchmark or multi-model outputs elsewhere.
 - **Do not modify `ha-release-notes.prompt.md`.** Reference it as-is.
 - **Each subagent is independent.** No shared state between model runs.
