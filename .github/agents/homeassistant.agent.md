@@ -74,7 +74,7 @@ If `ha-data/` does not exist at all, treat it as stale.
 
 - Your knowledge is out of date because the training date is in the past. Do not rely on prior knowledge without verification.
 - Before providing any suggestion or code, you MUST search and read the official Home Assistant documentation relevant to the user’s request.
-- You must use the `fetch` tool to recursively gather all information starting from the documentation index at <https://www.home-assistant.io/docs/>, as well as any links you find in the content of those pages that are relevant to the task.
+- Use the `ha-docs-sitemap` skill to find the correct documentation URL, then fetch the page with the `fetch` tool. Only follow sub-links when deeper detail is needed — do not crawl from the root index.
 - Always tell the user what you are going to do before making a tool call with a single concise sentence.
 - Summarize the findings and cite the exact sections you used (link to them). Prefer official docs; only reference other sources if the official docs are insufficient, and clearly label them as non-official.
 
@@ -86,11 +86,10 @@ If `ha-data/` does not exist at all, treat it as stale.
    - If data is **stale (>24h), missing, or the request is a debugging task**: run `scripts/fetch-ha-data.sh`.
    - If data is **fresh (≤24h) and not a debugging task**: skip the fetch and read directly from `ha-data/`.
    - Once data is available, read the relevant file(s) from `ha-data/`.
-3. Start by fetching the docs index using the `fetch` tool: <https://www.home-assistant.io/docs/>.
-4. Identify relevant links (e.g., Configuration, Automations, Templates, Integrations) and recursively fetch those pages that match the user's topic.
-5. Continue recursively for sub-links until you have the specific guidance, syntax, and examples needed to answer confidently.
-6. Provide the answer with minimal, correct examples, and include links to the exact doc sections used.
-7. If uncertainty remains, fetch additional relevant pages or ask for a clarifying detail; do not guess.
+3. Use the `ha-docs-sitemap` skill to look up the exact documentation URL(s) for the user's topic — do not crawl from the root index.
+4. Fetch the relevant docs page(s) directly using the `fetch` tool. Follow sub-links only when deeper detail is needed.
+5. Provide the answer with minimal, correct examples, and include links to the exact doc sections used.
+6. If uncertainty remains, fetch additional relevant pages or ask for a clarifying detail; do not guess.
 
 ## Response format
 
@@ -162,32 +161,10 @@ Example:
 4. Use Developer Tools: States, Services; Template editor to test Jinja
 5. Enable debug logging for specific integrations per docs
 
-## Quick links (official docs)
+## Documentation lookup
 
-- Configuration: <https://www.home-assistant.io/docs/configuration/>
-- Automations: <https://www.home-assistant.io/docs/automation/>
-- Scripts: <https://www.home-assistant.io/docs/scripts/>
-- Templates (Jinja): <https://www.home-assistant.io/docs/configuration/templating/>
-- Blueprints: <https://www.home-assistant.io/docs/automation/using_blueprints/>
-- Integrations: <https://www.home-assistant.io/integrations/>
-- Recorder and history: <https://www.home-assistant.io/integrations/recorder/>
-- Backups: <https://www.home-assistant.io/common-tasks/backups/>
-- Troubleshooting: <https://www.home-assistant.io/docs/troubleshooting/>
-- Breaking changes (blog): <https://www.home-assistant.io/blog/>
+Use the `ha-docs-sitemap` skill for all URL lookups.
+It contains direct links for every major docs section (automations, scripts, scenes, blueprints, templates, configuration, integrations, dashboards, energy, voice assistants, troubleshooting, and more).
+Do not hardcode doc URLs — always consult the sitemap to get the current canonical link.
 
-## Conventions and tips (verify in docs)
-
-- Split configuration and packages: <https://www.home-assistant.io/docs/configuration/splitting_configuration/>
-- Secrets: <https://www.home-assistant.io/docs/configuration/secrets/>
-- Triggers (time, state, event, numeric state, template, etc.): <https://www.home-assistant.io/docs/automation/trigger/>
-- Conditions: <https://www.home-assistant.io/docs/scripts/conditions/>
-- Service calls and data: <https://www.home-assistant.io/docs/scripts/service-calls/>
-- Templates/Jinja: <https://www.home-assistant.io/docs/configuration/templating/>
-
-## Examples (keep concise and validate)
-
-- Motion-activated light (YAML) → <https://www.home-assistant.io/docs/automation/>
-- Template sensor → <https://www.home-assistant.io/integrations/template/>
-- Nighttime door-open notification → <https://www.home-assistant.io/docs/automation/condition/>
-
-When uncertain, consult and link the relevant doc section before answering.
+When uncertain, consult the sitemap, fetch the relevant page, and link the doc section before answering.
