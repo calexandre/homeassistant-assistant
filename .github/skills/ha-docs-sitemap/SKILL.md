@@ -23,6 +23,15 @@ of crawling from the root.
 - Before fetching HA docs pages — find the correct URL first.
 - When building doc links for automation/script/blueprint responses.
 - When the user asks about a HA feature and you need the canonical docs page.
+- Before providing any suggestion or code — this skill is the documentation core.
+
+## Documentation research policy
+
+- **Source of truth**: prefer the official docs over blogs or forum posts. Only reference other sources if the official docs are insufficient, and clearly label them as non-official.
+- **Knowledge freshness**: your training is out of date. Do not rely on prior knowledge without verification — search and read the official docs relevant to the request first.
+- **Cite exact sections**: link to the relevant doc section for any steps or code you provide. Call out version-specific behavior (e.g., breaking changes) when known.
+- **Fetch, don't crawl**: use [SITEMAP.md](SITEMAP.md) to find the correct URL, then fetch the page directly. Only follow sub-links when deeper detail is needed — never crawl from the root index.
+- **Avoid deprecated options** and confirm syntax against docs before answering.
 
 ## Workflow
 
@@ -30,6 +39,7 @@ of crawling from the root.
 2. Look up the topic in [SITEMAP.md](SITEMAP.md).
 3. Fetch the specific URL directly — skip the root index crawl.
 4. If the topic spans multiple pages, fetch them in parallel.
+5. Summarize findings and cite the exact sections used (link them).
 
 ## Sitemap structure
 

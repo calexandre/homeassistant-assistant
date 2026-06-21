@@ -22,8 +22,7 @@ If no URL is provided, use the latest release from: `https://www.home-assistant.
    - Note the integrations, device types, and domains in use
 
 2. **Fetch Home Assistant Configs**
-   - Run `scripts/fetch-ha-data.sh` to download the latest automations, scenes, scripts, configuration YAML, and logs from the live instance
-   - Read `ha-data/automations.yaml`, `ha-data/scenes.yaml`, `ha-data/scripts.yaml`, and `ha-data/configuration.yaml`
+   - Invoke the `ha-config-fetch` skill to refresh and read the latest automations, scenes, scripts, configuration YAML, and logs from the live instance
    - Note all integrations, services, entity IDs, triggers, conditions, and actions referenced in the configs
 
 3. **Fetch Release Notes**
@@ -48,7 +47,7 @@ If no URL is provided, use the latest release from: `https://www.home-assistant.
 
 7. **Backward-Incompatible Changes Assessment**
 
-   Cross-reference each breaking change against **both** the live entity context (from `GetLiveContext`) **and** the fetched config files (from `ha-data/`):
+   Cross-reference each breaking change against **both** the live entity context (from `GetLiveContext`) **and** the fetched config files (via the `ha-config-fetch` skill):
    - **Integration**: Name
    - **Affected**: Yes/No — check if the integration, service, entity ID, or deprecated feature appears in automations, scenes, scripts, or configuration YAML
    - **Config Impact**: List any automations, scenes, or scripts that reference the affected integration or deprecated functionality (by alias or entity ID)

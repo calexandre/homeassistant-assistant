@@ -83,7 +83,7 @@ IMPORTANT — File output override:
 - Create the directory path if it does not exist
 - This override replaces the "File Output" section in the prompt file
 
-Execute the full workflow: GetLiveContext, fetch-ha-data.sh, fetch the release blog, generate the personalized summary, and write the file.
+Execute the full workflow: GetLiveContext, the `ha-config-fetch` skill (for config snapshots), fetch the release blog, generate the personalized summary, and write the file.
 ```
 
 Substitute `<RELEASE_URL>`, `<VERSION>`, and `<MODEL_SLUG>` with actual values.
@@ -139,7 +139,7 @@ Do not tell the user to invoke the benchmark manually.
 
 ## Rules
 
-- **You are a dispatcher, not an executor.** Never run GetLiveContext, fetch-ha-data.sh, or fetch release notes yourself. Only subagents do that.
+- **You are a dispatcher, not an executor.** Never run GetLiveContext, the `ha-config-fetch` skill, or fetch release notes yourself. Only subagents do that.
 - **Models are mandatory.** If the user does not provide them, list the available models in the current session and stop.
 - **Call runSubagent for EVERY provided model.** If 3 models are in the list, make 3 separate runSubagent calls.
 - **Never use minor or patch versions.** Only major releases (e.g., `2026.5`, not `2026.5.1`).

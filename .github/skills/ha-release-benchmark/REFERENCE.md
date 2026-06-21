@@ -21,7 +21,7 @@ appear in the model's output. Calculate `covered / total`.
 
 Are claims about the user's setup correct? Cross-reference every entity ID,
 automation alias, integration name, and device reference against
-`GetLiveContext` and `ha-data/*.yaml`.
+`GetLiveContext` and config snapshots fetched via the `ha-config-fetch` skill.
 
 - **0** 🔴 — Multiple fabricated setup details (hallucinated devices/integrations)
 - **1** 🟠 — 1-2 fabricated details plus multiple minor inaccuracies
@@ -164,7 +164,7 @@ models_detected:
 ### Known Non-Matches
 
 <!-- Things models must NOT claim exist in the setup -->
-- integration_x: NOT present — checked GetLiveContext and ha-data/
+- integration_x: NOT present — checked GetLiveContext and the `ha-config-fetch` skill snapshots
 - device_y: NOT present
 
 ### Trigger Type Classification

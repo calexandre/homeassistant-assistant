@@ -35,7 +35,7 @@ User: benchmark the 2026.5 release note results
 4. If the spec already exists, reuse it and skip the remaining ground-truth build steps unless the user explicitly asks to rebuild it
 5. If the spec does not exist, fetch the release blog post from `https://www.home-assistant.io/blog/`
 6. Call `GetLiveContext` for live entity/device/area data
-7. Read `ha-data/automations.yaml`, `scenes.yaml`, `scripts.yaml`, `configuration.yaml`
+7. Invoke the `ha-config-fetch` skill to refresh and read `automations.yaml`, `scenes.yaml`, `scripts.yaml`, `configuration.yaml`
 8. Extract from the release blog:
    - Every feature highlight (with anchor IDs)
    - Every new integration
@@ -83,7 +83,7 @@ output template in [REFERENCE.md](REFERENCE.md). Must include:
 ## Rules
 
 - **Never fabricate ground truth.** Every fact must trace to the release blog,
-  `GetLiveContext`, or `ha-data/*.yaml`.
+  `GetLiveContext`, or config snapshots fetched via the `ha-config-fetch` skill.
 - **Reuse the existing spec when present.** Only rebuild `.temp/<version>/ha-release-<version>-benchmark-spec.md`
   when it is missing or the user explicitly asks for a rebuild.
 - **Cite evidence.** Quote model text and ground-truth source when scoring.

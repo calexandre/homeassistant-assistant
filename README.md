@@ -62,7 +62,7 @@ The following script assumes your homeassistant instance is accessible via SSH o
 Use the fetch script to download them via SSH:
 
 ```bash
-scripts/fetch-ha-data.sh
+.github/skills/ha-config-fetch/fetch-ha-data.sh
 ```
 
 Config files and logs are saved to `ha-data/` (gitignored).
@@ -70,7 +70,7 @@ The script assumes the standard HAOS config path (`/config`).
 To override:
 
 ```bash
-scripts/fetch-ha-data.sh /custom/config/path
+.github/skills/ha-config-fetch/fetch-ha-data.sh /custom/config/path
 ```
 
 ## Usage
