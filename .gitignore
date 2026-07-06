@@ -7,3 +7,7 @@ ha-release-notes
 
 # Local HA data
 ha-data
+
+# Python bytecode
+__pycache__/
+*.pyc

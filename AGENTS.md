@@ -31,6 +31,9 @@ GitHub Copilot workspace for building Home Assistant automations, scripts, and c
 |---|---|
 | Live entity states, devices, areas | MCP server → `GetLiveContext` tool |
 | Automations, scenes, scripts, configuration YAML | `.github/skills/ha-config-fetch/fetch-ha-data.sh` → read `ha-data/*.yaml` |
+| Entity customizations (`customize.yaml`) | `.github/skills/ha-config-fetch/fetch-ha-data.sh` → read `ha-data/customize.yaml` |
+| ESPHome device YAMLs | `.github/skills/ha-config-fetch/fetch-ha-data.sh` → read `ha-data/esphome/*.yaml` (`secrets.yaml` is never fetched) |
+| Zigbee2MQTT config / devices / groups / state | `.github/skills/ha-config-fetch/fetch-ha-data.sh` → read `ha-data/zigbee2mqtt/{configuration,devices,groups}.yaml` + `state.json` |
 | Home Assistant logs (for debugging) | `.github/skills/ha-config-fetch/fetch-ha-data.sh` → read `ha-data/logs/{core,supervisor}.log` |
 
 The fetch script uses SSH (host alias: `homeassistant`, passwordless login assumed).

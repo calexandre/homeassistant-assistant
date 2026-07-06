@@ -51,6 +51,12 @@ After the script completes, read the file(s) you need:
 - `ha-data/scenes.yaml` — all scenes
 - `ha-data/scripts.yaml` — all scripts
 - `ha-data/configuration.yaml` — main configuration
+- `ha-data/customize.yaml` — entity customizations
+- `ha-data/esphome/*.yaml` — every ESPHome device YAML found under the ESPHome data dir (`secrets.yaml` is always skipped, never snapshotted)
+- `ha-data/zigbee2mqtt/configuration.yaml` — Zigbee2MQTT main config
+- `ha-data/zigbee2mqtt/devices.yaml` — Zigbee2MQTT device definitions
+- `ha-data/zigbee2mqtt/groups.yaml` — Zigbee2MQTT groups
+- `ha-data/zigbee2mqtt/state.json` — Zigbee2MQTT runtime state (not YAML; freshness gate does not cover it — debugging requests always re-fetch)
 - `ha-data/logs/core.log` — latest HA Core container logs (debugging)
 - `ha-data/logs/supervisor.log` — latest Supervisor container logs (debugging)
 

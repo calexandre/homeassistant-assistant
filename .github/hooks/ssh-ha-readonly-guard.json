@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "hooks": {
+    "PreToolUse": [
+      {
+        "type": "command",
+        "matcher": "Bash",
+        "bash": "python3 .github/hooks/ssh-ha-readonly-guard.py",
+        "timeoutSec": 10
+      }
+    ]
+  }
+}
