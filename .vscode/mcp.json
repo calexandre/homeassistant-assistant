@@ -1,7 +1,7 @@
 {
 			"servers": {
 				"homeassistant-cazita": {
-					"url": "https://${input:ha_host}/mcp_server/sse",
+					"url": "https://${input:ha_host}/api/mcp",
 					"type": "http",
 					"headers": {
 						"Authorization": "Bearer ${input:ha_bearer_token}"

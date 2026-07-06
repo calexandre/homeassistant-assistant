@@ -1,0 +1,13 @@
+{
+  "name": "homeassistant-assistant",
+  "description": "Home Assistant automation, scripting, template, and troubleshooting assistant with live-entity MCP context and official-docs-backed skills.",
+  "version": "1.0.0",
+  "author": { "name": "calexandre", "email": "clpalexandre@gmail.com" },
+  "repository": "https://github.com/calexandre/homeassistant-assistant",
+  "keywords": ["home-assistant", "automation", "esphome", "mcp", "smart-home"],
+  "skills": ["./.github/skills"],
+  "agents": [
+    "./.github/agents/homeassistant.agent.md",
+    "./.github/agents/ha-release-multi-model.agent.md"
+  ]
+}
