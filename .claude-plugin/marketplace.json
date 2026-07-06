@@ -1,0 +1,16 @@
+{
+  "name": "homeassistant",
+  "owner": { "name": "calexandre", "email": "clpalexandre@gmail.com" },
+  "description": "Marketplace for the Home Assistant Assistant plugin — automation, scripting, template, and troubleshooting skills grounded in live entities and official Home Assistant docs.",
+  "plugins": [
+    {
+      "name": "homeassistant-assistant",
+      "source": "./",
+      "description": "Home Assistant automation, scripting, template, and troubleshooting assistant with live-entity MCP context and official-docs-backed skills.",
+      "author": { "name": "calexandre", "email": "clpalexandre@gmail.com" },
+      "keywords": ["home-assistant", "automation", "esphome", "mcp", "smart-home"],
+      "category": "home-automation",
+      "tags": ["home-assistant", "automation", "esphome", "mcp", "smart-home"]
+    }
+  ]
+}

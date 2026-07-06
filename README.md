@@ -1,6 +1,8 @@
 # 🏠 Home Assistant Assistant
 
-<!-- TODO: add a project logo/banner here, e.g. ![Home Assistant Assistant](docs/banner.png) -->
+<p align="center">
+  <img src="images/haassistant-logo.png" alt="Home Assistant Assistant" width="50%" />
+</p>
 
 > Your Home Assistant setup, understood by AI — grounded in your **live entities** and the **official docs**, not guesses.
 
@@ -67,30 +69,27 @@ The MCP configuration lives in [.vscode/mcp.json](.vscode/mcp.json); skills, age
 
 ### 🤖 Claude Code
 
-Claude Code loads this repo as a plugin for the session with `--plugin-dir`:
+No checkout needed — add the marketplace and install the plugin straight from GitHub:
 
 ```bash
-git clone https://github.com/calexandre/homeassistant-assistant.git
-cd homeassistant-assistant
 export HA_HOST="homeassistant.local:8123"
 export HA_BEARER_TOKEN="your-long-lived-token"
-claude --plugin-dir .
+claude plugin marketplace add calexandre/homeassistant-assistant
+claude plugin install homeassistant-assistant@homeassistant
+claude
 ```
-
-Run `claude plugin validate .` first to confirm the manifest loads cleanly.
 
 ### 🐙 GitHub Copilot CLI
 
+No checkout needed — add the marketplace and install the plugin straight from GitHub:
+
 ```bash
-git clone https://github.com/calexandre/homeassistant-assistant.git
-cd homeassistant-assistant
 export HA_HOST="homeassistant.local:8123"
 export HA_BEARER_TOKEN="your-long-lived-token"
-copilot plugin install ./
+copilot plugin marketplace add calexandre/homeassistant-assistant
+copilot plugin install homeassistant-assistant@homeassistant
+copilot
 ```
-
-> [!NOTE]
-> Copilot CLI currently supports direct repo/path installs but flags them as deprecated in favor of marketplace installs. Once this repo is pushed, you can also install it straight from GitHub with `copilot plugin install calexandre/homeassistant-assistant`.
 
 ## 🗂️ Fetching your Home Assistant configs
 
@@ -190,9 +189,10 @@ ha-release-notes/              # Generated release summaries (gitignored)
 **Plugin doesn't load in Claude Code or Copilot CLI:**
 
 ```bash
-claude plugin validate .
-copilot plugin install ./
+claude plugin marketplace update homeassistant
+claude plugin list
+copilot plugin marketplace update homeassistant
 copilot plugin list
 ```
 
-Confirm `.claude-plugin/plugin.json`, `.mcp.json`, and `hooks/hooks.json` are valid JSON, and that `HA_HOST`/`HA_BEARER_TOKEN` are set in your shell before starting the client.
+Confirm `HA_HOST`/`HA_BEARER_TOKEN` are set in your shell before starting the client. If you're working from a local clone, validate the manifests directly with `claude plugin validate .`.
