@@ -1,7 +1,6 @@
 ---
 description: 'Analyze Home Assistant release notes and provide personalized summaries based on your current smart home setup. Includes highlights, integration improvements, and backward-incompatible change impact assessment.'
 agent: 'Home Assistant Agent 🏠'
-model: GPT-
 ---
 
 # Home Assistant Release Notes Analyzer
