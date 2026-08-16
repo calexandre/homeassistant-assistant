@@ -1,13 +1,12 @@
 ---
 name: ha-docs-sitemap
 description: >-
-  Structured sitemap of the official Home Assistant documentation (home-assistant.io/docs/)
-  and the Companion App documentation (companion.home-assistant.io/docs/).
-  Provides direct links to every major section and sub-page so agents can navigate
-  to the correct docs page without crawling. Use when an agent needs to find the right
-  HA documentation URL for automations, scripts, scenes, blueprints, templates,
-  configuration, integrations, dashboards, energy, voice assistants, companion app
-  notifications, sensors, location tracking, or troubleshooting.
+  Finds the canonical Home Assistant documentation URL for automations,
+  scripts, blueprints, templates, configuration, integrations, dashboards,
+  energy, sensors, voice assistants, companion app notifications, locations,
+  or troubleshooting without crawling the docs index. Use when you need the
+  exact official doc page before answering or implementing a Home Assistant
+  change.
 ---
 
 # HA Documentation Sitemap

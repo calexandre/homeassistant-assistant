@@ -1,9 +1,10 @@
 ---
 name: ha-troubleshooting
 description: >-
-  Docs-backed Home Assistant troubleshooting playbook — config check, logs,
-  traces, Developer Tools, debug logging. Use when an automation, integration,
-  or entity is failing, erroring, or misbehaving.
+  Diagnoses failing Home Assistant automations, integrations, and entities by
+  checking the config, logs, traces, and Developer Tools before proposing a
+  fix. Use when something is failing, erroring, misbehaving, or needs a
+  deeper debugging diagnosis.
 ---
 
 # HA Troubleshooting Playbook

@@ -1,12 +1,10 @@
 ---
 name: ha-release-benchmark
 description: >-
-  Benchmark multiple AI model outputs from the ha-release-notes prompt against
-  ground truth built from the user's live HA setup. Discovers model results,
-  builds a release-specific scoring spec, evaluates each model on 7 weighted
-  dimensions, and writes a ranked comparison. Use when user wants to compare,
-  evaluate, score, or benchmark release note summaries from different models,
-  or says "benchmark", "compare models", "score the results".
+  Benchmarks and ranks multiple model outputs for a Home Assistant release
+  against the live setup, scoring them by coverage, factual accuracy,
+  personalization, and breaking-change rigor. Use when you need to compare,
+  evaluate, or score different release-note summaries from multiple models.
 ---
 
 # HA Release Notes Benchmark

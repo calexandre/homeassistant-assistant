@@ -1,10 +1,11 @@
 ---
 name: ha-config-fetch
 description: >-
-  Fetch local Home Assistant config snapshots from ha-data/ via
-  fetch-ha-data.sh, gated by a freshness check. Use when a request
-  touches existing automations, scenes, scripts, configuration.yaml, or
-  Core/Supervisor logs — none of which the MCP server exposes.
+  Fetches Home Assistant snapshots from ha-data/ via fetch-ha-data.sh,
+  checking freshness before reading automations, scenes, scripts,
+  configuration.yaml, customize.yaml, logs, or other saved config files.
+  Use when the MCP server does not expose these files and you need the
+  local snapshot to inspect the current setup.
 ---
 
 # HA Config Fetch

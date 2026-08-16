@@ -1,9 +1,10 @@
 ---
 name: ha-state-presentation
 description: >-
-  Present Home Assistant live entity states with domain emojis, grouped by
-  area or function. Use when answering current states, status checks, or
-  monitoring queries from GetLiveContext output.
+  Groups live Home Assistant entities by area or function and presents their
+  current state in a concise, Home Assistant-friendly summary. Use for
+  current states, status checks, live monitoring, and summaries after
+  GetLiveContext.
 ---
 
 # HA State Presentation

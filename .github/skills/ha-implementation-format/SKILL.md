@@ -1,10 +1,11 @@
 ---
 name: ha-implementation-format
 description: >-
-  Output contract for Home Assistant implementation requests — the YAML /
-  How This Works / Customization Ideas structure, runnable output only to
-  .temp/, minimal valid YAML. Use when creating or editing automations,
-  scripts, scenes, blueprints, or configuration.
+  Produces Home Assistant implementation output in the required YAML /
+  How This Works / Customization Ideas format, writing runnable examples to
+  .temp/ only when needed. Use when creating or editing an automation,
+  script, scene, blueprint, or configuration and you need the repo's output
+  contract.
 ---
 
 # HA Implementation Output Contract
