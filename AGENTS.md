@@ -12,7 +12,7 @@ GitHub Copilot workspace for building Home Assistant automations, scripts, and c
 
 ⚠️ Ask first:
 
-- Changes to `.github/agents/homeassistant.agent.md` — this is the core agent definition
+- Changes to `.github/skills/homeassistant/SKILL.md` — this is the core Home Assistant definition (live-context gate and skill routing table)
 - Changes to `.vscode/mcp.json` — MCP connection config
 
 🚫 Never:
@@ -64,7 +64,7 @@ Commit messages follow Conventional Commits:
 ```
 
 Prompt and agent files use YAML front matter with `description`, `tools`, and optional `agent` fields.
-See `.github/agents/homeassistant.agent.md` for the canonical agent pattern.
+See `.github/agents/ha-release-multi-model.agent.md` for the canonical agent pattern.
 
 ## Documentation Standards
 
