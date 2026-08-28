@@ -4,6 +4,7 @@
 .vscode/settings.json
 Copilot-Processing.md
 ha-release-notes
+.esphome
 
 # Local HA data
 ha-data
