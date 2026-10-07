@@ -30,7 +30,6 @@ That combination is what keeps it from hallucinating entity IDs or deprecated YA
 - 🩺 **Troubleshooting playbook** — a guided flow through config checks, traces, and logs when something misbehaves.
 - 🔧 **ESPHome support** — device YAML authoring backed by the esphome.io sitemap.
 - 📰 **Release notes analyzer** — personalized summaries of new HA releases based on your actual setup.
-- 🧪 **Multi-model benchmarking** — compares release-note summaries across models against your live setup.
 - 🔐 **Read-only SSH guard** — a hook that blocks destructive SSH commands against your Home Assistant host.
 - 🧩 **Cross-tool plugin** — the same skills, agents, and hook install into VS Code, Claude Code, and GitHub Copilot CLI.
 
@@ -143,10 +142,6 @@ The troubleshooting skill walks through config checks, automation traces, and lo
 
 Generates a personalized summary of a Home Assistant release — highlights, new integrations, and breaking-change impact — based on your actual devices and configs.
 Saved to `ha-release-notes/ha-release-[VERSION].md`.
-
-### 🧪 Benchmarking release-note models
-
-Use the **HA Release Multi-Model 🧪** agent to generate and score summaries from multiple models against your live setup.
 
 ## 🗺️ Project structure
 

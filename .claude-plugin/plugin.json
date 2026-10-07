@@ -7,7 +7,6 @@
   "keywords": ["home-assistant", "automation", "esphome", "mcp", "smart-home"],
   "skills": ["./.github/skills"],
   "agents": [
-    "./.github/agents/homeassistant.agent.md",
-    "./.github/agents/ha-release-multi-model.agent.md"
+    "./.github/agents/homeassistant.agent.md"
   ]
 }

@@ -41,7 +41,6 @@ carries a doc citation.
 | Reports a failing, erroring, or misbehaving automation, integration, or entity | `ha-troubleshooting` |
 | Creates or edits a Home Assistant automation, script, scene, blueprint, or configuration | `ha-implementation-format` |
 | Authors or edits ESPHome device YAML, components, or firmware | `esphome` |
-| Scores or compares release-note summaries across models | `ha-release-benchmark` |
 | Asks only for a documentation URL or docs-backed explanation | `ha-docs-sitemap` |
 
 ## Guardrails

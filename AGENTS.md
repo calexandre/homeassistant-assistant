@@ -64,7 +64,6 @@ Commit messages follow Conventional Commits:
 ```
 
 Prompt and agent files use YAML front matter with `description`, `tools`, and optional `agent` fields.
-See `.github/agents/ha-release-multi-model.agent.md` for the canonical agent pattern.
 
 ## Documentation Standards
 
