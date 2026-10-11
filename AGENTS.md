@@ -68,7 +68,8 @@ Prompt and agent files use YAML front matter with `description`, `tools`, and op
 ## Documentation Standards
 
 All documentation lives in the repo root or `.github/`.
-ATX headers (`#`), one sentence per line, relative links.
+ATX headers (`#`), relative links.
+For every Markdown edit or generated report, including gitignored output, read and follow [the Markdown instructions](.github/instructions/markdown.instructions.md).
 When adding docs under `docs/`, update any navigation config to keep structure in sync.
 
 ## File Output Conventions
