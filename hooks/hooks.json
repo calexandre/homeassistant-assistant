@@ -2,11 +2,12 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Bash",
+        "matcher": "Bash|PowerShell",
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT:-${PLUGIN_ROOT:-.}}/.github/hooks/ssh-ha-readonly-guard.py\"",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/.github/hooks/ssh-ha-readonly-guard.py\"",
+            "bash": "python3 \"${CLAUDE_PLUGIN_ROOT:-${PLUGIN_ROOT:-.}}/.github/hooks/ssh-ha-readonly-guard.py\"",
             "powershell": "$root = if ($env:CLAUDE_PLUGIN_ROOT) { $env:CLAUDE_PLUGIN_ROOT } elseif ($env:PLUGIN_ROOT) { $env:PLUGIN_ROOT } else { '.' }; python (Join-Path $root '.github\\hooks\\ssh-ha-readonly-guard.py')",
             "timeout": 10
           }

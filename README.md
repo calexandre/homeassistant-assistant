@@ -30,7 +30,7 @@ That combination is what keeps it from hallucinating entity IDs or deprecated YA
 - 🩺 **Troubleshooting playbook** — a guided flow through config checks, traces, and logs when something misbehaves.
 - 🔧 **ESPHome support** — device YAML authoring backed by the esphome.io sitemap.
 - 📰 **Release notes analyzer** — personalized summaries of new HA releases based on your actual setup.
-- 🔐 **Read-only SSH guard** — a hook that blocks destructive SSH commands against your Home Assistant host.
+- 🔐 **Read-only SSH guard** — a hook that blocks destructive SSH commands against your Home Assistant host, whether they run in Bash or PowerShell.
 - 🧩 **Cross-tool plugin** — the same skills, agents, and hook install into VS Code, Claude Code, and GitHub Copilot CLI.
 
 ## 🧰 Prerequisites
@@ -39,7 +39,7 @@ That combination is what keeps it from hallucinating entity IDs or deprecated YA
 - A [long-lived access token](https://www.home-assistant.io/docs/authentication/#your-account-profile).
 - SSH access to Home Assistant with a host alias `homeassistant` in `~/.ssh/config` (passwordless), used only to fetch automations, scenes, scripts, and logs.
 - One of: VS Code with GitHub Copilot, [Claude Code](https://claude.com/product/claude-code), or [GitHub Copilot CLI](https://docs.github.com/en/copilot/concepts/agents/about-plugins).
-- Python 3 for the SSH guard hook, available as `python3` on Linux/macOS or `python` on Windows.
+- Python 3 for the SSH guard hook. Claude Code runs it as `python3` on every platform, including Windows. The Copilot clients run it as `python3` on Linux/macOS and as `python` on Windows.
 
 ### 🔗 Enabling the Home Assistant MCP server
 
@@ -195,4 +195,4 @@ Confirm `HA_HOST`/`HA_BEARER_TOKEN` are set in your shell before starting the cl
 
 **Shell commands fail with an SSH guard hook startup error:**
 
-Confirm Python is available using `python --version` on Windows or `python3 --version` on Linux/macOS. The hook uses separate PowerShell and Bash launchers; restart the Copilot app or CLI after changing hook configuration so it reloads. All Git subcommands, including `commit` and `push`, are allowed by this hook; the read-only restrictions apply only to direct SSH/file-transfer commands targeting `homeassistant`.
+Confirm Python is available: run `python3 --version` for Claude Code on any platform and for Copilot on Linux/macOS, or `python --version` for Copilot on Windows. On Windows, a `python3` or `python` command that only opens the Microsoft Store is an app execution alias, not an interpreter; install Python or turn the alias off in **Settings → Apps → Advanced app settings → App execution aliases**. The hook uses separate PowerShell and Bash launchers and inspects both the Bash and PowerShell tools; restart the client after changing hook configuration so it reloads. All Git subcommands, including `commit` and `push`, are allowed by this hook; the read-only restrictions apply only to direct SSH/file-transfer commands targeting `homeassistant`.
