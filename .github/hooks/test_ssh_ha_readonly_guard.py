@@ -67,6 +67,68 @@ class HookTests(unittest.TestCase):
                 )
                 self.assertEqual(decision.get("permissionDecision") == "deny", denied)
 
+    def test_agile_read_only_workflows(self):
+        for command in (
+            'ssh homeassistant "ha core logs"',
+            'ssh homeassistant "ha supervisor info"',
+            'ssh homeassistant "ha addons info example"',
+            'ssh homeassistant "cat /config/configuration.yaml && uptime"',
+            'ssh homeassistant "cat /config/configuration.yaml | head -n 5"',
+            'ssh homeassistant "docker context ls"',
+            'ssh homeassistant "docker buildx ls"',
+            'ssh homeassistant "cat /config/configuration.yaml &>/dev/null"',
+            'git status && ssh homeassistant "uptime" && git diff',
+        ):
+            with self.subTest(command=command):
+                decision = self.run_hook([sys.executable, str(GUARD)], {"command": command})
+                self.assertNotEqual(decision.get("permissionDecision"), "deny")
+
+    def test_writes_cannot_hide_behind_wrappers_or_read_binaries(self):
+        for command in (
+            'ssh.exe homeassistant "touch /tmp/example"',
+            r'& "C:\Windows\System32\OpenSSH\ssh.exe" homeassistant "touch /tmp/example"',
+            'echo ok && ssh homeassistant "touch /tmp/example"',
+            'git status\nssh homeassistant "touch /tmp/example"',
+            'env ssh homeassistant "touch /tmp/example"',
+            'sudo -n ssh homeassistant "touch /tmp/example"',
+            'ssh homeassistant "uptime"; ssh homeassistant "touch /tmp/example"',
+            'ssh homeassistant "find /tmp/example -delete"',
+            'ssh homeassistant "find /tmp -exec touch /tmp/example +"',
+            'ssh homeassistant "sed --in-place=.bak s/a/b/ /tmp/example"',
+            'ssh homeassistant "sed -n w/tmp/example /etc/hostname"',
+            'ssh homeassistant "docker context rm example"',
+            'ssh homeassistant "docker buildx create"',
+            'ssh homeassistant "ha core restart"',
+            'ssh homeassistant "journalctl --rotate"',
+            'ssh homeassistant "ip link set eth0 down"',
+            'ssh homeassistant "uptime && touch /tmp/example"',
+            'ssh homeassistant "uptime || touch /tmp/example"',
+            'ssh homeassistant "uptime; touch /tmp/example"',
+            'ssh homeassistant "cat /etc/hostname |& touch /tmp/example"',
+            'ssh homeassistant "cat /etc/hostname|&touch /tmp/example"',
+            'echo ok |& ssh homeassistant "touch /tmp/example"',
+            'ssh homeassistant "cat /etc/hostname >/tmp/example"',
+            'ssh homeassistant "echo $(touch /tmp/example)"',
+            'ssh homeassistant "parted /dev/example mklabel gpt"',
+            'scp ./example homeassistant:/config/example',
+        ):
+            with self.subTest(command=command):
+                decision = self.run_hook([sys.executable, str(GUARD)], {"command": command})
+                self.assertEqual(decision.get("permissionDecision"), "deny")
+
+    def test_bad_payloads_report_explicit_denials(self):
+        decision = self.run_hook(
+            [sys.executable, str(GUARD)], {"toolArgs": "{invalid"}
+        )
+        self.assertEqual(decision.get("permissionDecision"), "deny")
+        self.assertIn("invalid toolArgs JSON", decision["permissionDecisionReason"])
+        result = subprocess.run(
+            [sys.executable, str(GUARD)], input="{invalid", text=True,
+            capture_output=True, cwd=ROOT, timeout=10,
+        )
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(json.loads(result.stdout)["permissionDecision"], "deny")
+
     @unittest.skipUnless(os.name == "nt", "Windows launcher regression")
     def test_repository_and_plugin_windows_launchers(self):
         repository = json.loads(

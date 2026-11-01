@@ -41,7 +41,7 @@ READ_BINARIES = {
     "lspci", "lsusb", "vmstat", "iostat", "mpstat", "timedatectl",
     "localectl", "systemd-analyze", "loginctl", "lsns", "lsmod", "modinfo",
     "getent", "groups", "last", "lastlog", "w", "who", "lsof", "findmnt",
-    "mount", "fdisk", "parted", "blockdev", "udevadm", "dmidecode",
+    "dmidecode",
     "sensors", "vcgencmd",
 }
 
@@ -71,11 +71,11 @@ HA_READ_SUBCMDS = {
 }
 
 # Redirects we consider safe to strip (they only silence output, not write).
-SAFE_REDIRECTS = re.compile(r"(?:2>&1|2>/dev/null|>/dev/null|&>/dev/null)")
+SAFE_REDIRECTS = re.compile(r"(?:&>/dev/null|2>&1|[12]?>/dev/null)(?=\s|$)")
 
-# Anything that writes, chains, or substitutes -> deny.
+# Chaining is validated command by command; writes and substitutions are denied.
 DANGEROUS_TOKENS = re.compile(
-    r"(?:>>?|`|\$\(|;|&&|\|\||&|\n|\r)"
+    r"(?:[<>]|`|\$\(|\$\{|(?<!&)&(?!&))"
 )
 
 
@@ -106,8 +106,8 @@ def parse_payload() -> dict | None:
         if not raw.strip():
             return None
         return json.loads(raw)
-    except Exception:
-        return None
+    except json.JSONDecodeError as error:
+        emit_deny(f"invalid hook JSON: {error.msg}")
 
 
 def extract_command(payload: dict) -> str | None:
@@ -128,8 +128,8 @@ def extract_command(payload: dict) -> str | None:
             ta_obj = json.loads(ta)
             if isinstance(ta_obj, dict) and isinstance(ta_obj.get("command"), str):
                 return ta_obj["command"]
-        except Exception:
-            pass
+        except json.JSONDecodeError as error:
+            emit_deny(f"invalid toolArgs JSON: {error.msg}")
     # Flat fields
     if isinstance(payload.get("command"), str):
         return payload["command"]
@@ -167,14 +167,29 @@ def is_guarded_ssh_call(command: str) -> tuple[str | None, list[str] | None, int
     except ValueError:
         # Unparseable (e.g. unbalanced quotes) — be conservative: if it looks
         # like it mentions the guarded host over ssh, deny; else allow.
-        if re.search(r"\bssh\b.*\b" + re.escape(GUARDED_HOST) + r"\b", command):
+        if re.search(r"\b(?:ssh|scp|sftp|rsync)(?:\.exe)?\b.*\b" + re.escape(GUARDED_HOST) + r"\b", command, re.I | re.S):
             emit_deny("unparseable ssh command to guarded host")
         return (None, None, None)
 
     if not tokens:
         return (None, None, None)
 
-    binary = os.path.basename(tokens[0])
+    while tokens:
+        if re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", tokens[0]):
+            tokens.pop(0)
+        elif tokens[0] in {"env", "sudo", "command"}:
+            wrapper = tokens.pop(0)
+            while tokens and tokens[0].startswith("-"):
+                option = tokens.pop(0)
+                if option in ({"-u", "-g", "-C", "-D"} if wrapper == "sudo" else {"-u"}):
+                    if tokens:
+                        tokens.pop(0)
+        else:
+            break
+    if not tokens:
+        return (None, None, None)
+
+    binary = tokens[0].replace("\\", "/").rsplit("/", 1)[-1].lower().removesuffix(".exe")
     if binary not in SSH_BINARIES:
         return (None, None, None)
 
@@ -223,13 +238,29 @@ def check_segment_head(head: str, segment_tokens: list[str]) -> str | None:
 
     # sed: allow only without -i/--in-place
     if head == "sed":
-        if any(arg in ("-i", "--in-place") or arg.startswith("-i") for arg in segment_tokens[idx + 1:]):
+        if any(arg.startswith(("-i", "--in-place")) for arg in segment_tokens[idx + 1:]):
             return "sed with in-place edit is forbidden"
+        return "sed scripts can write or execute; use head, tail, or grep instead"
+
+    if head == "find":
+        if any(arg in {"-delete", "-exec", "-execdir", "-ok", "-okdir", "-fprint", "-fprint0", "-fprintf", "-fls"} for arg in segment_tokens[idx + 1:]):
+            return "find actions that write or execute commands are forbidden"
         return None
 
     # docker: allow only read subcommands
     if head == "docker":
         sub = next((a for a in segment_tokens[idx + 1:] if not a.startswith("-")), None)
+        nested_reads = {
+            "context": {"ls", "list", "inspect", "show"},
+            "buildx": {"ls", "inspect", "version"},
+            "manifest": {"inspect"},
+        }
+        if sub in nested_reads:
+            args = segment_tokens[idx + 1:]
+            position = args.index(sub)
+            if position + 1 < len(args) and args[position + 1] in nested_reads[sub]:
+                return None
+            return f"docker {sub} only allows read subcommands"
         if sub is None or sub not in DOCKER_READ_SUBCMDS:
             return f"docker {sub!r} is forbidden (only read subcommands allowed)"
         return None
@@ -244,13 +275,32 @@ def check_segment_head(head: str, segment_tokens: list[str]) -> str | None:
     # ha (Supervisor CLI): allow only read subcommands
     if head == "ha":
         sub = next((a for a in segment_tokens[idx + 1:] if not a.startswith("-")), None)
+        args = segment_tokens[idx + 1:]
+        resources = {
+            "core", "supervisor", "host", "hardware", "dns", "multicast",
+            "observer", "store", "addons", "backups", "backup", "jobs", "os",
+        }
+        if len(args) >= 2 and args[0] in resources and args[1] in {"info", "logs", "stats", "list"}:
+            return None
         if sub is None or sub not in HA_READ_SUBCMDS:
             return f"ha {sub!r} is forbidden (only read subcommands allowed)"
         return None
 
     # journalctl: always read
     if head == "journalctl":
+        if any(arg.split("=")[0] in {"--rotate", "--vacuum-size", "--vacuum-time", "--vacuum-files", "--flush", "--relinquish-var", "--sync", "--setup-keys", "--update-catalog"} for arg in segment_tokens[idx + 1:]):
+            return "journalctl maintenance operations are forbidden"
         return None
+
+    if head == "ip":
+        args = segment_tokens[idx + 1:]
+        safe_flags = {"-j", "-json", "-s", "-statistics", "-d", "-details", "-4", "-6", "-br", "-brief"}
+        words = [arg for arg in args if not arg.startswith("-")]
+        if all(not arg.startswith("-") or arg in safe_flags for arg in args):
+            if words and words[0] in {"address", "addr", "link", "route", "neigh", "neighbor", "rule", "netns"}:
+                if len(words) == 1 or words[1] in {"show", "list", "ls"}:
+                    return None
+        return "ip only allows display operations"
 
     # awk/gawk: deny (can write via print >"/path" or system())
     if head in ("awk", "gawk", "mawk"):
@@ -280,10 +330,11 @@ def guard_ssh(remote_command: str) -> None:
         )
 
     # Validate each pipeline segment's head against the allowlist.
-    for segment in stripped.split("|"):
-        seg = segment.strip()
-        if not seg:
-            continue
+    try:
+        segments = local_commands(stripped)
+    except ValueError:
+        emit_deny("unparseable remote command")
+    for seg in segments:
         try:
             seg_tokens = shlex.split(seg, posix=True)
         except ValueError:
@@ -295,7 +346,23 @@ def guard_ssh(remote_command: str) -> None:
             emit_deny(reason)
 
     # All segments passed.
-    emit_allow()
+    return
+
+
+def local_commands(command: str) -> list[str]:
+    """Keep quoted remote commands intact while inspecting local chains."""
+    lexer = shlex.shlex(command, posix=True, punctuation_chars=";&|\n")
+    lexer.whitespace = " \t\r"
+    lexer.whitespace_split = True
+    lexer.commenters = ""
+    segments: list[list[str]] = [[]]
+    for token in lexer:
+        if token and all(char in ";&|\n" for char in token):
+            if segments[-1]:
+                segments.append([])
+        else:
+            segments[-1].append(token)
+    return [shlex.join(segment) for segment in segments if segment]
 
 
 def main() -> None:
@@ -308,27 +375,25 @@ def main() -> None:
     if not command:
         emit_allow()
 
-    binary, tokens, host_idx = is_guarded_ssh_call(command)  # type: ignore[arg-type]
-    if binary is None:
-        # Not an ssh/scp/sftp/rsync call to the guarded host.
+    try:
+        commands = local_commands(command)
+    except ValueError:
+        is_guarded_ssh_call(command)
         emit_allow()
-
-    if binary in ("scp", "sftp", "rsync"):
-        guard_scp_sftp_rsync(binary)
-        return  # unreachable
-
-    # ssh
-    assert tokens is not None and host_idx is not None
-    remote_command = extract_remote_command(tokens, host_idx)
-    guard_ssh(remote_command)
+    for invocation in commands:
+        binary, tokens, host_idx = is_guarded_ssh_call(invocation)
+        if binary is None:
+            continue
+        if binary in ("scp", "sftp", "rsync"):
+            guard_scp_sftp_rsync(binary)
+        assert tokens is not None and host_idx is not None
+        guard_ssh(extract_remote_command(tokens, host_idx))
+    emit_allow()
 
 
 if __name__ == "__main__":
     try:
         main()
     except Exception as e:
-        # Never crash the hook with a non-zero exit (fail-closed would deny
-        # unrelated commands). On unexpected error, allow and let the normal
-        # permission flow decide.
         sys.stderr.write(f"ssh-ha-readonly-guard: unexpected error: {e}\n")
-        emit_allow()
+        emit_deny("unexpected inspection failure; review the hook error")
