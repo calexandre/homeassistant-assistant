@@ -39,6 +39,7 @@ That combination is what keeps it from hallucinating entity IDs or deprecated YA
 - A [long-lived access token](https://www.home-assistant.io/docs/authentication/#your-account-profile).
 - SSH access to Home Assistant with a host alias `homeassistant` in `~/.ssh/config` (passwordless), used only to fetch automations, scenes, scripts, and logs.
 - One of: VS Code with GitHub Copilot, [Claude Code](https://claude.com/product/claude-code), or [GitHub Copilot CLI](https://docs.github.com/en/copilot/concepts/agents/about-plugins).
+- Python 3 for the SSH guard hook, available as `python3` on Linux/macOS or `python` on Windows.
 
 ### 🔗 Enabling the Home Assistant MCP server
 
@@ -191,3 +192,7 @@ copilot plugin list
 ```
 
 Confirm `HA_HOST`/`HA_BEARER_TOKEN` are set in your shell before starting the client. If you're working from a local clone, validate the manifests directly with `claude plugin validate .`.
+
+**Shell commands fail with an SSH guard hook startup error:**
+
+Confirm Python is available using `python --version` on Windows or `python3 --version` on Linux/macOS. The hook uses separate PowerShell and Bash launchers; restart the Copilot app or CLI after changing hook configuration so it reloads. All Git subcommands, including `commit` and `push`, are allowed by this hook; the read-only restrictions apply only to direct SSH/file-transfer commands targeting `homeassistant`.

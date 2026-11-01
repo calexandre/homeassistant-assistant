@@ -6,6 +6,7 @@
         "type": "command",
         "matcher": "Bash",
         "bash": "python3 .github/hooks/ssh-ha-readonly-guard.py",
+        "powershell": "python .github\\hooks\\ssh-ha-readonly-guard.py",
         "timeoutSec": 10
       }
     ]
