@@ -102,7 +102,7 @@ class HookTests(unittest.TestCase):
             "x=\"$(ssh homeassistant 'uptime')\"; echo \"$x\"",
             # Mentioning an SSH command in an argument does not run it.
             "git commit -m \"fix(hooks): block ssh homeassistant 'touch' via PowerShell\"",
-            "grep -rn ssh .github/skills/homeassistant",
+            "grep -rn ssh .claude/skills/homeassistant",
         ):
             with self.subTest(command=command):
                 self.assertFalse(self.denied(command))

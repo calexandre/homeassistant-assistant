@@ -39,6 +39,7 @@ Before answering, the agent checks what you actually have (via MCP) and how Home
 - 📚 **Docs-grounded answers** — looks up the official Home Assistant and ESPHome docs and cites the exact section used.
 - 🩺 **Troubleshooting playbook** — a guided flow through config checks, logs, traces, and Developer Tools when something misbehaves.
 - 🔧 **ESPHome support** — device YAML authoring backed by an esphome.io sitemap.
+- 📰 **Personalized release notes** — `/ha-release-notes` checks a Home Assistant release against your devices and configs and flags the breaking changes that affect you.
 - 📂 **Config snapshots** — optional read-only SSH snapshots of automations, scripts, scenes, ESPHome YAMLs, Zigbee2MQTT data, and logs.
 - 🔐 **Read-only SSH guard** — a hook that blocks destructive SSH commands against your Home Assistant host, whether they run in Bash or PowerShell.
 - 🧩 **Cross-tool plugin** — the same skills and hook work in Claude Code, GitHub Copilot CLI, and VS Code.
@@ -65,6 +66,7 @@ Every request starts at the `homeassistant` skill, which calls `GetLiveContext` 
 | `ha-state-presentation` | Summarizes live states grouped by area or function |
 | `ha-config-fetch` | Refreshes `ha-data/` snapshots over SSH when they are older than 24 hours, and always before debugging |
 | `ha-docs-sitemap` | Maps a topic to the right home-assistant.io page instead of crawling the docs |
+| `ha-release-notes` | On demand only (`/ha-release-notes`): summarizes a release against your setup and flags breaking changes that affect you |
 | `esphome` | Authors ESPHome device YAML with an esphome.io sitemap |
 
 ## 🧰 Prerequisites
@@ -120,7 +122,7 @@ git clone https://github.com/calexandre/homeassistant-assistant.git
 code homeassistant-assistant
 ```
 
-Skills and the SSH guard hook load automatically from [.github/](.github/). Run **MCP: Add Server**, choose **HTTP**, enter `https://YOUR-HOME-ASSISTANT/api/mcp`, use the ID `homeassistant`, and sign in to Home Assistant when VS Code opens your browser.
+Skills load automatically from [.claude/skills/](.claude/skills/) and the SSH guard hook from [.github/hooks/](.github/hooks/). Run **MCP: Add Server**, choose **HTTP**, enter `https://YOUR-HOME-ASSISTANT/api/mcp`, use the ID `homeassistant`, and sign in to Home Assistant when VS Code opens your browser.
 
 ## ✅ Check that it works
 
@@ -166,10 +168,10 @@ The MCP server exposes live entity state, but not your automation, script, or sc
 4. Ask the agent to "refresh my Home Assistant data", or run the script yourself from a clone of this repo:
 
    ```bash
-   .github/skills/ha-config-fetch/fetch-ha-data.sh
+   .claude/skills/ha-config-fetch/fetch-ha-data.sh
    ```
 
-The script reads `/config` by default. If your add-on mounts the config elsewhere, pass the path: `.github/skills/ha-config-fetch/fetch-ha-data.sh /homeassistant`.
+The script reads `/config` by default. If your add-on mounts the config elsewhere, pass the path: `.claude/skills/ha-config-fetch/fetch-ha-data.sh /homeassistant`.
 
 ## 💡 Usage examples
 
@@ -210,6 +212,15 @@ The troubleshooting skill walks through config checks, automation traces, and lo
 > Add a BME280 sensor to the hall corridor wall switch over I2C.
 ```
 
+### 📰 Release notes
+
+```text
+/ha-release-notes
+/ha-release-notes <release notes URL>
+```
+
+Runs only when you call it (in Claude Code, as `/ha-release-notes`). Without a URL it uses the latest release on the Home Assistant blog. It checks highlights, new integrations, and breaking changes against your live entities and config snapshots, and saves the summary to `ha-release-notes/ha-release-[VERSION].md` (gitignored).
+
 ## 🔒 Safety and privacy
 
 - **Read-only SSH guard.** A `PreToolUse` hook inspects every Bash and PowerShell command. Commands that reach the `homeassistant` host must match a read-only allowlist; interactive SSH, uploads (`scp`, `sftp`, `rsync`), and everything else are denied. It guards against mistakes; it is not a sandbox.
@@ -225,14 +236,15 @@ The troubleshooting skill walks through config checks, automation traces, and lo
 ├── marketplace.json       # Marketplace entry used by `plugin marketplace add`
 └── icon.png               # Plugin icon
 hooks/hooks.json           # SSH read-only guard, Claude Code / Copilot CLI hook format
+.claude/skills/            # Domain skills (SKILL.md), the one folder every client reads
 .github/
-├── skills/                # Domain skills (SKILL.md), auto-discovered by every client
 ├── hooks/                 # SSH read-only guard script, its tests, VS Code hook format
 ├── instructions/          # Markdown style rules for VS Code
 ├── workflows/             # CI: runs the test suites on pushes and pull requests
 └── dependabot.yml         # Weekly updates for the GitHub Actions in workflows/
 AGENTS.md                  # Instructions for coding agents working on this repo
 ha-data/                   # Fetched HA snapshots and logs (gitignored)
+ha-release-notes/          # Generated release summaries (gitignored)
 .temp/                     # Scratch output (gitignored)
 ```
 

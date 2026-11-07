@@ -3,7 +3,7 @@
 .vscode/mcp.local.json
 .vscode/settings.json
 Copilot-Processing.md
-ha-release-notes
+/ha-release-notes/
 .esphome
 
 # Local HA data
@@ -15,3 +15,6 @@ __pycache__/
 
 # Personal MCP config: the repo root is the plugin root, so a committed .mcp.json would ship to every user
 .mcp.json
+
+# Claude Code per-user settings
+.claude/settings.local.json

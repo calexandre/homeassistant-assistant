@@ -35,7 +35,7 @@ If `ha-data/` does not exist at all, treat it as stale.
 `fetch-ha-data.sh` sits in this skill's folder and writes `ha-data/` into the current directory, so run it by its full path with the working directory at the project root. In a clone of this repository that is:
 
 ```bash
-.github/skills/ha-config-fetch/fetch-ha-data.sh
+.claude/skills/ha-config-fetch/fetch-ha-data.sh
 ```
 
 When the skill comes from an installed plugin, use the skill folder's absolute path instead.
@@ -43,7 +43,7 @@ When the skill comes from an installed plugin, use the skill folder's absolute p
 Optional: override the config directory (default `/config`):
 
 ```bash
-.github/skills/ha-config-fetch/fetch-ha-data.sh /custom/path
+.claude/skills/ha-config-fetch/fetch-ha-data.sh /custom/path
 ```
 
 If the script exits with `Cannot reach 'homeassistant' over passwordless SSH`, tell the user SSH snapshots are not set up, point them at the README's "Optional: SSH snapshots" section, and continue with `GetLiveContext` data only.

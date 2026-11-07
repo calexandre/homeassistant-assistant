@@ -25,8 +25,8 @@ Set up the Home Assistant MCP server as described in the [README](README.md#-set
    # SSH read-only guard (.github/hooks/)
    python3 -m unittest discover -s .github/hooks -p 'test_*.py'
 
-   # Fetch script (.github/skills/ha-config-fetch/)
-   python3 -m unittest discover -s .github/skills/ha-config-fetch -p 'test_*.py'
+   # Fetch script (.claude/skills/ha-config-fetch/)
+   python3 -m unittest discover -s .claude/skills/ha-config-fetch -p 'test_*.py'
    ```
 
    The [Tests workflow](.github/workflows/tests.yml) runs both suites on every pull request.
@@ -45,9 +45,9 @@ Set up the Home Assistant MCP server as described in the [README](README.md#-set
 
 [AGENTS.md](AGENTS.md) holds the repo's working rules (and is what coding agents read), and the [README](README.md#-project-structure) maps the folders. A few conventions worth knowing up front:
 
-- **Skills** live in `.github/skills/<name>/SKILL.md` with `name` and `description` front matter. A new skill also needs a row in the routing table of `.github/skills/homeassistant/SKILL.md`; open an issue or discussion first, since that file routes every request.
+- **Skills** live in `.claude/skills/<name>/SKILL.md` with `name` and `description` front matter. A new skill also needs a row in the routing table of `.claude/skills/homeassistant/SKILL.md`; open an issue or discussion first, since that file routes every request.
 - **The SSH guard** (`.github/hooks/ssh-ha-readonly-guard.py`) must always exit 0 and report decisions through stdout JSON, because Copilot treats a non-zero exit as a denial. Add a test case for every rule you change.
-- **Your Home Assistant data** stays out of commits: `ha-data/` and `.temp/` are gitignored, and so are your tokens.
+- **Your Home Assistant data** stays out of commits: `ha-data/`, `ha-release-notes/`, and `.temp/` are gitignored.
 
 ## License
 
