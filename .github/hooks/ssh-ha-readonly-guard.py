@@ -123,7 +123,9 @@ HA_READ_SUBCMDS = {
 }
 
 # Redirects we consider safe to strip (they only silence output, not write).
-SAFE_REDIRECTS = re.compile(r"(?:&>/dev/null|2>&1|[12]?>/dev/null)(?=\s|$)")
+# They may end at whitespace, the end of the command, or a separator such as
+# `2>&1;`; the separator and the next command are still checked afterwards.
+SAFE_REDIRECTS = re.compile(r"(?:&>/dev/null|2>&1|[12]?>/dev/null)(?=[\s;|&)]|$)")
 
 # Chaining is validated command by command; writes and substitutions are denied.
 DANGEROUS_TOKENS = re.compile(

@@ -93,6 +93,12 @@ class HookTests(unittest.TestCase):
             'ssh homeassistant "docker context ls"',
             'ssh homeassistant "docker buildx ls"',
             'ssh homeassistant "cat /config/configuration.yaml &>/dev/null"',
+            # Silencing redirects may touch the next separator.
+            "ssh -o BatchMode=yes homeassistant 'ls -ld /config/packages 2>&1; "
+            "find /config/packages -maxdepth 1 -type f -name \"*.yaml\" "
+            "! -name secrets.yaml -print 2>/dev/null'",
+            'ssh homeassistant "cat /config/configuration.yaml 2>/dev/null|head -n 5"',
+            'ssh homeassistant "ls /config 2>&1&&uptime"',
             'git status && ssh homeassistant "uptime" && git diff',
             # Local redirects write on this machine, not on Home Assistant.
             'ssh homeassistant "cat /config/configuration.yaml" > .temp/configuration.yaml',
@@ -132,6 +138,10 @@ class HookTests(unittest.TestCase):
             'ssh homeassistant "cat /etc/hostname|&touch /tmp/example"',
             'echo ok |& ssh homeassistant "touch /tmp/example"',
             'ssh homeassistant "cat /etc/hostname >/tmp/example"',
+            'ssh homeassistant "uptime 2>&1;touch /tmp/example"',
+            'ssh homeassistant "uptime 2>/dev/null;cat /etc/hostname >/tmp/example"',
+            'ssh homeassistant "uptime 2>&1&touch /tmp/example"',
+            'ssh homeassistant "find /config -print 2>/dev/null; find /config -delete"',
             'ssh homeassistant "echo $(touch /tmp/example)"',
             'ssh homeassistant "parted /dev/example mklabel gpt"',
             'scp ./example homeassistant:/config/example',
