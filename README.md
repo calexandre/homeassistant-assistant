@@ -73,7 +73,7 @@ Every request starts at the `homeassistant` skill, which calls `GetLiveContext` 
 | Home Assistant 2025.2 or later with the [Model Context Protocol Server](https://www.home-assistant.io/integrations/mcp_server/) integration | Everything |
 | One client: [Claude Code](https://claude.com/product/claude-code), [GitHub Copilot CLI](https://docs.github.com/en/copilot/concepts/agents/about-plugins), or VS Code with GitHub Copilot | Everything |
 | Python 3 | The SSH read-only guard hook, which every client runs |
-| SSH access to the Home Assistant host | Optional: [snapshots](#-optional-ssh-snapshots) of automations, scripts, scenes, config files, and logs |
+| SSH access to the Home Assistant host through a passwordless host alias named exactly `homeassistant` in `~/.ssh/config` | Optional: [snapshots](#-optional-ssh-snapshots) of automations, scripts, scenes, config files, and logs |
 
 Claude Code runs the hook as `python3` on every platform, including Windows. The Copilot clients run it as `python3` on Linux/macOS and as `python` on Windows.
 
@@ -145,6 +145,9 @@ The answer should name your real entities. If the agent says it cannot reach Hom
 
 The MCP server exposes live entity state, but not your automation, script, or scene definitions, config files, or logs. With SSH access, the agent pulls read-only snapshots of those into `ha-data/` in your working directory (gitignored in this repo).
 
+> [!IMPORTANT]
+> SSH access requires a host alias named exactly `homeassistant` in `~/.ssh/config`. The fetch script connects to that name, and the read-only guard only protects commands that target it: under any other alias, snapshots fail and the guard can't block writes to your host.
+
 | Snapshot | Path on the host | Needs |
 |---|---|---|
 | `automations`, `scenes`, `scripts`, `configuration`, `customize` YAML | `/config` | Any SSH add-on |
@@ -153,7 +156,7 @@ The MCP server exposes live entity state, but not your automation, script, or sc
 | Core and Supervisor logs, last 12 hours | Docker container logs | **Advanced SSH & Web Terminal** add-on with **Protection mode** off |
 
 1. Install an SSH add-on in Home Assistant and add your public key to it. The official **Terminal & SSH** add-on covers config files and ESPHome YAMLs; the community **Advanced SSH & Web Terminal** add-on with protection mode off covers everything.
-2. Add a host alias named exactly `homeassistant` to `~/.ssh/config` (the fetch script and the read-only guard both use that name), with `User` and `Port` set to what your add-on uses:
+2. Add the `homeassistant` host alias to `~/.ssh/config`, with `HostName`, `User`, and `Port` set to your Home Assistant host and what your add-on uses:
 
    ```text
    Host homeassistant

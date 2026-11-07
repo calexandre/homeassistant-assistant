@@ -12,3 +12,6 @@ ha-data
 # Python bytecode
 __pycache__/
 *.pyc
+
+# Personal MCP config: the repo root is the plugin root, so a committed .mcp.json would ship to every user
+.mcp.json
