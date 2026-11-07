@@ -83,6 +83,8 @@ A breaking change counts as affecting the user only if the integration, service,
 
 Use only headings and bullet points throughout the entire report. Do not use markdown tables in any section.
 
+**Warning headings:** start every heading about a breaking change or an important change with ⚠️, so it catches the user's eye while they scan the report. An important change needs the user's attention or action: a deprecation or removal of something they use, a changed default that alters how their setup behaves, or a required config change. Put ⚠️ first, before any link or other emoji; every other heading keeps its usual form.
+
 ```markdown
 # 🏠 Release Summary for [Version]
 
@@ -90,9 +92,9 @@ Use only headings and bullet points throughout the entire report. Do not use mar
 - **What's New**: 1-2 sentence explanation of the feature
 - **Hint for Your Setup**: How this could benefit your specific devices/areas
 
-## [Another Feature](URL#anchor)
-- **What's New**: ...
-- **Hint for Your Setup**: ...
+## ⚠️ [Feature That Needs Your Attention](URL#anchor)
+- **What's New**: 1-2 sentence explanation of the change
+- **Hint for Your Setup**: What changes for your devices or configs, and what to do
 
 > Repeat for each major highlight. Feature names must be clickable links to the release notes section.
 
@@ -104,21 +106,23 @@ Use only headings and bullet points throughout the entire report. Do not use mar
 - **[Integration Name](URL#anchor)**: Description of improvement and affected devices
 - Include links to the relevant section in the release notes
 
-## Backward-Incompatible Changes ✅ or ⚠️
+## ⚠️ Backward-Incompatible Changes
 
-> Use ✅ if none of the breaking changes affect the user's setup. Use ⚠️ if there are considerations to be taken.
+> When the release has no breaking changes at all, use `## ✅ Backward-Incompatible Changes` instead and say so in the Summary.
 
 **Summary**: Brief 1-2 sentence overview stating whether the user has problems or not based on their setup analysis.
 
-### [Integration Name](URL#anchor)
+### ⚠️ [Integration Name](URL#anchor)
 - **Affects You?**: Yes/No
 - **Config Impact**: List automations, scenes, or scripts that reference the affected integration (if any)
 - **Action Required**: What you need to do and which config files need updating (if affected)
 
-> Repeat for each breaking change. Link each integration to its section in the release notes.
+> Repeat for each breaking change, every one with ⚠️, whether or not it affects the user. Link each integration to its section in the release notes.
 
 ## ✅ Update Recommendation
 - Safe to update / Review required / Wait for patch
+
+> Use `## ⚠️ Update Recommendation` when the recommendation is Review required or Wait for patch.
 ```
 
 ## File output
