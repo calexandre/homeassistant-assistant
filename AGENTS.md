@@ -49,6 +49,9 @@ The fetch script uses SSH (host alias: `homeassistant`, passwordless login assum
 # Test the SSH read-only guard — run after any change under .github/hooks/
 python3 -m unittest discover -s .github/hooks -p 'test_*.py'
 
+# Test that the fetch script keeps input out of the remote shell — run after any change to fetch-ha-data.sh
+python3 -m unittest discover -s .github/skills/ha-config-fetch -p 'test_*.py'
+
 # Validate the plugin and marketplace manifests
 claude plugin validate .
 ```

@@ -19,10 +19,14 @@ Set up the Home Assistant MCP server as described in the [README](README.md#-set
 
 ## Before you open a pull request
 
-1. Run the SSH guard tests if you touched anything under `.github/hooks/`:
+1. Run the tests for what you touched:
 
    ```bash
+   # SSH read-only guard (.github/hooks/)
    python3 -m unittest discover -s .github/hooks -p 'test_*.py'
+
+   # Fetch script (.github/skills/ha-config-fetch/)
+   python3 -m unittest discover -s .github/skills/ha-config-fetch -p 'test_*.py'
    ```
 
 2. Validate the plugin manifests:

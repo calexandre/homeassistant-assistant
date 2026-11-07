@@ -44,6 +44,16 @@ echo "🏠 Home Assistant Data Fetcher"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
+# Paths and file names end up inside remote shell commands, so only plain ones are allowed.
+SAFE_PATH_RE='^/[A-Za-z0-9._/-]*$'
+SAFE_NAME_RE='^[A-Za-z0-9._-]+\.yaml$'
+
+if [[ ! "${HA_CONFIG_DIR}" =~ ${SAFE_PATH_RE} ]]; then
+    echo "❌ Invalid config directory: '${HA_CONFIG_DIR}'"
+    echo "   Use a plain absolute path such as /config or /homeassistant."
+    exit 2
+fi
+
 # --- Preflight: SSH must work without a password prompt ---
 if ! ssh -o BatchMode=yes -o ConnectTimeout=10 "${SSH_HOST}" true 2>/dev/null; then
     echo "❌ Cannot reach '${SSH_HOST}' over passwordless SSH."
@@ -68,7 +78,7 @@ CONFIG_FILES=("automations.yaml" "scenes.yaml" "scripts.yaml" "configuration.yam
 
 for file in "${CONFIG_FILES[@]}"; do
     # using cat via SSH instead of scp to bypass missing sftp/scp subsystem
-    ssh "${SSH_HOST}" "cat ${HA_CONFIG_DIR}/${file}" > "${OUT_DIR}/${file}" 2>/dev/null
+    ssh "${SSH_HOST}" "cat '${HA_CONFIG_DIR}/${file}'" > "${OUT_DIR}/${file}" 2>/dev/null
     check_result "${OUT_DIR}/${file}" "${file}"
 done
 
@@ -78,7 +88,7 @@ echo ""
 echo "🔌 Fetching ESPHome device YAMLs from ${SSH_HOST}:${ESPHOME_DIR}..."
 
 # List remote yaml basenames; skip if the directory is missing or empty.
-REMOTE_ESPHOME_YAMLS=$(ssh "${SSH_HOST}" "ls -1 ${ESPHOME_DIR}/*.yaml 2>/dev/null" 2>/dev/null | xargs -r -n1 basename)
+REMOTE_ESPHOME_YAMLS=$(ssh "${SSH_HOST}" "ls -1 '${ESPHOME_DIR}'/*.yaml 2>/dev/null" 2>/dev/null | xargs -r -n1 basename)
 
 if [ -z "${REMOTE_ESPHOME_YAMLS}" ]; then
     echo "  ⏭️  ESPHome (no *.yaml files found at ${ESPHOME_DIR})"
@@ -88,7 +98,11 @@ else
             echo "  ⏭️  ${file} (skipped: secrets)"
             continue
         fi
-        ssh "${SSH_HOST}" "cat ${ESPHOME_DIR}/${file}" > "${ESPHOME_OUT}/${file}" 2>/dev/null
+        if [[ ! "${file}" =~ ${SAFE_NAME_RE} ]]; then
+            echo "  ⏭️  ${file} (skipped: unsafe file name)"
+            continue
+        fi
+        ssh "${SSH_HOST}" "cat '${ESPHOME_DIR}/${file}'" > "${ESPHOME_OUT}/${file}" 2>/dev/null
         check_result "${ESPHOME_OUT}/${file}" "esphome/${file}"
     done
 fi
