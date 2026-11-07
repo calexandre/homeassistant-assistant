@@ -2,19 +2,36 @@
 
 Skills and a safety hook for building Home Assistant automations, scripts, and configurations with Claude Code, GitHub Copilot CLI, and VS Code with GitHub Copilot — not for HA core development. The same files ship as a plugin through `.claude-plugin/`.
 
+## Layout
+
+| Path | Holds | Read by |
+|---|---|---|
+| `.claude/skills/` | Every skill | Claude Code, Copilot CLI, and VS Code in a clone; the plugin through `plugin.json` |
+| `.github/hooks/ssh-ha-readonly-guard.py` | SSH read-only guard script and its tests | The two hook configs below, by path |
+| `hooks/hooks.json` | Guard hook config, plugin format | Plugin installs (Claude Code, Copilot CLI) |
+| `.github/hooks/ssh-ha-readonly-guard.json` | Guard hook config, Copilot format | VS Code and Copilot CLI in a clone |
+| `.claude-plugin/` | Plugin and marketplace manifests, icon | Plugin installs |
+| `.github/workflows/tests.yml` | CI running both test suites | GitHub Actions; `.github/dependabot.yml` keeps its actions current |
+
+Claude Code in a plain clone loads the skills but not the guard; `claude --plugin-dir .` loads both.
+
 ## Landmines & Boundaries
 
 ✅ Always:
 
 - Query live entities via the Home Assistant MCP server (`GetLiveContext`)
 - Write runnable or scratch output to `.temp/` (gitignored)
-- Keep skills only in `.claude/skills/` — the one folder Claude Code, Copilot CLI, and VS Code all read, so each skill is listed once; a copy in `.github/skills/` or `.agents/skills/` shows up twice in Copilot clients
+- Keep skills only in `.claude/skills/` — the one folder Claude Code, Copilot CLI, and VS Code all read, so each skill is listed once; VS Code lists a second copy in `.github/skills/` or `.agents/skills/` twice
 - Run `fetch-ha-data.sh` (in `.claude/skills/ha-config-fetch/`) to refresh local config snapshots and logs
+- Treat the `homeassistant` SSH host as read-only, whether or not the guard hook is loaded in this session
+- Change the guard's launch command in both hook configs (`hooks/hooks.json` and `.github/hooks/ssh-ha-readonly-guard.json`)
+- Add every new test suite to `.github/workflows/tests.yml`
 - Bump `version` in `.claude-plugin/plugin.json` in any change that ships to plugin users — the version pins installed copies, so an unbumped change never reaches them
 
 ⚠️ Ask first:
 
 - Changes to `.claude/skills/homeassistant/SKILL.md` — this is the core Home Assistant definition (live-context gate and skill routing table)
+- Adding hooks to `.claude/settings.json` — VS Code's Copilot mode reads it alongside `.github/hooks/`, so the guard may run twice
 
 🚫 Never:
 
@@ -63,14 +80,14 @@ Commit messages follow Conventional Commits:
 
 ```text
 ✅ feat(ha-release-notes): add file output instructions
-✅ fix: Rename thought logging instructions file
-✅ docs: Update tools and description in Home Assistant agent
+✅ fix(ha-config-fetch): keep script input out of the remote shell
+✅ docs: use OAuth sign-in for every client
 
 ❌ updated stuff
 ❌ WIP
 ```
 
-Skills use YAML front matter with `name` and `description`.
+Skills use YAML front matter with `name` and `description`. Add `disable-model-invocation: true` to a skill that should run only when the user calls it, as `ha-release-notes` does.
 
 ## Documentation Standards
 
