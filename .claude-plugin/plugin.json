@@ -1,14 +1,11 @@
 {
   "name": "homeassistant-assistant",
   "description": "Home Assistant automation, scripting, template, and troubleshooting assistant with live-entity MCP context and official-docs-backed skills.",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "author": { "name": "calexandre" },
   "homepage": "https://github.com/calexandre/homeassistant-assistant",
   "repository": "https://github.com/calexandre/homeassistant-assistant",
   "license": "MIT",
   "keywords": ["home-assistant", "automation", "esphome", "mcp", "smart-home"],
-  "skills": ["./.github/skills"],
-  "agents": [
-    "./.github/agents/homeassistant.agent.md"
-  ]
+  "skills": ["./.github/skills"]
 }

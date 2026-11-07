@@ -1,12 +1,12 @@
 # AGENTS.md
 
-Skills, an agent, and a safety hook for building Home Assistant automations, scripts, and configurations with Claude Code, GitHub Copilot CLI, and VS Code with GitHub Copilot — not for HA core development. The same files ship as a plugin through `.claude-plugin/`.
+Skills and a safety hook for building Home Assistant automations, scripts, and configurations with Claude Code, GitHub Copilot CLI, and VS Code with GitHub Copilot — not for HA core development. The same files ship as a plugin through `.claude-plugin/`.
 
 ## Landmines & Boundaries
 
 ✅ Always:
 
-- Query live entities via the `homeassistant` MCP server (`GetLiveContext`)
+- Query live entities via the Home Assistant MCP server (`GetLiveContext`)
 - Write runnable or scratch output to `.temp/` (gitignored)
 - Run `fetch-ha-data.sh` (in `.github/skills/ha-config-fetch/`) to refresh local config snapshots and logs
 - Bump `version` in `.claude-plugin/plugin.json` in any change that ships to plugin users — the version pins installed copies, so an unbumped change never reaches them
@@ -14,7 +14,6 @@ Skills, an agent, and a safety hook for building Home Assistant automations, scr
 ⚠️ Ask first:
 
 - Changes to `.github/skills/homeassistant/SKILL.md` — this is the core Home Assistant definition (live-context gate and skill routing table)
-- Renaming the `homeassistant` MCP server — the name is wired into both tool vocabularies in `.github/agents/homeassistant.agent.md` (`homeassistant/…` for VS Code, `mcp__homeassistant__…` for Claude Code) and the README install commands
 
 🚫 Never:
 
@@ -67,7 +66,7 @@ Commit messages follow Conventional Commits:
 ❌ WIP
 ```
 
-Agent files use YAML front matter with `name`, `description`, and `tools`; skills use `name` and `description`.
+Skills use YAML front matter with `name` and `description`.
 
 ## Documentation Standards
 

@@ -12,7 +12,7 @@
 
 > Your Home Assistant setup, understood by AI — grounded in your **live entities** and the **official docs**, not guesses.
 
-Skills, an agent, and a safety hook for **Claude Code**, **GitHub Copilot CLI**, and **VS Code with GitHub Copilot** that help you build automations, scripts, scenes, and ESPHome configs for your existing Home Assistant installation. It is not for Home Assistant core development.
+Skills and a safety hook for **Claude Code**, **GitHub Copilot CLI**, and **VS Code with GitHub Copilot** that help you build automations, scripts, scenes, and ESPHome configs for your existing Home Assistant installation. It is not for Home Assistant core development.
 
 Before answering, the agent checks what you actually have (via MCP) and how Home Assistant says to do it (via the official docs). That combination keeps it from inventing entity IDs or suggesting deprecated YAML.
 
@@ -40,13 +40,13 @@ Before answering, the agent checks what you actually have (via MCP) and how Home
 - 🔧 **ESPHome support** — device YAML authoring backed by an esphome.io sitemap.
 - 📂 **Config snapshots** — optional read-only SSH snapshots of automations, scripts, scenes, ESPHome YAMLs, Zigbee2MQTT data, and logs.
 - 🔐 **Read-only SSH guard** — a hook that blocks destructive SSH commands against your Home Assistant host, whether they run in Bash or PowerShell.
-- 🧩 **Cross-tool plugin** — the same skills, agent, and hook work in Claude Code, GitHub Copilot CLI, and VS Code.
+- 🧩 **Cross-tool plugin** — the same skills and hook work in Claude Code, GitHub Copilot CLI, and VS Code.
 
 ## 🧭 How it works
 
 ```mermaid
 flowchart LR
-  user([You]) --> agent["Home Assistant agent<br/>Claude Code · Copilot CLI · VS Code"]
+  user([You]) --> agent["Your AI agent + skills<br/>Claude Code · Copilot CLI · VS Code"]
   agent -->|"MCP · GetLiveContext"| ha[("Home Assistant")]
   agent -->|"looks up"| docs["Official docs<br/>home-assistant.io · esphome.io"]
   agent -->|"reads"| snap["ha-data/ snapshots"]
@@ -90,7 +90,7 @@ The integration's options control which tools it exposes and whether it requires
 
 ## 📦 Installation
 
-Pick your client. All three load the same skills, agent, and hook. Name the MCP server `homeassistant`: the agent's tool list uses that name.
+Pick your client. All three load the same skills and hook.
 
 ### 🤖 Claude Code
 
@@ -121,7 +121,7 @@ git clone https://github.com/calexandre/homeassistant-assistant.git
 code homeassistant-assistant
 ```
 
-Skills, the agent, and the SSH guard hook load automatically from [.github/](.github/). VS Code keeps MCP servers in the Copilot Global configuration, `~/.copilot/mcp-config.json`, the same file Copilot CLI writes, so a server you added with `copilot mcp add` above is already there.
+Skills and the SSH guard hook load automatically from [.github/](.github/). VS Code keeps MCP servers in the Copilot Global configuration, `~/.copilot/mcp-config.json`, the same file Copilot CLI writes, so a server you added with `copilot mcp add` above is already there.
 
 Otherwise, run **MCP: Add Server**, choose **HTTP**, enter `https://YOUR-HOME-ASSISTANT/api/mcp`, use the ID `homeassistant`, and save it to **Global → Copilot Global**. Then add your long-lived token to that server's entry in `~/.copilot/mcp-config.json`:
 
@@ -182,7 +182,7 @@ The script reads `/config` by default. If your add-on mounts the config elsewher
 
 ## 💡 Usage examples
 
-In Claude Code and Copilot CLI, just ask: the `homeassistant` skill picks up any Home Assistant request. In VS Code, open Chat and choose **Home Assistant Agent 🏠** from the agent picker.
+Just ask, in any client: the `homeassistant` skill picks up any Home Assistant request. In VS Code, use Chat in Agent mode.
 
 ### 🤖 Creating automations
 
@@ -222,7 +222,7 @@ The troubleshooting skill walks through config checks, automation traces, and lo
 ## 🔒 Safety and privacy
 
 - **Read-only SSH guard.** A `PreToolUse` hook inspects every Bash and PowerShell command. Commands that reach the `homeassistant` host must match a read-only allowlist; interactive SSH, uploads (`scp`, `sftp`, `rsync`), and everything else are denied. It guards against mistakes; it is not a sandbox.
-- **Read-only MCP tools in the agent.** From the Home Assistant MCP server, the Home Assistant Agent lists only the `GetLiveContext` and `GetDateTime` tools, so it can read your home but not control devices. Outside the agent, your client asks before each MCP tool call.
+- **Device control stays with you.** The skills only need `GetLiveContext` to read your home, and your client asks before each MCP tool call. For a hard guarantee, turn on the integration's **Read-only** option.
 - **What leaves your machine.** Entity names and states from `GetLiveContext`, and any snapshot the agent reads (automations, logs, Zigbee2MQTT state), are sent to your AI provider as part of the conversation. `secrets.yaml` is never fetched.
 - **Tokens.** Claude Code's browser sign-in avoids handling a token at all. Otherwise use `read -rs` as shown above so the token stays out of your shell history. Copilot CLI and VS Code store the token in `~/.copilot/mcp-config.json`, so keep that file private and out of any dotfiles repo.
 
@@ -235,7 +235,6 @@ The troubleshooting skill walks through config checks, automation traces, and lo
 └── icon.png               # Plugin icon
 hooks/hooks.json           # SSH read-only guard, Claude Code / Copilot CLI hook format
 .github/
-├── agents/                # Home Assistant Agent (*.agent.md)
 ├── skills/                # Domain skills (SKILL.md), auto-discovered by every client
 ├── hooks/                 # SSH read-only guard script, its tests, VS Code hook format
 └── instructions/          # Markdown style rules for VS Code
@@ -254,8 +253,6 @@ ha-data/                   # Fetched HA snapshots and logs (gitignored)
 4. The integration requires an administrator account by default, so a token from a non-admin user fails. Use an admin token or change that option in the integration.
 
 **The agent says a device doesn't exist:** expose it under **Settings → Voice assistants → Expose**. The **Device control** tools only see exposed entities.
-
-**The Home Assistant Agent can't call `GetLiveContext`:** name the MCP server `homeassistant`, the name in the agent's tool list. Remove the server and add it again under that name if needed.
 
 **The plugin doesn't load in Claude Code or Copilot CLI:**
 

@@ -1,7 +1,7 @@
 ---
 title: Home Assistant Documentation Sitemap
 root: https://www.home-assistant.io/docs/
-updated: 2026-05-19
+updated: 2026-11-07
 ---
 
 # Home Assistant Documentation Sitemap
@@ -181,9 +181,14 @@ Root: <https://www.home-assistant.io/docs/>
 
 ## Integrations (key pages)
 
+Every integration page lives at `https://www.home-assistant.io/integrations/<domain>/`. Use the integration's domain (`hue`, `zha`, `esphome`) for its setup and options, or the entity domain before the dot in an entity ID (`light.kitchen` → `light`) for that entity type's actions and attributes.
+
 | Page | URL |
 |---|---|
 | Integrations index | <https://www.home-assistant.io/integrations/> |
+| Model Context Protocol Server (how this agent reaches Home Assistant: setup, tool sets, sign-in, troubleshooting) | <https://www.home-assistant.io/integrations/mcp_server/> |
+| Model Context Protocol Client (Home Assistant calling external MCP servers) | <https://www.home-assistant.io/integrations/mcp/> |
+| ESPHome (Home Assistant side of ESPHome devices) | <https://www.home-assistant.io/integrations/esphome/> |
 | Template integration | <https://www.home-assistant.io/integrations/template/> |
 | Recorder | <https://www.home-assistant.io/integrations/recorder/> |
 | Default config | <https://www.home-assistant.io/integrations/default_config/> |
