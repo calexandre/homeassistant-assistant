@@ -232,20 +232,32 @@ Runs only when you call it (in Claude Code, as `/ha-release-notes`). Pass a vers
 
 ```text
 .claude-plugin/
-├── plugin.json            # Plugin manifest (Claude Code + Copilot CLI)
-├── marketplace.json       # Marketplace entry used by `plugin marketplace add`
-└── icon.png               # Plugin icon
-hooks/hooks.json           # SSH read-only guard, Claude Code / Copilot CLI hook format
-.claude/skills/            # Domain skills (SKILL.md), the one folder every client reads
+├── plugin.json                  # Plugin manifest (Claude Code + Copilot CLI): version, skills path
+├── marketplace.json             # Marketplace entry used by `plugin marketplace add`
+└── icon.png                     # Plugin icon
+.claude/skills/                  # Every skill, in the one folder all three clients read
+├── homeassistant/               # Entry point: live-context gate and skill routing
+├── ha-config-fetch/             # fetch-ha-data.sh (SSH snapshots) and its tests
+├── ha-docs-sitemap/             # SITEMAP.md of home-assistant.io
+├── ha-implementation-format/    # YAML / How This Works / Customization Ideas output
+├── ha-release-notes/            # /ha-release-notes, on demand only
+├── ha-state-presentation/       # Live states grouped by area or function
+├── ha-troubleshooting/          # Config, logs, traces, Developer Tools
+└── esphome/                     # ESPHome YAML guidance and SITEMAP.md of esphome.io
+hooks/hooks.json                 # SSH read-only guard config for plugin installs
 .github/
-├── hooks/                 # SSH read-only guard script, its tests, VS Code hook format
-├── instructions/          # Markdown style rules for VS Code
-├── workflows/             # CI: runs the test suites on pushes and pull requests
-└── dependabot.yml         # Weekly updates for the GitHub Actions in workflows/
-AGENTS.md                  # Instructions for coding agents working on this repo
-ha-data/                   # Fetched HA snapshots and logs (gitignored)
-ha-release-notes/          # Generated release summaries (gitignored)
-.temp/                     # Scratch output (gitignored)
+├── hooks/                       # SSH read-only guard script, its tests, and its config for clones
+├── instructions/                # Markdown rules for docs and generated reports
+├── workflows/tests.yml          # CI: runs both test suites on pushes to main and on pull requests
+└── dependabot.yml               # Weekly updates for the GitHub Actions in workflows/
+images/                          # README logo
+AGENTS.md                        # Instructions for coding agents working on this repo
+CONTRIBUTING.md                  # Tests, version bumps, and commit style for contributors
+SECURITY.md                      # How to report a vulnerability privately
+LICENSE                          # MIT
+ha-data/                         # Fetched HA snapshots and logs (gitignored)
+ha-release-notes/                # Generated release reports (gitignored)
+.temp/                           # Scratch output (gitignored)
 ```
 
 ## 🧯 Troubleshooting
