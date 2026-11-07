@@ -7,7 +7,7 @@
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/github/license/calexandre/homeassistant-assistant" alt="License: MIT" /></a>
   <a href=".claude-plugin/plugin.json"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fcalexandre%2Fhomeassistant-assistant%2Fmain%2F.claude-plugin%2Fplugin.json&query=%24.version&label=plugin" alt="Plugin version" /></a>
-  <a href="https://www.home-assistant.io/integrations/mcp_server/"><img src="https://img.shields.io/badge/Home%20Assistant-2025.2%2B-18BCF2?logo=homeassistant&logoColor=white" alt="Home Assistant 2025.2 or later" /></a>
+  <a href="https://www.home-assistant.io/integrations/mcp_server/"><img src="https://img.shields.io/badge/Home%20Assistant-2026.11%2B-18BCF2?logo=homeassistant&logoColor=white" alt="Home Assistant 2026.11 or later" /></a>
 </p>
 
 > Your Home Assistant setup, understood by AI — grounded in your **live entities** and the **official docs**, not guesses.
@@ -70,7 +70,7 @@ Every request starts at the `homeassistant` skill, which calls `GetLiveContext` 
 
 | You need | For |
 |---|---|
-| Home Assistant 2025.2 or later with the [Model Context Protocol Server](https://www.home-assistant.io/integrations/mcp_server/) integration | Everything |
+| Home Assistant 2026.11 or later with the [Model Context Protocol Server](https://www.home-assistant.io/integrations/mcp_server/) integration (the first release with the complete OAuth support browser sign-in relies on: Client ID Metadata Documents, PKCE, and discovery for public clients) | Everything |
 | One client: [Claude Code](https://claude.com/product/claude-code), [GitHub Copilot CLI](https://docs.github.com/en/copilot/concepts/agents/about-plugins), or VS Code with GitHub Copilot | Everything |
 | Python 3 | The SSH read-only guard hook, which every client runs |
 | SSH access to the Home Assistant host through a passwordless host alias named exactly `homeassistant` in `~/.ssh/config` | Optional: [snapshots](#-optional-ssh-snapshots) of automations, scripts, scenes, config files, and logs |
@@ -82,9 +82,8 @@ Claude Code runs the hook as `python3` on every platform, including Windows. The
 1. In Home Assistant, go to **Settings → Devices & services → Add Integration**, search for **Model Context Protocol Server**, and finish the setup flow.
 2. Go to **Settings → Voice assistants → Expose** and expose the entities you want the agent to see. The default **Device control** tools only see exposed entities, so anything you leave out is invisible to the agent.
 3. Note your MCP URL: your Home Assistant URL followed by `/api/mcp`, for example `https://example.ui.nabu.casa/api/mcp`.
-4. For VS Code and Copilot CLI, create a token under **Profile → Security → Long-lived access tokens**. Claude Code can sign in through your browser instead.
 
-Use an HTTPS URL when you can (Home Assistant Cloud, a reverse proxy, or Home Assistant's own TLS): the Home Assistant docs note that Claude Code only connects to MCP servers over HTTPS. VS Code also accepts a plain `http://homeassistant.local:8123` URL on your local network.
+All three clients sign in through Home Assistant's own login page in your browser (OAuth), so there is no token to create or copy. Use an HTTPS URL that matches the **Internal URL** or **External URL** configured in Home Assistant (Home Assistant Cloud, a reverse proxy, or Home Assistant's own TLS): the Home Assistant docs note that Claude Code only connects to MCP servers over HTTPS.
 
 The integration's options control which tools it exposes and whether it requires an administrator account (on by default). See the [integration docs](https://www.home-assistant.io/integrations/mcp_server/) for the details.
 
@@ -101,18 +100,17 @@ claude mcp add --scope user --transport http homeassistant https://YOUR-HOME-ASS
 claude mcp login homeassistant
 ```
 
-`claude mcp login` opens your browser to sign in to Home Assistant, so there is no token to copy. To use a long-lived token instead, skip the login and add the server with a header, as shown for Copilot CLI below (`claude mcp add` takes the same `--header` flag).
+`claude mcp login` opens your browser to sign in to Home Assistant.
 
 ### 🐙 GitHub Copilot CLI
 
 ```bash
 copilot plugin marketplace add calexandre/homeassistant-assistant
 copilot plugin install homeassistant-assistant@homeassistant
-read -rs HA_TOKEN
-copilot mcp add --transport http homeassistant https://YOUR-HOME-ASSISTANT/api/mcp --header "Authorization: Bearer $HA_TOKEN"
+copilot mcp add --transport http homeassistant https://YOUR-HOME-ASSISTANT/api/mcp
 ```
 
-`read -rs` waits silently: paste the long-lived token and press Enter, which keeps it out of your shell history. In PowerShell, run `$HA_TOKEN = Read-Host -MaskInput` instead; the `copilot mcp add` line works as is. Copilot CLI saves the server in `~/.copilot/mcp-config.json`.
+Copilot CLI signs in to Home Assistant through your browser, like Claude Code.
 
 ### 🖥️ VS Code
 
@@ -121,15 +119,7 @@ git clone https://github.com/calexandre/homeassistant-assistant.git
 code homeassistant-assistant
 ```
 
-Skills and the SSH guard hook load automatically from [.github/](.github/). VS Code keeps MCP servers in the Copilot Global configuration, `~/.copilot/mcp-config.json`, the same file Copilot CLI writes, so a server you added with `copilot mcp add` above is already there.
-
-Otherwise, run **MCP: Add Server**, choose **HTTP**, enter `https://YOUR-HOME-ASSISTANT/api/mcp`, use the ID `homeassistant`, and save it to **Global → Copilot Global**. Then add your long-lived token to that server's entry in `~/.copilot/mcp-config.json`:
-
-```json
-"headers": {
-  "Authorization": "Bearer YOUR_LONG_LIVED_TOKEN"
-}
-```
+Skills and the SSH guard hook load automatically from [.github/](.github/). Run **MCP: Add Server**, choose **HTTP**, enter `https://YOUR-HOME-ASSISTANT/api/mcp`, use the ID `homeassistant`, and sign in to Home Assistant when VS Code opens your browser.
 
 ## ✅ Check that it works
 
@@ -224,7 +214,7 @@ The troubleshooting skill walks through config checks, automation traces, and lo
 - **Read-only SSH guard.** A `PreToolUse` hook inspects every Bash and PowerShell command. Commands that reach the `homeassistant` host must match a read-only allowlist; interactive SSH, uploads (`scp`, `sftp`, `rsync`), and everything else are denied. It guards against mistakes; it is not a sandbox.
 - **Device control stays with you.** The skills only need `GetLiveContext` to read your home, and your client asks before each MCP tool call. For a hard guarantee, turn on the integration's **Read-only** option.
 - **What leaves your machine.** Entity names and states from `GetLiveContext`, and any snapshot the agent reads (automations, logs, Zigbee2MQTT state), are sent to your AI provider as part of the conversation. `secrets.yaml` is never fetched.
-- **Tokens.** Claude Code's browser sign-in avoids handling a token at all. Otherwise use `read -rs` as shown above so the token stays out of your shell history. Copilot CLI and VS Code store the token in `~/.copilot/mcp-config.json`, so keep that file private and out of any dotfiles repo.
+- **No tokens to handle.** Every client signs in through Home Assistant's own login page, so there is no access token to copy, paste, or leak.
 
 ## 🧱 Project structure
 
@@ -249,8 +239,8 @@ ha-data/                   # Fetched HA snapshots and logs (gitignored)
 
 1. Check the server's status with `claude mcp list`, `copilot mcp list`, or **MCP: List Servers** in VS Code.
 2. Check that the URL ends in `/api/mcp`, uses the right scheme (`https://` for Claude Code), and opens from this machine.
-3. On `401 Unauthorized`, the token is wrong or revoked: create a new one, or run `claude mcp login homeassistant` again.
-4. The integration requires an administrator account by default, so a token from a non-admin user fails. Use an admin token or change that option in the integration.
+3. If sign-in fails or you get `401 Unauthorized`, check that the URL matches the **Internal URL** or **External URL** configured in Home Assistant, then sign in again (`claude mcp login homeassistant` in Claude Code). The integration docs' [troubleshooting section](https://www.home-assistant.io/integrations/mcp_server/#troubleshooting) covers the remaining OAuth cases.
+4. The integration requires an administrator account by default, so signing in as a non-admin user fails. Sign in as an administrator or change that option in the integration.
 
 **The agent says a device doesn't exist:** expose it under **Settings → Voice assistants → Expose**. The **Device control** tools only see exposed entities.
 
