@@ -29,6 +29,8 @@ Set up the Home Assistant MCP server as described in the [README](README.md#-set
    python3 -m unittest discover -s .github/skills/ha-config-fetch -p 'test_*.py'
    ```
 
+   The [Tests workflow](.github/workflows/tests.yml) runs both suites on every pull request.
+
 2. Validate the plugin manifests:
 
    ```bash

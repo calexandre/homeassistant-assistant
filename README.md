@@ -5,6 +5,7 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/calexandre/homeassistant-assistant/actions/workflows/tests.yml"><img src="https://github.com/calexandre/homeassistant-assistant/actions/workflows/tests.yml/badge.svg" alt="Tests" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/calexandre/homeassistant-assistant" alt="License: MIT" /></a>
   <a href=".claude-plugin/plugin.json"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fcalexandre%2Fhomeassistant-assistant%2Fmain%2F.claude-plugin%2Fplugin.json&query=%24.version&label=plugin" alt="Plugin version" /></a>
   <a href="https://www.home-assistant.io/integrations/mcp_server/"><img src="https://img.shields.io/badge/Home%20Assistant-2026.11%2B-18BCF2?logo=homeassistant&logoColor=white" alt="Home Assistant 2026.11 or later" /></a>
@@ -227,7 +228,9 @@ hooks/hooks.json           # SSH read-only guard, Claude Code / Copilot CLI hook
 .github/
 ├── skills/                # Domain skills (SKILL.md), auto-discovered by every client
 ├── hooks/                 # SSH read-only guard script, its tests, VS Code hook format
-└── instructions/          # Markdown style rules for VS Code
+├── instructions/          # Markdown style rules for VS Code
+├── workflows/             # CI: runs the test suites on pushes and pull requests
+└── dependabot.yml         # Weekly updates for the GitHub Actions in workflows/
 AGENTS.md                  # Instructions for coding agents working on this repo
 ha-data/                   # Fetched HA snapshots and logs (gitignored)
 .temp/                     # Scratch output (gitignored)
