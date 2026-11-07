@@ -1,28 +1,28 @@
 # AGENTS.md
 
-GitHub Copilot workspace for building Home Assistant automations, scripts, and configurations — not for HA core development.
+Skills, an agent, and a safety hook for building Home Assistant automations, scripts, and configurations with Claude Code, GitHub Copilot CLI, and VS Code with GitHub Copilot — not for HA core development. The same files ship as a plugin through `.claude-plugin/`.
 
 ## Landmines & Boundaries
 
 ✅ Always:
 
-- Query live entities via the `homeassistant-cazita` MCP server (`GetLiveContext`)
+- Query live entities via the `homeassistant` MCP server (`GetLiveContext`)
 - Write runnable or scratch output to `.temp/` (gitignored)
 - Run `fetch-ha-data.sh` (in `.github/skills/ha-config-fetch/`) to refresh local config snapshots and logs
+- Bump `version` in `.claude-plugin/plugin.json` in any change that ships to plugin users — the version pins installed copies, so an unbumped change never reaches them
 
 ⚠️ Ask first:
 
 - Changes to `.github/skills/homeassistant/SKILL.md` — this is the core Home Assistant definition (live-context gate and skill routing table)
-- Changes to `.vscode/mcp.json` — MCP connection config
+- Renaming the `homeassistant` MCP server — the name is wired into both tool vocabularies in `.github/agents/homeassistant.agent.md` (`homeassistant/…` for VS Code, `mcp__homeassistant__…` for Claude Code) and the README install commands
 
 🚫 Never:
 
 - Assume entity IDs — always call `GetLiveContext` first
 - Query automations, scenes, scripts, `configuration.yaml`, or logs via MCP — **these are not exposed by the MCP server**.
   Run `.github/skills/ha-config-fetch/fetch-ha-data.sh` instead, then read from `ha-data/`
-- Modify or commit files inside gitignored directories (`ha-data/`, `ha-release-notes/`, `.temp/`)
+- Modify or commit files inside gitignored directories (`ha-data/`, `.temp/`)
 - Read or analyze gitignored files for context without being asked — they contain local-only data
-- Reference files under `.github/instructions/.disabled/` — those are archived, not active
 - Bypass git hooks or use `--no-verify`
 
 ## Two Data Sources
@@ -46,9 +46,13 @@ The fetch script uses SSH (host alias: `homeassistant`, passwordless login assum
 
 # Optional: override config directory (default: /config)
 .github/skills/ha-config-fetch/fetch-ha-data.sh /custom/path
-```
 
-No build, test, lint, or format commands — this is a documentation-and-config workspace.
+# Test the SSH read-only guard — run after any change under .github/hooks/
+python3 -m unittest discover -s .github/hooks -p 'test_*.py'
+
+# Validate the plugin and marketplace manifests
+claude plugin validate .
+```
 
 ## Code Style
 
@@ -63,17 +67,15 @@ Commit messages follow Conventional Commits:
 ❌ WIP
 ```
 
-Prompt and agent files use YAML front matter with `description`, `tools`, and optional `agent` fields.
+Agent files use YAML front matter with `name`, `description`, and `tools`; skills use `name` and `description`.
 
 ## Documentation Standards
 
 All documentation lives in the repo root or `.github/`.
 ATX headers (`#`), relative links.
 For every Markdown edit or generated report, including gitignored output, read and follow [the Markdown instructions](.github/instructions/markdown.instructions.md).
-When adding docs under `docs/`, update any navigation config to keep structure in sync.
 
 ## File Output Conventions
 
 - Implementation output (scratch YAML, test configs): write to `.temp/`
-- Release note summaries: write to `ha-release-notes/ha-release-[VERSION].md`
-- Both directories are gitignored — never commit their contents
+- `.temp/` is gitignored — never commit its contents
