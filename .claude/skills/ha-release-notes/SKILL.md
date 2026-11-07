@@ -3,9 +3,10 @@ name: ha-release-notes
 description: >-
   Compares a Home Assistant release against the live setup and produces a
   personalized summary of highlights, new integrations, improvements, and
-  breaking changes, saving the result to ha-release-notes/ha-release-[VERSION].md.
-  Use when the user wants a release summary tailored to their actual devices,
-  automations, scenes, scripts, and configuration.
+  breaking changes, saving the report to ha-release-notes/ha-release-[VERSION].md
+  and replying in chat with the highlights, the warnings that affect your setup,
+  and a link to the report. Use when the user wants a release summary tailored to
+  their actual devices, automations, scenes, scripts, and configuration.
 disable-model-invocation: true
 ---
 
@@ -132,9 +133,9 @@ Use only headings and bullet points throughout the entire report. Do not use mar
 
 ## File output
 
-The report is a file, not a chat message. Save it to `ha-release-notes/` in the current working directory, creating the folder when it is missing. Git ignores that folder on purpose: the report describes the user's home, so it stays on this machine. Write it there anyway; the gitignore is no reason to save it to session storage or anywhere else.
+The full report is a file. Save it to `ha-release-notes/` in the current working directory, creating the folder when it is missing. Git ignores that folder on purpose: the report describes the user's home, so it stays on this machine. Write it there anyway; the gitignore is no reason to save it to session storage or anywhere else.
 
-Done when the file exists at `ha-release-notes/ha-release-[VERSION].md`; end your reply with its path.
+Done when the file exists at `ha-release-notes/ha-release-[VERSION].md` and the chat reply described under Chat reply has been written.
 
 Use this naming convention:
 
@@ -160,6 +161,14 @@ date: "<YYYY-MM-DD date of generation>"
 ---
 ```
 
+## Chat reply
+
+After saving the file, reply in chat with three parts, in this order. Do not paste the full report into the chat.
+
+1. Highlights: a single paragraph that names the release's major highlights and what they mean for this setup. Link each highlight to its release notes section. Use no bullets or headings in this paragraph.
+2. Warnings: one bullet for each change in the report whose own heading starts with ⚠️, which covers the highlights and the breaking changes that affect this setup. Skip the section headings. Each bullet links the change to its release notes section and states in one line what the user has to do. Include the update recommendation as a bullet too when its heading carries ⚠️. If no heading starts with ⚠️, write one bullet saying that no warnings apply to this setup.
+3. Report: a Markdown link to the saved file, using its path relative to the working directory, for example `[ha-release-notes/ha-release-2026.11.md](ha-release-notes/ha-release-2026.11.md)`.
+
 ## Example usage
 
 ```text
@@ -175,5 +184,6 @@ date: "<YYYY-MM-DD date of generation>"
 - Do not claim a breaking change affects the user unless it is actually present in the live setup or config YAML.
 - Do not write markdown tables; use headings and bullet points only.
 - Save all generated summaries under `ha-release-notes/`.
+- The chat reply holds one highlights paragraph, the warnings that affect this setup, and the report link; the full analysis stays in the file.
 - Do not invent unsupported integrations, features, or breaking changes.
 - This skill is intentionally user-invoked only and is not model-discoverable.
