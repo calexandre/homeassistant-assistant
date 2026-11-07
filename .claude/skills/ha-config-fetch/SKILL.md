@@ -67,5 +67,5 @@ After the script completes, read the file(s) you need:
 
 ## Rules
 
-- Never modify or commit files inside `ha-data/` — gitignored, local-only snapshots.
+- Never hand-edit or commit files inside `ha-data/` — `fetch-ha-data.sh` owns these local-only snapshots.
 - Do not assume file contents — always check freshness first.

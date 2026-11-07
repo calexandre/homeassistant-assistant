@@ -123,7 +123,11 @@ Use only headings and bullet points throughout the entire report. Do not use mar
 
 ## File output
 
-Save the generated summary to the `ha-release-notes/` folder using this naming convention:
+The report is a file, not a chat message. Save it to `ha-release-notes/` in the current working directory, creating the folder when it is missing. Git ignores that folder on purpose: the report describes the user's home, so it stays on this machine. Write it there anyway; the gitignore is no reason to save it to session storage or anywhere else.
+
+Done when the file exists at `ha-release-notes/ha-release-[VERSION].md`; end your reply with its path.
+
+Use this naming convention:
 
 - Filename: `ha-release-[VERSION].md` (for example, `ha-release-2026.1.md`)
 - The file must begin with the YAML front matter block before the first heading

@@ -18,7 +18,7 @@ description: >-
 ## File output rule
 
 - Never modify tracked repository files.
-- If runnable or multi-file output is helpful, write it only inside `.temp/` (gitignored) and summarize what you created.
+- If runnable or multi-file output is helpful, write it only inside `.temp/` and summarize what you created. Git ignores `.temp/` on purpose so this output stays local; create the folder when it is missing and write there.
 - Otherwise, provide the content directly in chat.
 
 ## Required response structure

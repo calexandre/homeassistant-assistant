@@ -20,7 +20,7 @@ Claude Code in a plain clone loads the skills but not the guard; `claude --plugi
 ✅ Always:
 
 - Query live entities via the Home Assistant MCP server (`GetLiveContext`)
-- Write runnable or scratch output to `.temp/` (gitignored)
+- Write local output to the folders listed under [File Output Conventions](#file-output-conventions), even though git ignores them
 - Keep skills only in `.claude/skills/` — the one folder Claude Code, Copilot CLI, and VS Code all read, so each skill is listed once; VS Code lists a second copy in `.github/skills/` or `.agents/skills/` twice
 - Run `fetch-ha-data.sh` (in `.claude/skills/ha-config-fetch/`) to refresh local config snapshots and logs
 - Treat the `homeassistant` SSH host as read-only, whether or not the guard hook is loaded in this session
@@ -38,8 +38,9 @@ Claude Code in a plain clone loads the skills but not the guard; `claude --plugi
 - Assume entity IDs — always call `GetLiveContext` first
 - Query automations, scenes, scripts, `configuration.yaml`, or logs via MCP — **these are not exposed by the MCP server**.
   Run `.claude/skills/ha-config-fetch/fetch-ha-data.sh` instead, then read from `ha-data/`
-- Modify or commit files inside gitignored directories (`ha-data/`, `ha-release-notes/`, `.temp/`)
-- Read or analyze gitignored files for context without being asked — they contain local-only data
+- Commit anything in `ha-data/`, `ha-release-notes/`, or `.temp/`
+- Hand-edit files in `ha-data/` — `fetch-ha-data.sh` owns those snapshots
+- Read local output (`ha-data/`, `ha-release-notes/`, `.temp/`) that the task or the running skill doesn't need — it holds personal data
 - Bypass git hooks or use `--no-verify`
 
 ## Two Data Sources
@@ -99,4 +100,5 @@ For every Markdown edit or generated report, including gitignored output, read a
 
 - Implementation output (scratch YAML, test configs): write to `.temp/`
 - Release summaries from the `ha-release-notes` skill: write to `ha-release-notes/ha-release-[VERSION].md`
-- `.temp/` and `ha-release-notes/` are gitignored — never commit their contents
+
+Git ignores both folders on purpose: what goes there describes the user's home, so it stays on this machine. Write there (create the folder when it is missing) and leave it uncommitted; the gitignore is no reason to save the output anywhere else.
