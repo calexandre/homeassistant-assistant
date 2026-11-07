@@ -216,10 +216,10 @@ The troubleshooting skill walks through config checks, automation traces, and lo
 
 ```text
 /ha-release-notes
-/ha-release-notes <release notes URL>
+/ha-release-notes 2026.11.0
 ```
 
-Runs only when you call it (in Claude Code, as `/ha-release-notes`). Without a URL it uses the latest release on the Home Assistant blog. It checks highlights, new integrations, and breaking changes against your live entities and config snapshots, and saves the summary to `ha-release-notes/ha-release-[VERSION].md` (gitignored).
+Runs only when you call it (in Claude Code, as `/ha-release-notes`). Pass a version like `2026.11.0` (patch versions work too) or a release notes URL; with neither, it uses the latest release on the Home Assistant blog. It checks highlights, new integrations, and breaking changes against your live entities and config snapshots, and saves the summary to `ha-release-notes/ha-release-[VERSION].md` (gitignored).
 
 ## 🔒 Safety and privacy
 

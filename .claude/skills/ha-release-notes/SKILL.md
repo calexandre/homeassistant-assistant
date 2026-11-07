@@ -14,13 +14,16 @@ disable-model-invocation: true
 ## When to use
 
 - The user wants a personalized summary of a Home Assistant release based on the current live setup.
-- The request includes a release notes URL or no URL, in which case the latest release from the HA blog should be used.
+- The request names a release by URL or version (`2026.11`, `2026.11.0`, `2026.11.2`), or names none, in which case the latest release from the HA blog should be used.
 - The user wants highlights, new integrations, integration improvements, or backward-incompatible change impact assessed against their actual devices, automations, scenes, scripts, and configuration.
 
 ## Input
 
-- Release URL: provide the exact Home Assistant blog URL for the release notes.
-- No URL provided: use the latest release from `https://www.home-assistant.io/blog/`.
+Resolve the argument to one release post before Step 1:
+
+- Release URL: use the exact Home Assistant blog URL as given.
+- Version: every monthly release `<year>.<month>` has one post at `https://www.home-assistant.io/blog/<date>/release-<year><month>/` (for example `release-202611` for 2026.11). Find it in `https://www.home-assistant.io/blog/categories/release-notes/`. A patch version such as `2026.11.2` uses the same post: its changes sit under the post's `#patch-releases` section.
+- Nothing provided: use the newest post in `https://www.home-assistant.io/blog/categories/release-notes/`.
 
 ## Workflow
 
@@ -38,7 +41,7 @@ disable-model-invocation: true
 
 ### Step 3 — Fetch release notes
 
-1. Fetch the release notes page from the provided URL.
+1. Fetch the release post resolved under Input. For a patch version, also read each patch release section up to and including that version.
 2. Extract all highlights, new integrations, improvements, and breaking changes.
 3. Capture section anchors: record the HTML anchor IDs for each highlight section, such as `#home-dashboard-improvements` or `#new-integrations`.
 4. Prefer the official Home Assistant release page as the source of truth.
@@ -147,12 +150,14 @@ date: "<YYYY-MM-DD date of generation>"
 ## Example usage
 
 ```text
-Analyze https://www.home-assistant.io/blog/2026/01/07/release-20261/
+/ha-release-notes
+/ha-release-notes 2026.11.0
+/ha-release-notes https://www.home-assistant.io/blog/2026/11/04/release-202611/
 ```
 
 ## Rules
 
-- Use the release note URL exactly as provided, or derive it from the HA blog when none is supplied.
+- Use a provided URL exactly as given; resolve a version or a missing argument through the release notes index, as described under Input.
 - Always cross-check the release changes against both `GetLiveContext` and the fetched config files before claiming an impact.
 - Do not claim a breaking change affects the user unless it is actually present in the live setup or config YAML.
 - Do not write markdown tables; use headings and bullet points only.
