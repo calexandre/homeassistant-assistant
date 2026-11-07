@@ -83,7 +83,7 @@ A breaking change counts as affecting the user only if the integration, service,
 
 Use only headings and bullet points throughout the entire report. Do not use markdown tables in any section.
 
-**Warning headings:** start every heading about a breaking change or an important change with ⚠️, so it catches the user's eye while they scan the report. An important change needs the user's attention or action: a deprecation or removal of something they use, a changed default that alters how their setup behaves, or a required config change. Put ⚠️ first, before any link or other emoji; every other heading keeps its usual form.
+**Warning headings:** the ⚠️ marks are the user's to-do list, so they go only where this user's setup is touched. Start a heading with ⚠️ only when the analysis confirms the change affects their setup (**Affects You?** Yes) or the user has to change something because of it: a required config edit, a deprecation or removal of something they use, a changed default that alters how their setup behaves, or a step they must take after updating. A heading for a change that doesn't apply, or whose impact the analysis couldn't confirm, keeps its usual form; its bullets still say what to check. Put ⚠️ first, before any link or other emoji.
 
 ```markdown
 # 🏠 Release Summary for [Version]
@@ -108,16 +108,21 @@ Use only headings and bullet points throughout the entire report. Do not use mar
 
 ## ⚠️ Backward-Incompatible Changes
 
-> When the release has no breaking changes at all, use `## ✅ Backward-Incompatible Changes` instead and say so in the Summary.
+> Use `## ✅ Backward-Incompatible Changes` instead when none of the breaking changes affect the user's setup.
 
 **Summary**: Brief 1-2 sentence overview stating whether the user has problems or not based on their setup analysis.
 
-### ⚠️ [Integration Name](URL#anchor)
-- **Affects You?**: Yes/No
-- **Config Impact**: List automations, scenes, or scripts that reference the affected integration (if any)
-- **Action Required**: What you need to do and which config files need updating (if affected)
+### ⚠️ [Integration That Affects You](URL#anchor)
+- **Affects You?**: Yes
+- **Config Impact**: List automations, scenes, or scripts that reference the affected integration
+- **Action Required**: What you need to do and which config files need updating
 
-> Repeat for each breaking change, every one with ⚠️, whether or not it affects the user. Link each integration to its section in the release notes.
+### [Integration That Doesn't](URL#anchor)
+- **Affects You?**: No
+- **Config Impact**: None found
+- **Action Required**: None
+
+> Repeat for each breaking change; only the ones that affect the user's setup get ⚠️. Link each integration to its section in the release notes.
 
 ## ✅ Update Recommendation
 - Safe to update / Review required / Wait for patch
