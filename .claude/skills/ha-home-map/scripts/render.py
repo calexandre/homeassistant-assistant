@@ -2,7 +2,10 @@
 
 The output opens straight from disk, with no server and no internet connection.
 
-Usage: render.py <graph.json> <output.html> [--title "My home"]
+Usage: render.py <graph.json> <output.html> [--title "My home"] [--offline]
+
+Area icons missing from assets/icons.json are fetched from the jsdelivr CDN by name, unless
+--offline is given; either way, an icon that cannot be found falls back to mdi:texture-box.
 """
 import argparse
 import base64
@@ -39,6 +42,7 @@ def main():
     parser.add_argument("graph")
     parser.add_argument("out")
     parser.add_argument("--title", default="Home map")
+    parser.add_argument("--offline", action="store_true", help="never fetch missing icons")
     args = parser.parse_args()
 
     graph = json.loads(pathlib.Path(args.graph).read_text())
@@ -46,7 +50,7 @@ def main():
     for node in graph["nodes"]:
         name = node.get("icon")
         if name and name not in icons:
-            path = fetch_icon(name)
+            path = None if args.offline else fetch_icon(name)
             if path:
                 icons[name] = path
             else:

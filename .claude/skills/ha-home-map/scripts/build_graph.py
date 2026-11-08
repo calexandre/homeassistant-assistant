@@ -4,12 +4,14 @@ Reads Home Assistant's area, device, entity, and config-entry registries plus th
 script, scene, and Zigbee2MQTT YAML, and writes the graph JSON that render.py turns into HTML.
 
 Usage:
-  build_graph.py --registry DIR --config DIR --out graph.json [--automations FILE ...]
+  build_graph.py --registry DIR --config DIR --out graph.json
 
---registry  holds areas.json, devices.json, entities.json (the .storage/core.*_registry files)
-            and entries.json (core.config_entries reduced to domain, title, and group members)
---config    holds automations.yaml, scripts.yaml, scenes.yaml, and zigbee2mqtt/devices.yaml
---automations  extra YAML files with automations: a list, or a package with an `automation` key
+--registry  holds areas.json, devices.json, entities.json, and entries.json, as fetch-ha-data.sh
+            writes them to ha-data/registry/ (trimmed by ha-config-fetch/trim_registry.py)
+--config    a copy of the config folder, such as ha-data/: configuration.yaml with the files it
+            includes in the same layout, and zigbee2mqtt/devices.yaml. Automations, scripts, and
+            scenes come from every automation, script, and scene key, packages included. Without
+            configuration.yaml, automations.yaml, scripts.yaml, and scenes.yaml are read instead.
 """
 import argparse
 import json
@@ -20,21 +22,80 @@ from collections import Counter, defaultdict
 import yaml
 
 
-class Loader(yaml.SafeLoader):
-    """Read Home Assistant YAML: keep !include, !secret, and !input as their plain values."""
+class Include:
+    """An !include or !include_dir_* tag, resolved later against the folder of the file it is in."""
 
-
-Loader.add_multi_constructor("!", lambda loader, suffix, node: (
-    loader.construct_scalar(node) if isinstance(node, yaml.ScalarNode)
-    else loader.construct_sequence(node) if isinstance(node, yaml.SequenceNode)
-    else loader.construct_mapping(node)))
+    def __init__(self, tag, path, base):
+        self.tag, self.path, self.base = tag, path, base
 
 
 def load_yaml(path):
+    """Read Home Assistant YAML. !include tags become Include; !secret, !input, and others keep their value."""
     path = pathlib.Path(path)
-    if not path.exists():
+    if not path.is_file():
         return None
+
+    class Loader(yaml.SafeLoader):
+        pass
+
+    def construct(loader, suffix, node):
+        value = (loader.construct_scalar(node) if isinstance(node, yaml.ScalarNode)
+                 else loader.construct_sequence(node) if isinstance(node, yaml.SequenceNode)
+                 else loader.construct_mapping(node))
+        return Include(suffix, value, path.parent) if suffix.startswith("include") and isinstance(value, str) else value
+
+    Loader.add_multi_constructor("!", construct)
     return yaml.load(path.read_text(), Loader=Loader)
+
+
+def expand(value, root, depth=0):
+    """Replace Include values with what they name, the way Home Assistant does, inside root only."""
+    if isinstance(value, dict):
+        return {k: expand(v, root, depth) for k, v in value.items()}
+    if isinstance(value, list):
+        return [expand(v, root, depth) for v in value]
+    if not isinstance(value, Include) or depth > 8:
+        return None if isinstance(value, Include) else value
+    target = (value.base / value.path).resolve()
+    if not target.is_relative_to(root):
+        return None
+    if value.tag == "include":
+        return expand(load_yaml(target), root, depth + 1)
+    files = sorted(f for f in target.rglob("*.yaml") if f.name != "secrets.yaml"
+                   and not any(part.startswith(".") for part in f.relative_to(target).parts)) if target.is_dir() else []
+    loaded = [expand(load_yaml(f), root, depth + 1) for f in files]
+    if value.tag == "include_dir_list":
+        return [x for x in loaded if x is not None]
+    if value.tag == "include_dir_named":
+        return {f.stem: x for f, x in zip(files, loaded)}
+    if value.tag == "include_dir_merge_list":
+        return [item for x in loaded if isinstance(x, list) for item in x]
+    if value.tag == "include_dir_merge_named":
+        return {k: v for x in loaded if isinstance(x, dict) for k, v in x.items()}
+    return None
+
+
+def load_logic(cfg):
+    """Every automation, script, and scene in the config, packages included."""
+    cfg = pathlib.Path(cfg).resolve()
+    if not (cfg / "configuration.yaml").is_file():
+        return (list(load_yaml(cfg / "automations.yaml") or []), load_yaml(cfg / "scripts.yaml") or {},
+                list(load_yaml(cfg / "scenes.yaml") or []))
+    conf = expand(load_yaml(cfg / "configuration.yaml"), cfg) or {}
+    packages = (conf.get("homeassistant") or {}).get("packages") if isinstance(conf.get("homeassistant"), dict) else None
+    sections = [conf] + [p for p in (packages or {}).values() if isinstance(p, dict)] if isinstance(packages, dict) else [conf]
+    automations, scripts, scenes = [], {}, []
+    as_items = lambda v: v if isinstance(v, list) else [v] if isinstance(v, dict) else []
+    for section in sections:
+        for key, value in section.items():
+            domain = str(key).split(" ")[0]
+            if domain == "automation":
+                automations += as_items(value)
+            elif domain == "script" and isinstance(value, dict):
+                scripts.update(value)
+            elif domain == "scene":
+                scenes += as_items(value)
+    return automations, scripts, scenes
 
 
 def load_registry(path, key):
@@ -97,7 +158,7 @@ LOGIC = ("automation", "script", "scene")
 
 
 class Home:
-    def __init__(self, registry, config, extra_automations):
+    def __init__(self, registry, config):
         reg = pathlib.Path(registry)
         cfg = pathlib.Path(config)
         self.areas = {a["id"]: a for a in load_registry(reg / "areas.json", "areas")}
@@ -106,15 +167,9 @@ class Home:
         self.entries = json.loads((reg / "entries.json").read_text())
         self.entity_by_reg_id = {e["id"]: e for e in self.entities.values() if e.get("id")}
 
-        self.automations = list(load_yaml(cfg / "automations.yaml") or [])
-        for path in extra_automations:
-            data = load_yaml(path) or []
-            if isinstance(data, dict):
-                data = [a for key, value in data.items() if key.split(" ")[0] == "automation"
-                        for a in (value if isinstance(value, list) else [value])]
-            self.automations += [a for a in data if isinstance(a, dict)]
-        self.scripts = load_yaml(cfg / "scripts.yaml") or {}
-        self.scenes = load_yaml(cfg / "scenes.yaml") or []
+        automations, self.scripts, scenes = load_logic(cfg)
+        self.automations = [a for a in automations if isinstance(a, dict)]
+        self.scenes = [s for s in scenes if isinstance(s, dict)]
         z2m = load_yaml(cfg / "zigbee2mqtt" / "devices.yaml") or {}
         self.z2m_ieee_by_name = {str(v.get("friendly_name")): str(k) for k, v in z2m.items() if isinstance(v, dict)}
 
@@ -241,6 +296,11 @@ def norm(text):
     return re.sub(r"[^a-z0-9]", "", str(text).lower())
 
 
+def slug(text):
+    """The object ID Home Assistant gives a YAML automation or scene with no ID (ASCII only)."""
+    return re.sub(r"[^a-z0-9]+", "_", str(text).lower()).strip("_")
+
+
 def new_refs(entity=()):
     return {"entity": set(entity), "device": set(), "area": set(), "topic": set()}
 
@@ -266,8 +326,8 @@ def collect(node, refs, in_actions):
     for key, value in node.items():
         if in_actions and key in SKIP_IN_ACTIONS:
             continue
-        if key in ("entity_id", "device_id", "area_id"):
-            refs[key.split("_")[0]].update(v for v in as_list(value) if "{" not in v)
+        if key in ("entity_id", "device_id", "area_id") or key.endswith("_entity_id"):
+            refs[key.split("_")[-2]].update(v for v in as_list(value) if "{" not in v)
         elif key == "topic" and isinstance(value, str):
             refs["topic"].add(value)
         elif key in ("action", "service") and isinstance(value, str) and value.startswith("script.") \
@@ -287,7 +347,7 @@ def build(home):
         trig, act = new_refs(), new_refs()
         collect(auto.get("triggers") or auto.get("trigger"), trig, False)
         collect(auto.get("actions") or auto.get("action"), act, True)
-        eid = auto_entity_by_uid.get(str(auto.get("id"))) or f"automation.{norm(auto.get('alias') or auto.get('id'))}"
+        eid = auto_entity_by_uid.get(str(auto.get("id"))) or f"automation.{slug(auto.get('alias') or auto.get('id'))}"
         logic[eid] = {"kind": "automation", "label": auto.get("alias") or str(auto.get("id")),
                       "description": auto.get("description") or "", "mode": auto.get("mode", "single"),
                       "trig": home.resolve(trig), "act": home.resolve(act)}
@@ -302,7 +362,7 @@ def build(home):
     for scene in home.scenes:
         if not isinstance(scene, dict):
             continue
-        eid = scene_entity_by_uid.get(str(scene.get("id"))) or f"scene.{norm(scene.get('name'))}"
+        eid = scene_entity_by_uid.get(str(scene.get("id"))) or f"scene.{slug(scene.get('name'))}"
         act = new_refs(entity=(scene.get("entities") or {}).keys())
         logic[eid] = {"kind": "scene", "label": scene.get("name") or eid, "description": "", "mode": "",
                       "trig": (set(), set(), set()), "act": home.resolve(act)}
@@ -350,7 +410,8 @@ def build(home):
     for d in real:
         dtype = home.device_type(d)
         nodes.append({
-            "id": nid[d["id"]], "kind": "device", "label": d.get("name_by_user") or d.get("name") or "?",
+            "id": nid[d["id"]], "kind": "device",
+            "label": d.get("name_by_user") or d.get("name") or d.get("model") or "Unnamed device",
             "parent": f"area:{dev_area[d['id']] or '__none'}", "protocol": home.protocol(d), "dtype": dtype,
             "icon": TYPES[dtype][0], "type_label": TYPES[dtype][1], "integration": home.integration(d),
             "manufacturer": d.get("manufacturer") or "", "model": d.get("model") or "",
@@ -393,10 +454,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--registry", required=True)
     parser.add_argument("--config", required=True)
-    parser.add_argument("--automations", nargs="*", default=[])
     parser.add_argument("--out", required=True)
     args = parser.parse_args()
-    graph = build(Home(args.registry, args.config, args.automations))
+    graph = build(Home(args.registry, args.config))
     pathlib.Path(args.out).write_text(json.dumps(graph, ensure_ascii=False, indent=1))
     print(json.dumps(graph["stats"], ensure_ascii=False, indent=1))
 

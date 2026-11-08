@@ -20,3 +20,7 @@ jobs:
         run: python -m unittest discover -s .github/hooks -p 'test_*.py' -v
       - name: Fetch script input checks
         run: python -m unittest discover -s .claude/skills/ha-config-fetch -p 'test_*.py' -v
+      - name: Home map
+        run: |
+          python -m pip install --quiet pyyaml
+          python -m unittest discover -s .claude/skills/ha-home-map -p 'test_*.py' -v
