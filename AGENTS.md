@@ -14,7 +14,7 @@ Skills and a safety hook for building Home Assistant automations, scripts, and c
 | `.github/workflows/tests.yml` | CI running every test suite | GitHub Actions; `.github/dependabot.yml` keeps its actions current |
 | `tests/<skill>/` | Test suites for the skills | Contributors and CI |
 | `demo/` | `demo_home.py` (made-up homes), `build.sh`, and its output `assets/home-map.html`, shipped already built, with its screenshot | The README; the `ha-home-map` skill, which hands the built demo to users without SSH snapshots; the tests |
-| `demo/assets/` | GitHub Pages root: the showcase `index.html` with a card per demo, each demo as one self-contained HTML file, and its screenshot | `.github/workflows/pages.yml`, which publishes it on pushes to `main` |
+| `demo/assets/` | GitHub Pages root: the showcase `index.html` with a card per demo and install steps that mirror the README's, each demo as one self-contained HTML file, and its screenshot | `.github/workflows/pages.yml`, which publishes it on pushes to `main` and stamps the plugin version into its `__PLUGIN_VERSION__` placeholders |
 
 Claude Code in a plain clone loads the skills but not the guard; `claude --plugin-dir .` loads both.
 

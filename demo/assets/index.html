@@ -4,15 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Home Assistant Assistant · Demos</title>
-<meta name="description" content="Try the Home Assistant Assistant skills in your browser, on a made-up home.">
+<meta name="description" content="Try the Home Assistant Assistant skills in your browser, on a made-up home, then install the plugin.">
 <meta name="color-scheme" content="light dark">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Home Assistant Assistant · Demos">
-<meta property="og:description" content="Try the Home Assistant Assistant skills in your browser, on a made-up home.">
+<meta property="og:description" content="Try the Home Assistant Assistant skills in your browser, on a made-up home, then install the plugin.">
 <meta property="og:url" content="https://calexandre.github.io/homeassistant-assistant/">
 <meta property="og:image" content="https://calexandre.github.io/homeassistant-assistant/home-map.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" href="favicon.png">
+<script>document.documentElement.classList.add("js");</script>
 <style>
   :root {
     --bg: #f5f6f8;
@@ -26,12 +27,19 @@
     --chip: #e8f4fb;
     --chip-ink: #0b6b99;
     --code-bg: #eef1f4;
+    --warn: #9a6700;
     --shadow: 0 1px 2px rgb(16 24 40 / 6%), 0 4px 16px rgb(16 24 40 / 6%);
     --hero-bg: #080b1f;
     --hero-glow: rgb(0 220 255 / 16%);
     --hero-text: #f1f8ff;
     --hero-text-2: #a9bad0;
     --hero-line: rgb(169 186 208 / 35%);
+    --term-bg: #0d1117;
+    --term-head: #161b22;
+    --term-text: #e6edf3;
+    --term-text-2: #8b949e;
+    --term-line: #30363d;
+    --term-accent: #7ee0ff;
     --radius: 14px;
   }
   @media (prefers-color-scheme: dark) {
@@ -47,6 +55,7 @@
       --chip: #12303f;
       --chip-ink: #8fd6f7;
       --code-bg: #232833;
+      --warn: #e3b341;
       --shadow: 0 1px 2px rgb(0 0 0 / 40%);
     }
   }
@@ -60,6 +69,8 @@
   }
   a { color: var(--primary); }
   a:focus-visible, .btn:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; border-radius: 8px; }
+  code { font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; }
+  :not(pre) > code { background: var(--code-bg); color: var(--text); border-radius: 6px; padding: 2px 6px; font-size: .9em; }
   .wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
 
   /* Hero ----------------------------------------------------------------- */
@@ -74,10 +85,18 @@
     width: 100%;
     max-width: 560px;
     height: auto;
-    margin: 0 auto 28px;
+    margin: 0 auto 24px;
     border-radius: 18px;
     box-shadow: 0 0 0 1px var(--hero-line), 0 20px 60px rgb(0 200 255 / 18%);
   }
+  .release {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin: 0 0 14px; padding: 3px 12px 3px 10px;
+    border: 1px solid var(--hero-line); border-radius: 999px;
+    color: var(--hero-text-2); font-size: 14px;
+  }
+  .release::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--term-accent); box-shadow: 0 0 8px var(--term-accent); }
+  .release strong { color: var(--hero-text); font-weight: 600; }
   .hero h1 { margin: 0 0 10px; font-size: clamp(28px, 5vw, 44px); line-height: 1.15; font-weight: 600; letter-spacing: -0.01em; }
   .hero p { margin: 0 auto; max-width: 620px; color: var(--hero-text-2); font-size: clamp(16px, 2.2vw, 19px); }
   .hero .actions { justify-content: center; margin-top: 26px; }
@@ -98,11 +117,15 @@
   .btn.ghost { color: var(--text); border-color: var(--line); }
   .btn.ghost:hover { background: var(--code-bg); }
 
-  /* Demos ---------------------------------------------------------------- */
-  main { padding: 48px 0 24px; }
+  /* Sections ------------------------------------------------------------- */
+  main { padding-bottom: 24px; }
+  .section { padding-top: 48px; }
   .section-head { margin-bottom: 22px; }
   .section-head h2 { margin: 0 0 6px; font-size: 26px; font-weight: 600; }
   .section-head p { margin: 0; color: var(--text-2); max-width: 720px; }
+  .section-head p + p { margin-top: 6px; }
+
+  /* Demos ---------------------------------------------------------------- */
   .demos {
     display: grid;
     gap: 24px;
@@ -128,12 +151,84 @@
   .facts { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
   .facts li { background: var(--chip); color: var(--chip-ink); border-radius: 999px; padding: 2px 10px; font-size: 13px; font-weight: 500; }
   .own { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); font-size: 14px; color: var(--text-2); }
-  .own code { background: var(--code-bg); color: var(--text); border-radius: 6px; padding: 2px 7px; font: 13px/1.6 ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; }
   @container (min-width: 760px) {
     .demo-inner { grid-template-columns: 3fr 2fr; }
     .shot { border-bottom: 0; border-right: 1px solid var(--line); display: flex; align-items: center; }
     .body { padding: 26px 28px; }
   }
+
+  /* Install -------------------------------------------------------------- */
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; counter-reset: step; }
+  .step {
+    counter-increment: step;
+    display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px 18px;
+    padding: 22px 24px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow);
+  }
+  .step::before {
+    content: counter(step);
+    display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%;
+    background: var(--chip); color: var(--chip-ink); font-weight: 600;
+  }
+  .step h3 { margin: 4px 0 8px; font-size: 19px; font-weight: 600; }
+  .step p { margin: 0 0 12px; color: var(--text-2); }
+  .step strong { color: var(--text); font-weight: 600; }
+  .step-body > :last-child { margin-bottom: 0; }
+  @media (max-width: 560px) {
+    .step { grid-template-columns: minmax(0, 1fr); padding: 18px 16px; }
+  }
+
+  .field { display: grid; gap: 6px; max-width: 520px; }
+  .field label { font-size: 14px; font-weight: 500; }
+  .field input {
+    width: 100%; min-height: 44px; padding: 8px 12px;
+    border: 1px solid var(--line); border-radius: 10px;
+    background: var(--bg); color: var(--text); font: inherit;
+  }
+  .field input:focus-visible { outline: 3px solid var(--primary); outline-offset: 1px; }
+  .field .hint { margin: 0; font-size: 13px; color: var(--text-2); }
+  .field .hint.warn { color: var(--warn); }
+
+  .tablist {
+    display: none; flex-wrap: wrap; gap: 4px;
+    width: fit-content; max-width: 100%; margin: 0 0 12px; padding: 4px;
+    border-radius: 12px; background: var(--code-bg);
+  }
+  .js .tablist { display: flex; }
+  .tab {
+    min-height: 36px; padding: 0 12px;
+    border: 0; border-radius: 9px; background: transparent;
+    color: var(--text-2); font: inherit; font-size: 14px; font-weight: 500; white-space: nowrap; cursor: pointer;
+  }
+  .tab:hover { color: var(--text); }
+  .tab[aria-selected="true"] { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+  .tab:focus-visible { outline: 3px solid var(--primary); outline-offset: 1px; }
+  @media (max-width: 560px) {
+    .tablist { width: 100%; flex-wrap: nowrap; }
+    .tab { flex: 1; padding: 0 4px; font-size: 13px; }
+  }
+  .panel-title { margin: 0 0 8px; font-size: 15px; font-weight: 600; }
+  .panel + .panel { margin-top: 20px; }
+  .js .panel-title { display: none; }
+  .js .panel + .panel { margin-top: 0; }
+
+  .term { margin: 0 0 12px; border: 1px solid var(--term-line); border-radius: 12px; background: var(--term-bg); overflow: hidden; }
+  .term-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    min-height: 38px; padding: 0 6px 0 14px;
+    background: var(--term-head); border-bottom: 1px solid var(--term-line);
+    color: var(--term-text-2); font-size: 12px; font-weight: 500; letter-spacing: .02em;
+  }
+  .copy {
+    min-height: 30px; padding: 0 10px;
+    border: 1px solid var(--term-line); border-radius: 7px; background: transparent;
+    color: var(--term-text); font: inherit; cursor: pointer;
+  }
+  .copy:hover { background: rgb(255 255 255 / 8%); }
+  .copy:focus-visible { outline: 2px solid var(--term-accent); outline-offset: 2px; }
+  .term pre { margin: 0; padding: 14px 16px; overflow-x: auto; color: var(--term-text); font-size: 13.5px; line-height: 1.7; }
+  .ha-url { color: var(--chip-ink); }
+  .term .ha-url { color: var(--term-accent); }
 
   /* Footer --------------------------------------------------------------- */
   footer { padding: 28px 0 40px; color: var(--text-2); font-size: 14px; }
@@ -141,13 +236,16 @@
 </style>
 </head>
 <body>
+<!-- The Pages workflow stamps the version from .claude-plugin/plugin.json into the version placeholders at deploy time. -->
 <header class="hero">
   <div class="wrap">
     <img src="logo.webp" width="1120" height="625" alt="Pixel-art robot next to the Home Assistant house logo, wired to lights, sensors, and locks">
+    <div class="release">Plugin <strong>v__PLUGIN_VERSION__</strong></div>
     <h1>Home Assistant Assistant</h1>
     <p>Skills for Claude Code, GitHub Copilot CLI, and VS Code that build automations, scripts, and ESPHome configs grounded in your live entities and the official docs.</p>
     <div class="actions">
       <a class="btn primary" href="#demos">See the demos</a>
+      <a class="btn ghost" href="#install">Install</a>
       <a class="btn ghost" href="https://github.com/calexandre/homeassistant-assistant">
         <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
         View on GitHub
@@ -156,37 +254,119 @@
   </div>
 </header>
 
-<main id="demos">
-  <div class="wrap">
-    <div class="section-head">
-      <h2>Demos</h2>
-      <p>Each demo is what a skill makes, run on a made-up home, so you can try it before installing anything. Everything runs in your browser.</p>
-    </div>
+<main>
+  <section class="section" id="demos" aria-labelledby="demos-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="demos-title">Demos</h2>
+        <p>Each demo is what a skill makes, run on a made-up home, so you can try it before installing anything. Everything runs in your browser.</p>
+      </div>
 
-    <div class="demos">
-      <article class="demo">
-        <div class="demo-inner">
-          <a class="shot" href="home-map.html" aria-label="Open the home map demo">
-            <img src="home-map.png" width="1600" height="950" loading="lazy" alt="Home map of a made-up home: each room a card holding colored device icons and dark automation squares, linked by trigger and control lines, with display options, a legend, and filters in the sidebar">
-          </a>
-          <div class="body">
-            <h3><a href="home-map.html">Home map</a></h3>
-            <p>Every room as a card holding its devices, linked to the automations, scripts, and scenes that trigger or control them. Search, filter, and click through 12 rooms, 166 devices, and 57 automations.</p>
-            <ul class="facts" aria-label="Highlights">
-              <li>One HTML file</li>
-              <li>Works offline</li>
-              <li>Light and dark</li>
-            </ul>
-            <div class="actions">
-              <a class="btn primary" href="home-map.html">Open the demo</a>
-              <a class="btn ghost" href="https://github.com/calexandre/homeassistant-assistant#-home-map">How it works</a>
+      <div class="demos">
+        <article class="demo">
+          <div class="demo-inner">
+            <a class="shot" href="home-map.html" aria-label="Open the home map demo">
+              <img src="home-map.png" width="1600" height="950" loading="lazy" alt="Home map of a made-up home: each room a card holding colored device icons and dark automation squares, linked by trigger and control lines, with display options, a legend, and filters in the sidebar">
+            </a>
+            <div class="body">
+              <h3><a href="home-map.html">Home map</a></h3>
+              <p>Every room as a card holding its devices, linked to the automations, scripts, and scenes that trigger or control them. Search, filter, and click through 12 rooms, 166 devices, and 57 automations.</p>
+              <ul class="facts" aria-label="Highlights">
+                <li>One HTML file</li>
+                <li>Works offline</li>
+                <li>Light and dark</li>
+              </ul>
+              <div class="actions">
+                <a class="btn primary" href="home-map.html">Open the demo</a>
+                <a class="btn ghost" href="https://github.com/calexandre/homeassistant-assistant#-home-map">How it works</a>
+              </div>
+              <p class="own">Map your own home: <code>/ha-home-map</code></p>
             </div>
-            <p class="own">Map your own home: <code>/ha-home-map</code></p>
           </div>
-        </div>
-      </article>
+        </article>
+      </div>
     </div>
-  </div>
+  </section>
+
+  <!-- These steps mirror the README's "Set up the Home Assistant MCP server" and "Installation" sections; change both together. -->
+  <section class="section" id="install" aria-labelledby="install-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="install-title">Install</h2>
+        <p>Installing gets the latest version, <strong>v__PLUGIN_VERSION__</strong>. You need Home Assistant 2026.11 or later, Python 3, and one client: Claude Code, GitHub Copilot CLI, or VS Code with GitHub Copilot.</p>
+      </div>
+
+      <ol class="steps">
+        <li class="step">
+          <div class="step-body">
+            <h3>Turn on the MCP server in Home Assistant</h3>
+            <p>Go to <strong>Settings → Devices &amp; services → Add Integration</strong> and add <strong>Model Context Protocol Server</strong>. Then pick the entities the agent may see under <strong>Settings → Voice assistants → Expose</strong>.</p>
+            <div class="field">
+              <label for="ha-url">Your Home Assistant URL</label>
+              <input id="ha-url" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://example.ui.nabu.casa">
+              <p class="hint" id="ha-url-hint" aria-live="polite">The HTTPS address set as the Internal or External URL in Home Assistant. It fills in the commands below and never leaves this page.</p>
+            </div>
+          </div>
+        </li>
+
+        <li class="step">
+          <div class="step-body">
+            <h3>Add the plugin and connect it</h3>
+            <div class="tablist" role="tablist" aria-label="Client">
+              <button class="tab" type="button" role="tab" id="tab-claude" aria-controls="panel-claude" aria-selected="true">Claude Code</button>
+              <button class="tab" type="button" role="tab" id="tab-copilot" aria-controls="panel-copilot" aria-selected="false" tabindex="-1">Copilot CLI</button>
+              <button class="tab" type="button" role="tab" id="tab-vscode" aria-controls="panel-vscode" aria-selected="false" tabindex="-1">VS Code</button>
+            </div>
+
+            <div class="panel" role="tabpanel" id="panel-claude" aria-labelledby="tab-claude">
+              <h4 class="panel-title">Claude Code</h4>
+              <div class="term">
+                <div class="term-head"><span>Terminal</span><button class="copy" type="button" hidden>Copy</button></div>
+                <pre><code>claude plugin marketplace add calexandre/homeassistant-assistant
+claude plugin install homeassistant-assistant@homeassistant
+claude mcp add --scope user --transport http homeassistant <span class="ha-url">https://YOUR-HOME-ASSISTANT</span>/api/mcp
+claude mcp login homeassistant</code></pre>
+              </div>
+              <p><code>claude mcp login</code> opens your browser to sign in to Home Assistant, so there is no token to copy.</p>
+            </div>
+
+            <div class="panel" role="tabpanel" id="panel-copilot" aria-labelledby="tab-copilot">
+              <h4 class="panel-title">GitHub Copilot CLI</h4>
+              <div class="term">
+                <div class="term-head"><span>Terminal</span><button class="copy" type="button" hidden>Copy</button></div>
+                <pre><code>copilot plugin marketplace add calexandre/homeassistant-assistant
+copilot plugin install homeassistant-assistant@homeassistant
+copilot mcp add --transport http homeassistant <span class="ha-url">https://YOUR-HOME-ASSISTANT</span>/api/mcp</code></pre>
+              </div>
+              <p>Copilot CLI opens your browser to sign in to Home Assistant, so there is no token to copy.</p>
+            </div>
+
+            <div class="panel" role="tabpanel" id="panel-vscode" aria-labelledby="tab-vscode">
+              <h4 class="panel-title">VS Code</h4>
+              <div class="term">
+                <div class="term-head"><span>Terminal</span><button class="copy" type="button" hidden>Copy</button></div>
+                <pre><code>git clone https://github.com/calexandre/homeassistant-assistant.git
+code homeassistant-assistant</code></pre>
+              </div>
+              <p>The skills and the SSH guard load from the clone. Run <strong>MCP: Add Server</strong>, choose <strong>HTTP</strong>, enter <code><span class="ha-url">https://YOUR-HOME-ASSISTANT</span>/api/mcp</code>, use the ID <code>homeassistant</code>, and sign in when VS Code opens your browser.</p>
+            </div>
+          </div>
+        </li>
+
+        <li class="step">
+          <div class="step-body">
+            <h3>Check that it works</h3>
+            <p>Ask a question only your house can answer:</p>
+            <div class="term">
+              <div class="term-head"><span>Prompt</span><button class="copy" type="button" hidden>Copy</button></div>
+              <pre><code>Which lights are on right now?</code></pre>
+            </div>
+            <p>The answer should name your real entities. For automations, logs, and your own home map, add the optional <a href="https://github.com/calexandre/homeassistant-assistant#-optional-ssh-snapshots">SSH snapshots</a>. Stuck? See <a href="https://github.com/calexandre/homeassistant-assistant#-troubleshooting">Troubleshooting</a>.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
 </main>
 
 <footer>
@@ -197,5 +377,63 @@
     </div>
   </div>
 </footer>
+
+<script>
+(() => {
+  // Fill the user's Home Assistant URL into the commands; nothing is stored or sent.
+  const PLACEHOLDER = "https://YOUR-HOME-ASSISTANT";
+  const input = document.getElementById("ha-url");
+  const hint = document.getElementById("ha-url-hint");
+  const hintText = hint.textContent;
+  const slots = document.querySelectorAll(".ha-url");
+  input.addEventListener("input", () => {
+    let url = input.value.trim().replace(/\/+$/, "").replace(/\/api\/mcp$/i, "").replace(/\/+$/, "");
+    if (url && !/^[a-z][a-z0-9+.-]*:\/\//i.test(url)) url = "https://" + url;
+    slots.forEach((slot) => { slot.textContent = url || PLACEHOLDER; });
+    const insecure = /^http:\/\//i.test(url);
+    hint.textContent = insecure ? "Use HTTPS: Claude Code connects to MCP servers only over HTTPS." : hintText;
+    hint.classList.toggle("warn", insecure);
+  });
+
+  // Tabs: one client at a time; without JavaScript every client shows, one under another.
+  const tabs = [...document.querySelectorAll('[role="tab"]')];
+  const select = (tab, focus) => {
+    tabs.forEach((t) => {
+      const on = t === tab;
+      t.setAttribute("aria-selected", String(on));
+      t.tabIndex = on ? 0 : -1;
+      document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
+    });
+    if (focus) tab.focus();
+  };
+  tabs.forEach((tab, i) => {
+    tab.addEventListener("click", () => select(tab));
+    tab.addEventListener("keydown", (event) => {
+      const to = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 }[event.key];
+      if (to === undefined) return;
+      event.preventDefault();
+      select(tabs[(to + tabs.length) % tabs.length], true);
+    });
+  });
+  select(tabs[0]);
+
+  // Copy buttons, shown only where the clipboard is available.
+  document.querySelectorAll(".copy").forEach((button) => {
+    if (!navigator.clipboard) return;
+    button.hidden = false;
+    button.setAttribute("aria-live", "polite");
+    button.addEventListener("click", async () => {
+      const text = button.closest(".term").querySelector("code").textContent;
+      try {
+        await navigator.clipboard.writeText(text);
+        button.textContent = "Copied";
+      } catch {
+        button.textContent = "Press Ctrl+C";
+      }
+      setTimeout(() => { button.textContent = "Copy"; }, 1600);
+    });
+  });
+})();
+</script>
 </body>
 </html>

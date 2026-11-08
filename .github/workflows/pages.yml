@@ -1,6 +1,7 @@
 # Publishes the demo showcase: demo/assets/ is the site root, so the URL of each file there is
 # https://calexandre.github.io/homeassistant-assistant/<file>. The Tests workflow checks that the
-# built demos match their source, so this one publishes the committed files as they are.
+# built demos match their source, so this one publishes the committed files as they are, after
+# stamping the plugin version into the showcase. A version bump redeploys, so the site never lags.
 name: Pages
 
 on:
@@ -8,6 +9,7 @@ on:
     branches: [main]
     paths:
       - demo/assets/**
+      - .claude-plugin/plugin.json
       - .github/workflows/pages.yml
   workflow_dispatch:
 
@@ -31,6 +33,12 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
+      - name: Stamp the plugin version
+        run: |
+          version=$(jq -er .version .claude-plugin/plugin.json)
+          [[ $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::Unexpected plugin version: $version"; exit 1; }
+          sed -i "s/__PLUGIN_VERSION__/$version/g" demo/assets/index.html
+          grep -q "v$version" demo/assets/index.html || { echo "::error::demo/assets/index.html has no __PLUGIN_VERSION__ placeholder"; exit 1; }
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:

@@ -305,7 +305,7 @@ hooks/hooks.json                 # SSH read-only guard config for plugin install
 ├── hooks/                       # SSH read-only guard script, its tests, and its config for clones
 ├── instructions/                # Markdown rules for docs and generated reports
 ├── workflows/tests.yml          # CI: runs every test suite on pushes to main and on pull requests
-├── workflows/pages.yml          # Publishes demo/assets/ to GitHub Pages on pushes to main
+├── workflows/pages.yml          # Publishes demo/assets/ to GitHub Pages, stamped with the plugin version
 └── dependabot.yml               # Weekly updates for the GitHub Actions in workflows/
 tests/                           # Test suites for the skills, one folder per skill, kept out of the skill folders
 demo/

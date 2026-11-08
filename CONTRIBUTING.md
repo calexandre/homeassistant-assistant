@@ -52,7 +52,7 @@ Set up the Home Assistant MCP server as described in the [README](README.md#-set
 
 - **Skills** live in `.claude/skills/<name>/SKILL.md` with `name` and `description` front matter, and their tests in `tests/<name>/`, so the skill folder holds only what the skill runs. A new skill also needs a row in the routing table of `.claude/skills/homeassistant/SKILL.md`; open an issue or discussion first, since that file routes every request.
 - **The SSH guard** (`.github/hooks/ssh-ha-readonly-guard.py`) must always exit 0 and report decisions through stdout JSON, because Copilot treats a non-zero exit as a denial. Add a test case for every rule you change.
-- **Demos** live in `demo/assets/`, the root of the [demo site](https://calexandre.github.io/homeassistant-assistant/): each one is a self-contained HTML file built from a made-up home, with a screenshot and a card in `demo/assets/index.html`. Pushes to `main` that touch the folder publish it.
+- **Demos** live in `demo/assets/`, the root of the [demo site](https://calexandre.github.io/homeassistant-assistant/): each one is a self-contained HTML file built from a made-up home, with a screenshot and a card in `demo/assets/index.html`. The page's install steps mirror the README's MCP server and Installation sections, so change both together. Pushes to `main` that touch the folder or the plugin version publish it, with the version from `.claude-plugin/plugin.json` stamped in.
 - **Your Home Assistant data** stays out of commits: `ha-data/`, `ha-release-notes/`, and `.temp/` are gitignored.
 
 ## License
