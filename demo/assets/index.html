@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Home Assistant Assistant · Demos</title>
+<meta name="description" content="Try the Home Assistant Assistant skills in your browser, on a made-up home.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Home Assistant Assistant · Demos">
+<meta property="og:description" content="Try the Home Assistant Assistant skills in your browser, on a made-up home.">
+<meta property="og:url" content="https://calexandre.github.io/homeassistant-assistant/">
+<meta property="og:image" content="https://calexandre.github.io/homeassistant-assistant/home-map.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="favicon.png">
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --surface: #ffffff;
+    --text: #1f2328;
+    --text-2: #5d6470;
+    --line: #e1e4e8;
+    --primary: #0398dc;
+    --primary-hover: #0284c7;
+    --primary-ink: #ffffff;
+    --chip: #e8f4fb;
+    --chip-ink: #0b6b99;
+    --code-bg: #eef1f4;
+    --shadow: 0 1px 2px rgb(16 24 40 / 6%), 0 4px 16px rgb(16 24 40 / 6%);
+    --hero-bg: #080b1f;
+    --hero-glow: rgb(0 220 255 / 16%);
+    --hero-text: #f1f8ff;
+    --hero-text-2: #a9bad0;
+    --hero-line: rgb(169 186 208 / 35%);
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1116;
+      --surface: #181b22;
+      --text: #e6e8ec;
+      --text-2: #a2a9b4;
+      --line: #2a2f39;
+      --primary: #29b6f6;
+      --primary-hover: #4fc3f7;
+      --primary-ink: #04121c;
+      --chip: #12303f;
+      --chip-ink: #8fd6f7;
+      --code-bg: #232833;
+      --shadow: 0 1px 2px rgb(0 0 0 / 40%);
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.55 Roboto, "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  }
+  a { color: var(--primary); }
+  a:focus-visible, .btn:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; border-radius: 8px; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+
+  /* Hero ----------------------------------------------------------------- */
+  .hero {
+    background: radial-gradient(60% 70% at 50% 35%, var(--hero-glow), transparent 70%), var(--hero-bg);
+    color: var(--hero-text);
+    padding: 40px 0 48px;
+    text-align: center;
+  }
+  .hero img {
+    display: block;
+    width: 100%;
+    max-width: 560px;
+    height: auto;
+    margin: 0 auto 28px;
+    border-radius: 18px;
+    box-shadow: 0 0 0 1px var(--hero-line), 0 20px 60px rgb(0 200 255 / 18%);
+  }
+  .hero h1 { margin: 0 0 10px; font-size: clamp(28px, 5vw, 44px); line-height: 1.15; font-weight: 600; letter-spacing: -0.01em; }
+  .hero p { margin: 0 auto; max-width: 620px; color: var(--hero-text-2); font-size: clamp(16px, 2.2vw, 19px); }
+  .hero .actions { justify-content: center; margin-top: 26px; }
+  .hero .btn.ghost { color: var(--hero-text); border-color: var(--hero-line); }
+  .hero .btn.ghost:hover { background: rgb(255 255 255 / 8%); }
+
+  .actions { display: flex; flex-wrap: wrap; gap: 10px 12px; align-items: center; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    min-height: 42px; padding: 0 18px;
+    border: 1px solid transparent; border-radius: 999px;
+    font-weight: 500; text-decoration: none; white-space: nowrap;
+    transition: background-color .15s, border-color .15s;
+  }
+  .btn svg { width: 18px; height: 18px; fill: currentColor; flex: none; }
+  .btn.primary { background: var(--primary); color: var(--primary-ink); }
+  .btn.primary:hover { background: var(--primary-hover); }
+  .btn.ghost { color: var(--text); border-color: var(--line); }
+  .btn.ghost:hover { background: var(--code-bg); }
+
+  /* Demos ---------------------------------------------------------------- */
+  main { padding: 48px 0 24px; }
+  .section-head { margin-bottom: 22px; }
+  .section-head h2 { margin: 0 0 6px; font-size: 26px; font-weight: 600; }
+  .section-head p { margin: 0; color: var(--text-2); max-width: 720px; }
+  .demos {
+    display: grid;
+    gap: 24px;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  }
+  .demo {
+    container-type: inline-size;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .demo-inner { display: grid; }
+  .shot { display: block; background: var(--code-bg); border-bottom: 1px solid var(--line); }
+  .shot img { display: block; width: 100%; height: auto; transition: opacity .15s; }
+  .shot:hover img { opacity: .92; }
+  .body { padding: 20px 22px 22px; display: flex; flex-direction: column; gap: 12px; }
+  .body h3 { margin: 0; font-size: 22px; font-weight: 600; }
+  .body h3 a { color: inherit; text-decoration: none; }
+  .body h3 a:hover { text-decoration: underline; }
+  .body p { margin: 0; color: var(--text-2); }
+  .facts { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+  .facts li { background: var(--chip); color: var(--chip-ink); border-radius: 999px; padding: 2px 10px; font-size: 13px; font-weight: 500; }
+  .own { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); font-size: 14px; color: var(--text-2); }
+  .own code { background: var(--code-bg); color: var(--text); border-radius: 6px; padding: 2px 7px; font: 13px/1.6 ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; }
+  @container (min-width: 760px) {
+    .demo-inner { grid-template-columns: 3fr 2fr; }
+    .shot { border-bottom: 0; border-right: 1px solid var(--line); display: flex; align-items: center; }
+    .body { padding: 26px 28px; }
+  }
+
+  /* Footer --------------------------------------------------------------- */
+  footer { padding: 28px 0 40px; color: var(--text-2); font-size: 14px; }
+  .foot { display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: space-between; border-top: 1px solid var(--line); padding-top: 20px; }
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <img src="logo.webp" width="1120" height="625" alt="Pixel-art robot next to the Home Assistant house logo, wired to lights, sensors, and locks">
+    <h1>Home Assistant Assistant</h1>
+    <p>Skills for Claude Code, GitHub Copilot CLI, and VS Code that build automations, scripts, and ESPHome configs grounded in your live entities and the official docs.</p>
+    <div class="actions">
+      <a class="btn primary" href="#demos">See the demos</a>
+      <a class="btn ghost" href="https://github.com/calexandre/homeassistant-assistant">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+        View on GitHub
+      </a>
+    </div>
+  </div>
+</header>
+
+<main id="demos">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Demos</h2>
+      <p>Each demo is what a skill makes, run on a made-up home, so you can try it before installing anything. Everything runs in your browser.</p>
+    </div>
+
+    <div class="demos">
+      <article class="demo">
+        <div class="demo-inner">
+          <a class="shot" href="home-map.html" aria-label="Open the home map demo">
+            <img src="home-map.png" width="1600" height="950" loading="lazy" alt="Home map of a made-up home: each room a card holding colored device icons and dark automation squares, linked by trigger and control lines, with display options, a legend, and filters in the sidebar">
+          </a>
+          <div class="body">
+            <h3><a href="home-map.html">Home map</a></h3>
+            <p>Every room as a card holding its devices, linked to the automations, scripts, and scenes that trigger or control them. Search, filter, and click through 12 rooms, 166 devices, and 57 automations.</p>
+            <ul class="facts" aria-label="Highlights">
+              <li>One HTML file</li>
+              <li>Works offline</li>
+              <li>Light and dark</li>
+            </ul>
+            <div class="actions">
+              <a class="btn primary" href="home-map.html">Open the demo</a>
+              <a class="btn ghost" href="https://github.com/calexandre/homeassistant-assistant#-home-map">How it works</a>
+            </div>
+            <p class="own">Map your own home: <code>/ha-home-map</code></p>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <span>Demos use made-up homes; no real data.</span>
+      <span><a href="https://github.com/calexandre/homeassistant-assistant">GitHub</a> · <a href="https://github.com/calexandre/homeassistant-assistant/blob/main/LICENSE">MIT license</a></span>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

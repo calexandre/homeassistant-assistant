@@ -1,0 +1,40 @@
+# Publishes the demo showcase: demo/assets/ is the site root, so the URL of each file there is
+# https://calexandre.github.io/homeassistant-assistant/<file>. The Tests workflow checks that the
+# built demos match their source, so this one publishes the committed files as they are.
+name: Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - demo/assets/**
+      - .github/workflows/pages.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time; let a running deployment finish rather than cancel it halfway.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: demo/assets
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
