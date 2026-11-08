@@ -454,6 +454,14 @@ const edges = G.edges.map((e, i) => ({ ...e, i, s: byId.get(e.source), t: byId.g
 edges.forEach((e) => { e.s.out.push(e); e.t.inn.push(e); });
 nodes.forEach((n) => { if (n.parent && byId.has(n.parent)) { n.p = byId.get(n.parent); n.p.kids.push(n); } });
 nodes.forEach((n) => { n.deg = n.out.length + n.inn.length; });
+// On the map, a name that starts with its room drops the room: "Kitchen Ceiling Light" reads "Ceiling Light" in Kitchen.
+nodes.forEach((n) => {
+  n.short = n.label;
+  const room = n.p && !n.p.virtual ? n.p.label : "";
+  const rest = room && n.label.toLowerCase().startsWith(room.toLowerCase()) ? n.label.slice(room.length) : "";
+  if (/^[\s\-_:·]+\S/.test(rest)) { const t = rest.replace(/^[\s\-_:·]+/, ""); n.short = t[0].toUpperCase() + t.slice(1); }
+});
+const plural = (n, word) => `${n} ${n === 1 ? word.replace(/s$/, "") : word}`;
 const isLogic = (n) => n.kind === "automation" || n.kind === "script" || n.kind === "scene";
 const AREAS = nodes.filter((n) => n.kind === "area");
 const LEAVES = nodes.filter((n) => n.kind !== "area");
@@ -540,6 +548,8 @@ function seeded(seed) {
   };
 }
 
+// The card around an area's nodes. a.minW widens a card whose title would otherwise be cut,
+// and a.padB deepens it so the labels under its bottom row fit at the zoom the map opens at.
 function areaBox(a, posOf) {
   let x1 = Infinity, y1 = Infinity, x2 = -Infinity, y2 = -Infinity;
   for (const k of a.kids) {
@@ -548,11 +558,15 @@ function areaBox(a, posOf) {
     x1 = Math.min(x1, p.x - hw); x2 = Math.max(x2, p.x + hw); y1 = Math.min(y1, p.y - up); y2 = Math.max(y2, p.y + down);
   }
   if (x1 === Infinity) { const p = posOf(a); x1 = p.x - 70; x2 = p.x + 70; y1 = p.y - 10; y2 = p.y + 10; }
-  x1 -= PAD; x2 += PAD; y1 -= PAD + HEAD; y2 += PAD;
-  const minW = 200;
+  x1 -= PAD; x2 += PAD; y1 -= PAD + HEAD; y2 += PAD + (a.padB || 0);
+  const minW = a.minW || 200;
   if (x2 - x1 < minW) { const c = (x1 + x2) / 2; x1 = c - minW / 2; x2 = c + minW / 2; }
   return { x1, y1, x2, y2, w: x2 - x1, h: y2 - y1 };
 }
+// Area titles keep a readable size on screen whatever the zoom.
+const titleSize = (k) => clamp(11 + 5 * k, 12, 17);
+const titleFont = (px) => `500 ${px.toFixed(1)}px Roboto, Noto, system-ui, sans-serif`;
+const titleNeed = (a, k) => { const px = titleSize(k); return 2 * clamp(14 * k, 6, 14) + px * 1.3 + 14 + textWidth(ctx, titleFont(px), a.label); };
 
 function runFcose(els, options) {
   const cy = cytoscape({
@@ -576,11 +590,12 @@ function runFcose(els, options) {
 }
 
 // Two passes: lay out what is inside each area on its own, then place the areas as cards,
-// pulling areas that share many links together. Cards never overlap, and each one is
-// mirrored so its linked nodes face the areas they connect to.
+// pulling areas that share many links together. Cards never overlap, the arrangement that
+// opens at the largest zoom wins, and each card is mirrored so its linked nodes face the
+// areas they connect to.
 function computeLayout(aspect) {
   const areas = AREAS.filter((a) => a.vis);
-  const local = new Map(), offset = new Map(), size = new Map();
+  const local = new Map(), offset = new Map(), natural = new Map();
   for (const a of areas) {
     const kids = a.kids.filter((k) => k.vis);
     let lp = new Map();
@@ -606,9 +621,10 @@ function computeLayout(aspect) {
     const mx = xs.length ? (Math.min(...xs) + Math.max(...xs)) / 2 : 0, my = ys.length ? (Math.min(...ys) + Math.max(...ys)) / 2 : 0;
     lp.forEach((p, id) => local.set(id, { x: p.x - mx, y: p.y - my }));
     local.set(a.id, { x: 0, y: 0 });
+    a.minW = 200; a.padB = 0;
     const b = areaBox(a, (n) => local.get(n.id));
     offset.set(a, { x: (b.x1 + b.x2) / 2, y: (b.y1 + b.y2) / 2 });
-    size.set(a, { w: b.w, h: b.h });
+    natural.set(a, { w: b.w, h: b.h });
   }
 
   const areaOf = (n) => (n.kind === "area" ? n : n.p);
@@ -623,32 +639,36 @@ function computeLayout(aspect) {
   const linked = new Set();
   links.forEach((_, key) => key.split("|").forEach((id) => linked.add(id)));
   const main = areas.filter((a) => linked.has(a.id)), loose = areas.filter((a) => !linked.has(a.id));
-  const center = new Map();
+  const base = new Map();
   if (main.length > 1) {
-    const els = main.map((a) => ({ group: "nodes", data: { id: a.id, w: size.get(a).w, h: size.get(a).h } }));
+    const els = main.map((a) => ({ group: "nodes", data: { id: a.id, w: natural.get(a).w, h: natural.get(a).h } }));
     let i = 0;
     links.forEach((n, key) => { const [s, t] = key.split("|"); els.push({ group: "edges", data: { id: "L" + i++, source: s, target: t, n } }); });
     runFcose(els, {
       nodeSeparation: 60, nodeRepulsion: () => 60000, gravity: 0.4, numIter: 3000,
       idealEdgeLength: (e) => Math.max(30, 110 - 8 * e.data("n")), edgeElasticity: (e) => Math.min(0.9, 0.3 + 0.06 * e.data("n")),
-    }).forEach((p, id) => center.set(id, p));
-  } else main.forEach((a) => center.set(a.id, { x: 0, y: 0 }));
+    }).forEach((p, id) => base.set(id, p));
+  } else main.forEach((a) => base.set(a.id, { x: 0, y: 0 }));
 
-  const rect = (a) => {
+  const GAP = 36, clear = clearArea();
+  loose.sort((a, b) => natural.get(b).h - natural.get(a).h || a.label.localeCompare(b.label));
+  // One arrangement: stretch the linked cards toward the screen's shape, push overlapping cards
+  // apart (sideways when ox < oy * bias), then put the unlinked cards beside or under them.
+  const rectOf = (center, size) => (a) => {
     const c = center.get(a.id), s = size.get(a);
-    return { x1: c.x - s.w / 2, y1: c.y - s.h / 2, x2: c.x + s.w / 2, y2: c.y + s.h / 2, w: s.w, h: s.h };
+    return { x1: c.x - s.w / 2, y1: c.y - s.h / 2, x2: c.x + s.w / 2, y2: c.y + s.h / 2 };
   };
-  const union = (list) => list.map(rect).reduce((u, r) => ({ x1: Math.min(u.x1, r.x1), y1: Math.min(u.y1, r.y1), x2: Math.max(u.x2, r.x2), y2: Math.max(u.y2, r.y2) }),
+  const unionOf = (list, rect) => list.map(rect).reduce((u, r) => ({ x1: Math.min(u.x1, r.x1), y1: Math.min(u.y1, r.y1), x2: Math.max(u.x2, r.x2), y2: Math.max(u.y2, r.y2) }),
     { x1: Infinity, y1: Infinity, x2: -Infinity, y2: -Infinity });
-  const GAP = 36;
-  if (main.length > 1) {
-    // Widen (or heighten) toward the screen's shape, then push overlapping cards apart.
-    const u = union(main), ratio = aspect / ((u.x2 - u.x1) / (u.y2 - u.y1));
+  const separate = (size, stretch, bias) => {
+    const center = new Map([...base].map(([id, p]) => [id, { ...p }]));
+    if (main.length < 2) return center;
+    const rect = rectOf(center, size), u = unionOf(main, rect), ratio = aspect / ((u.x2 - u.x1) / (u.y2 - u.y1));
     const cx = (u.x1 + u.x2) / 2, cy = (u.y1 + u.y2) / 2;
     main.forEach((a) => {
       const c = center.get(a.id);
-      if (ratio > 1) c.x = cx + (c.x - cx) * Math.min(ratio, 2.2);
-      else c.y = cy + (c.y - cy) * Math.min(1 / ratio, 2.2);
+      if (ratio > 1) c.x = cx + (c.x - cx) * Math.min(ratio, stretch);
+      else c.y = cy + (c.y - cy) * Math.min(1 / ratio, stretch);
     });
     for (let iter = 0; iter < 600; iter++) {
       let moved = false;
@@ -659,42 +679,75 @@ function computeLayout(aspect) {
           if (ox <= 0 || oy <= 0) continue;
           const ca = center.get(main[i].id), cb = center.get(main[j].id);
           const dx = Math.sign(cb.x - ca.x) || 1, dy = Math.sign(cb.y - ca.y) || 1;
-          if (ox < oy * aspect) { ca.x -= dx * ox / 2; cb.x += dx * ox / 2; } else { ca.y -= dy * oy / 2; cb.y += dy * oy / 2; }
+          if (ox < oy * bias) { ca.x -= dx * ox / 2; cb.x += dx * ox / 2; } else { ca.y -= dy * oy / 2; cb.y += dy * oy / 2; }
           moved = true;
         }
       }
       if (!moved) break;
     }
-  }
-  if (loose.length) {
-    // Areas with no links outside themselves go beside the rest when the map is narrower
-    // than the screen, and in rows underneath when it is wider.
-    loose.sort((a, b) => size.get(b).h - size.get(a).h || a.label.localeCompare(b.label));
-    const u = main.length ? union(main) : { x1: 0, y1: 0, x2: 0, y2: 0 };
-    const mainW = u.x2 - u.x1, mainH = u.y2 - u.y1;
-    if (main.length && mainW / Math.max(mainH, 1) < aspect) {
-      let x = u.x2 + GAP * 1.5, y = u.y1, colW = 0;
-      for (const a of loose) {
-        const s = size.get(a);
-        if (y > u.y1 && y + s.h > u.y1 + Math.max(mainH, 600)) { y = u.y1; x += colW + GAP; colW = 0; }
-        center.set(a.id, { x: x + s.w / 2, y: y + s.h / 2 });
-        y += s.h + GAP; colW = Math.max(colW, s.w);
-      }
-    } else {
-      const width = Math.max(mainW, 900);
-      let x = u.x1, y = main.length ? u.y2 + GAP * 1.5 : 0, rowH = 0;
-      for (const a of loose) {
-        const s = size.get(a);
-        if (x > u.x1 && x + s.w > u.x1 + width) { x = u.x1; y += rowH + GAP; rowH = 0; }
-        center.set(a.id, { x: x + s.w / 2, y: y + s.h / 2 });
-        x += s.w + GAP; rowH = Math.max(rowH, s.h);
+    return center;
+  };
+  const placeLoose = (separated, size, beside, spread) => {
+    const center = new Map(separated);
+    if (loose.length) {
+      const u = main.length ? unionOf(main, rectOf(center, size)) : { x1: 0, y1: 0, x2: 0, y2: 0 };
+      const mainW = u.x2 - u.x1, mainH = u.y2 - u.y1;
+      const fill = loose.reduce((t, a) => t + (size.get(a).w + GAP) * (size.get(a).h + GAP), mainW * mainH);
+      if (beside) {
+        const tall = Math.max(mainH, Math.sqrt(fill / aspect));
+        let x = u.x2 + GAP * 1.5, y = u.y1, colW = 0;
+        for (const a of loose) {
+          const s = size.get(a);
+          if (y > u.y1 && y + s.h > u.y1 + tall) { y = u.y1; x += colW + GAP; colW = 0; }
+          center.set(a.id, { x: x + s.w / 2, y: y + s.h / 2 });
+          y += s.h + GAP; colW = Math.max(colW, s.w);
+        }
+      } else {
+        const width = Math.max(mainW, Math.sqrt(fill * aspect) * spread, ...loose.map((a) => size.get(a).w));
+        let x = u.x1, y = main.length ? u.y2 + GAP * 1.5 : 0, rowH = 0;
+        for (const a of loose) {
+          const s = size.get(a);
+          if (x > u.x1 && x + s.w > u.x1 + width) { x = u.x1; y += rowH + GAP; rowH = 0; }
+          center.set(a.id, { x: x + s.w / 2, y: y + s.h / 2 });
+          x += s.w + GAP; rowH = Math.max(rowH, s.h);
+        }
       }
     }
+    const u = unionOf(areas, rectOf(center, size));
+    return { center, k: Math.min((clear.w - 80) / Math.max(1, u.x2 - u.x1), (clear.h - 80) / Math.max(1, u.y2 - u.y1), 1.6) };
+  };
+  const bestFor = (size) => {
+    let top = null;
+    for (const stretch of main.length > 1 ? [1, 1.4, 1.8, 2.2] : [1]) {
+      for (const bias of main.length > 1 ? [0.6, 1, 1.6] : [1]) {
+        const separated = separate(size, stretch, aspect * bias);
+        for (const beside of main.length && loose.length ? [true, false] : [false]) {
+          for (const spread of beside || !loose.length ? [1] : [0.8, 1, 1.25, 1.5]) {
+            const r = placeLoose(separated, size, beside, spread);
+            if (!top || r.k > top.k * 1.001) top = r;
+          }
+        }
+      }
+    }
+    return top;
+  };
+  let placed = bestFor(natural);
+  // At the zoom the map opens at, widen cards whose title would be cut (up to a point) and
+  // deepen cards so labels under the bottom row fit, then arrange again.
+  const k0 = placed.k * 0.94, size = new Map();
+  const padB = clamp(15 + 19 / k0 - (FOOT.device[2] + PAD), 0, 40);
+  let changed = false;
+  for (const a of areas) {
+    const n = natural.get(a), w = Math.min(titleNeed(a, k0) / k0, Math.max(520, n.w));
+    if (w > n.w + 1) { a.minW = w; changed = true; }
+    if (padB > 1) { a.padB = padB; offset.get(a).y += padB / 2; changed = true; }
+    size.set(a, { w: Math.max(n.w, w), h: n.h + (a.padB || 0) });
   }
+  if (changed) placed = bestFor(size);
 
   const pos = new Map();
   for (const a of areas) {
-    const c = center.get(a.id), off = offset.get(a);
+    const c = placed.center.get(a.id), off = offset.get(a);
     let best = [1, 1], bestCost = Infinity;
     for (const [fx, fy] of [[1, 1], [-1, 1], [1, -1], [-1, -1]]) {
       let cost = 0;
@@ -703,8 +756,8 @@ function computeLayout(aspect) {
         const p = local.get(n.id);
         for (const e of n.out.concat(n.inn)) {
           const B = e.vis && areaOf(e.s === n ? e.t : e.s);
-          if (!B || B === a || !center.has(B.id)) continue;
-          const o = center.get(B.id);
+          if (!B || B === a || !placed.center.has(B.id)) continue;
+          const o = placed.center.get(B.id);
           cost += Math.hypot(c.x + p.x * fx - o.x, c.y + p.y * fy - o.y);
         }
       }
@@ -944,12 +997,12 @@ function draw(c, v, w, h, snapshot, dt) {
   c.lineJoin = "round"; c.lineCap = "round";
 
   // Areas: Home Assistant-style cards with the area icon and name in the header.
-  const titlePx = clamp(11 + 5 * k, 12, 17);
-  const titleFont = `500 ${titlePx.toFixed(1)}px Roboto, Noto, system-ui, sans-serif`;
+  const titlePx = titleSize(k), tFont = titleFont(titlePx);
   const obstacles = [];
   for (const a of AREAS) {
     if (!a.vis) continue;
     const b = a.box, x = b.x1 * k + ox, y = b.y1 * k + oy, bw = b.w * k, bh = b.h * k;
+    a.sb = { x1: x, y1: y, x2: x + bw, y2: y + bh };
     if (x > w || y > h || x + bw < 0 || y + bh < 0) continue;
     const inFocus = !focus || focus.has(a) || a.kids.some((n) => focus.has(n));
     c.globalAlpha = inFocus ? 1 : 1 - 0.5 * fT;
@@ -961,10 +1014,10 @@ function draw(c, v, w, h, snapshot, dt) {
     if (bw > icon + 20) {
       drawIcon(c, a.icon, tx + icon / 2, hy, icon, T.t2);
       const room = bw - (tx - x) - icon - 12 - clamp(14 * k, 6, 14);
-      const title = fitText(c, titleFont, a.label, Math.max(0, room));
-      c.font = titleFont; c.fillStyle = T.t1; c.textAlign = "left"; c.textBaseline = "middle";
+      const title = fitText(c, tFont, a.label, Math.max(0, room));
+      c.font = tFont; c.fillStyle = T.t1; c.textAlign = "left"; c.textBaseline = "middle";
       c.fillText(title, tx + icon + 8, hy);
-      const tw = textWidth(c, titleFont, title);
+      const tw = textWidth(c, tFont, title);
       obstacles.push({ x1: tx, y1: hy - titlePx * 0.7, x2: tx + icon + 8 + tw, y2: hy + titlePx * 0.7 });
     }
     obstacles.push({ x1: x, y1: y, x2: x + bw, y2: y + bh, own: a, area: true });
@@ -996,8 +1049,10 @@ function draw(c, v, w, h, snapshot, dt) {
       c.lineTo(p1.x - s * Math.cos(ang + 0.42), p1.y - s * Math.sin(ang + 0.42)); c.closePath(); c.fill();
     }
   };
-  for (const e of edges) if (e.vis && !(focus && focus.has(e))) drawEdge(e, false);
-  if (focus) for (const e of edges) if (e.vis && focus.has(e)) drawEdge(e, true);
+  // An edge to the room a node already sits in would only cross the room's title, so it is left out.
+  const own = (e) => (e.t.kind === "area" && e.s.p === e.t) || (e.s.kind === "area" && e.t.p === e.s);
+  for (const e of edges) if (e.vis && !own(e) && !(focus && focus.has(e))) drawEdge(e, false);
+  if (focus) for (const e of edges) if (e.vis && !own(e) && focus.has(e)) drawEdge(e, true);
   c.globalAlpha = 1;
 
   // Glyphs: devices are tinted circles with their type icon; automations, scripts, and scenes are dark squares.
@@ -1028,11 +1083,11 @@ function draw(c, v, w, h, snapshot, dt) {
     }
   }
   c.globalAlpha = 1;
-  return drawLabels(c, onScreen, obstacles, focus, fT, w, h, snapshot, dt);
+  return drawLabels(c, onScreen, obstacles, focus, fT, w, h, snapshot, dt, k);
 }
 
 // Labels: place as many as fit without overlapping, most important first; fade them in and out.
-function drawLabels(c, list, obstacles, focus, fT, w, h, snapshot, dt) {
+function drawLabels(c, list, obstacles, focus, fT, w, h, snapshot, dt, k) {
   const CELL = 64, grid = new Map();
   const cells = (r, fn) => {
     for (let gx = Math.floor(r.x1 / CELL); gx <= Math.floor(r.x2 / CELL); gx++)
@@ -1051,8 +1106,8 @@ function drawLabels(c, list, obstacles, focus, fT, w, h, snapshot, dt) {
     if (focus && !focus.has(n) && fT > 0.5) continue;
     if (rank(n) > 1 && n.r < (n.deg ? 4 : 6) && !(focus && focus.has(n))) continue;
     const font = isLogic(n) ? FONT.strong : FONT.label;
-    const max = n === selected || n === hovered ? 260 : isLogic(n) ? 150 : 130;
-    const text = fitText(c, font, n.label, max);
+    const max = (n === selected || n === hovered ? 260 : isLogic(n) ? 150 : 130) * clamp(k, 1, 1.8);
+    const text = fitText(c, font, n.short, max);
     const tw = textWidth(c, font, text), th = 15;
     const spots = [
       [n.sx - tw / 2, n.sy + n.r + 3, "center"], [n.sx + n.r + 5, n.sy - th / 2, "left"],
@@ -1061,7 +1116,9 @@ function drawLabels(c, list, obstacles, focus, fT, w, h, snapshot, dt) {
     for (const [x, y] of spots) {
       const r = { x1: x - 2, y1: y, x2: x + tw + 2, y2: y + th, own: n };
       if (r.x1 < 0 || r.x2 > w || r.y1 < 0 || r.y2 > h) continue;
-      if (free(r, n)) { add(r); n.placed = { x, y, text, font, cut: text !== n.label }; break; }
+      const B = n.p && !n.p.virtual && n.p.sb; // labels stay inside their own card; the dashed groups have no card
+      if (B && (r.x1 < B.x1 + 2 || r.x2 > B.x2 - 2 || r.y2 > B.y2 - 1)) continue;
+      if (free(r, n)) { add(r); n.placed = { x, y, text, font, cut: text !== n.short }; break; }
     }
   }
   const step = snapshot ? 1 : dt / 140;
@@ -1572,13 +1629,13 @@ function renderStats() {
   const s = G.stats, v = (kind) => LEAVES.filter((n) => n.kind === kind && n.vis).length;
   const parts = [[AREAS.filter((a) => a.vis && !a.virtual).length, s.areas, "areas"], [v("device"), s.devices, "devices"],
     [v("automation"), s.automations, "automations"], [v("script"), s.scripts, "scripts"], [v("scene"), s.scenes, "scenes"]];
-  $("#stats").textContent = parts.filter(([, total]) => total).map(([n, total, label]) => (n === total ? `${total} ${label}` : `${n} of ${total} ${label}`)).join(" · ");
+  $("#stats").textContent = parts.filter(([, total]) => total).map(([n, total, label]) => (n === total ? plural(total, label) : `${n} of ${plural(total, label)}`)).join(" · ");
   canvas.setAttribute("aria-label", `Map of ${$("#stats").textContent}. Use the search or the table view for a text version.`);
 }
 function renderFoot() {
   const s = G.stats;
   $("#foot").innerHTML = `Generated ${esc(G.meta.generated)} from the Home Assistant registries and the automation, script, and scene YAML.` +
-    (s.not_on_map && s.not_on_map.length ? `<details><summary>${s.not_on_map.length} automations touch no device</summary><ul>${s.not_on_map.map((n) => `<li>${esc(n)}</li>`).join("")}</ul></details>` : "");
+    (s.not_on_map && s.not_on_map.length ? `<details><summary>${plural(s.not_on_map.length, "automations")} ${s.not_on_map.length === 1 ? "touches" : "touch"} no device</summary><ul>${s.not_on_map.map((n) => `<li>${esc(n)}</li>`).join("")}</ul></details>` : "");
 }
 
 /* === Table view ========================================================================== */
@@ -1679,9 +1736,17 @@ matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { re
 /* === Start =============================================================================== */
 function resize() {
   const r = stage.getBoundingClientRect();
+  // Keep the selected node, or else the middle of the map, in the middle after the window changes shape.
+  let keep = null;
+  if (layoutDone && W > 1) {
+    const c = clearArea();
+    keep = selected && selected.kind !== "area" ? { x: selected.x, y: selected.y }
+      : { x: (c.x + c.w / 2 - view.x) / view.k, y: (c.y + c.h / 2 - view.y) / view.k };
+  }
   DPR = window.devicePixelRatio || 1;
   W = Math.max(1, r.width); H = Math.max(1, r.height);
   canvas.width = Math.round(W * DPR); canvas.height = Math.round(H * DPR);
+  if (keep) { const c = clearArea(); view.x = c.x + c.w / 2 - keep.x * view.k; view.y = c.y + c.h / 2 - keep.y * view.k; }
   invalidate();
 }
 new ResizeObserver(resize).observe(stage);

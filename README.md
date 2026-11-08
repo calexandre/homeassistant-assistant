@@ -40,6 +40,7 @@ Before answering, the agent checks what you actually have (via MCP) and how Home
 - 🩺 **Troubleshooting playbook** — a guided flow through config checks, logs, traces, and Developer Tools when something misbehaves.
 - 🔧 **ESPHome support** — device YAML authoring backed by an esphome.io sitemap.
 - 📰 **Personalized release notes** — `/ha-release-notes` checks a Home Assistant release against your devices and configs and flags the breaking changes that affect you.
+- 🗺️ **Home map** — `/ha-home-map` draws an interactive map of your areas, devices, and the automations, scripts, and scenes that link them, as one HTML file that works offline.
 - 📂 **Config snapshots** — optional read-only SSH snapshots of automations, scripts, scenes, ESPHome YAMLs, Zigbee2MQTT data, and logs.
 - 🔐 **Read-only SSH guard** — a hook that blocks destructive SSH commands against your Home Assistant host, whether they run in Bash or PowerShell.
 - 🧩 **Cross-tool plugin** — the same skills and hook work in Claude Code, GitHub Copilot CLI, and VS Code.
@@ -67,6 +68,7 @@ Every request starts at the `homeassistant` skill, which calls `GetLiveContext` 
 | `ha-config-fetch` | Refreshes `ha-data/` snapshots over SSH when they are older than 24 hours, and always before debugging |
 | `ha-docs-sitemap` | Maps a topic to the right home-assistant.io page instead of crawling the docs |
 | `ha-release-notes` | On demand only (`/ha-release-notes`): summarizes a release against your setup and flags breaking changes that affect you |
+| `ha-home-map` | On demand only (`/ha-home-map`): draws your areas, devices, automations, scripts, and scenes as an offline, interactive map |
 | `esphome` | Authors ESPHome device YAML with an esphome.io sitemap |
 
 ## 🧰 Prerequisites
@@ -76,7 +78,8 @@ Every request starts at the `homeassistant` skill, which calls `GetLiveContext` 
 | Home Assistant 2026.11 or later with the [Model Context Protocol Server](https://www.home-assistant.io/integrations/mcp_server/) integration (the first release with the complete OAuth support browser sign-in relies on: Client ID Metadata Documents, PKCE, and discovery for public clients) | Everything |
 | One client: [Claude Code](https://claude.com/product/claude-code), [GitHub Copilot CLI](https://docs.github.com/en/copilot/concepts/agents/about-plugins), or VS Code with GitHub Copilot | Everything |
 | Python 3 | The SSH read-only guard hook, which every client runs |
-| SSH access to the Home Assistant host through a passwordless host alias named exactly `homeassistant` in `~/.ssh/config` | Optional: [snapshots](#-optional-ssh-snapshots) of automations, scripts, scenes, config files, and logs |
+| SSH access to the Home Assistant host through a passwordless host alias named exactly `homeassistant` in `~/.ssh/config` | Optional: [snapshots](#-optional-ssh-snapshots) of automations, scripts, scenes, config files, and logs, and the home map |
+| [PyYAML](https://pypi.org/project/PyYAML/) or [uv](https://docs.astral.sh/uv/) | Optional: the home map |
 
 Claude Code runs the hook as `python3` on every platform, including Windows. The Copilot clients run it as `python3` on Linux/macOS and as `python` on Windows.
 
@@ -144,6 +147,8 @@ The MCP server exposes live entity state, but not your automation, script, or sc
 | Snapshot | Path on the host | Needs |
 |---|---|---|
 | `automations`, `scenes`, `scripts`, `configuration`, `customize` YAML | `/config` | Any SSH add-on |
+| Every file `configuration.yaml` includes, such as packages and automation folders (`secrets.yaml` is always skipped) | `/config` | Any SSH add-on |
+| Area, device, entity, and integration registries, trimmed as they download: no credentials, integration titles, MAC addresses, or serial numbers | `/config/.storage` | Any SSH add-on |
 | ESPHome device YAMLs (`secrets.yaml` is always skipped) | `/config/esphome` | Any SSH add-on |
 | Zigbee2MQTT `configuration`, `devices`, `groups`, `state.json` | `/share/zigbee2mqtt` | Root, or a user with `sudo` |
 | Core and Supervisor logs, last 12 hours | Docker container logs | **Advanced SSH & Web Terminal** add-on with **Protection mode** off |
@@ -221,11 +226,22 @@ The troubleshooting skill walks through config checks, automation traces, and lo
 
 Runs only when you call it (in Claude Code, as `/ha-release-notes`). Pass a version like `2026.11.0` (patch versions work too) or a release notes URL; with neither, it uses the latest release on the Home Assistant blog. It checks highlights, new integrations, and breaking changes against your live entities and config snapshots, and saves the summary to `ha-release-notes/ha-release-[VERSION].md` (gitignored).
 
+### 🗺️ Home map
+
+```text
+/ha-home-map
+/ha-home-map Beach house
+```
+
+<img src="images/home-map-demo.png" alt="Home map of a made-up home: each room a card holding colored device icons and dark automation squares, linked by dashed trigger lines and solid control arrows, with filters and a legend in the sidebar" width="100%" />
+
+Runs only when you call it. It reads your [SSH snapshots](#-optional-ssh-snapshots) and saves one HTML file to `.temp/home-map/home-map.html` (gitignored) that opens straight from disk, with no server or internet connection. Each area is a card holding its devices, colored by how they connect (Zigbee, Wi-Fi, Z-Wave, and so on), and the automations, scripts, and scenes that act on them; dashed lines trigger, solid arrows control, and dotted arrows run another script or scene. Search by name or entity ID, filter by area, connection, device type, or integration, open any item for its details, switch to a table, or download the map as a PNG. Without SSH, it offers a preview built from a made-up home.
+
 ## 🔒 Safety and privacy
 
 - **Read-only SSH guard.** A `PreToolUse` hook inspects every Bash and PowerShell command. Commands that reach the `homeassistant` host must match a read-only allowlist; interactive SSH, uploads (`scp`, `sftp`, `rsync`), and everything else are denied. It guards against mistakes; it is not a sandbox.
 - **Device control stays with you.** The skills only need `GetLiveContext` to read your home, and your client asks before each MCP tool call. For a hard guarantee, turn on the integration's **Read-only** option.
-- **What leaves your machine.** Entity names and states from `GetLiveContext`, and any snapshot the agent reads (automations, logs, Zigbee2MQTT state), are sent to your AI provider as part of the conversation. `secrets.yaml` is never fetched.
+- **What leaves your machine.** Entity names and states from `GetLiveContext`, and any snapshot the agent reads (automations, logs, Zigbee2MQTT state), are sent to your AI provider as part of the conversation. `secrets.yaml` is never fetched, and the registries are trimmed before they are saved, so integration credentials never reach the disk. The home map stays on your machine; building it fetches only area icons it doesn't bundle, by icon name, from the jsdelivr CDN.
 - **No tokens to handle.** Every client signs in through Home Assistant's own login page, so there is no access token to copy, paste, or leak.
 
 ## 🧱 Project structure
@@ -237,7 +253,8 @@ Runs only when you call it (in Claude Code, as `/ha-release-notes`). Pass a vers
 └── icon.png                     # Plugin icon
 .claude/skills/                  # Every skill, in the one folder all three clients read
 ├── homeassistant/               # Entry point: live-context gate and skill routing
-├── ha-config-fetch/             # fetch-ha-data.sh (SSH snapshots) and its tests
+├── ha-config-fetch/             # fetch-ha-data.sh (SSH snapshots), its helpers, and their tests
+├── ha-home-map/                 # /ha-home-map, on demand only: graph builder, page template, and tests
 ├── ha-docs-sitemap/             # SITEMAP.md of home-assistant.io
 ├── ha-implementation-format/    # YAML / How This Works / Customization Ideas output
 ├── ha-release-notes/            # /ha-release-notes, on demand only
@@ -248,9 +265,9 @@ hooks/hooks.json                 # SSH read-only guard config for plugin install
 .github/
 ├── hooks/                       # SSH read-only guard script, its tests, and its config for clones
 ├── instructions/                # Markdown rules for docs and generated reports
-├── workflows/tests.yml          # CI: runs both test suites on pushes to main and on pull requests
+├── workflows/tests.yml          # CI: runs every test suite on pushes to main and on pull requests
 └── dependabot.yml               # Weekly updates for the GitHub Actions in workflows/
-images/                          # README logo
+images/                          # README logo and home map screenshot
 AGENTS.md                        # Instructions for coding agents working on this repo
 CONTRIBUTING.md                  # Tests, version bumps, and commit style for contributors
 SECURITY.md                      # How to report a vulnerability privately

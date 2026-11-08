@@ -27,9 +27,12 @@ Set up the Home Assistant MCP server as described in the [README](README.md#-set
 
    # Fetch script (.claude/skills/ha-config-fetch/)
    python3 -m unittest discover -s .claude/skills/ha-config-fetch -p 'test_*.py'
+
+   # Home map (.claude/skills/ha-home-map/), which needs PyYAML
+   uv run --no-project --with pyyaml python3 -m unittest discover -s .claude/skills/ha-home-map -p 'test_*.py'
    ```
 
-   The [Tests workflow](.github/workflows/tests.yml) runs both suites on every pull request.
+   The [Tests workflow](.github/workflows/tests.yml) runs every suite on every pull request.
 
 2. Validate the plugin manifests:
 

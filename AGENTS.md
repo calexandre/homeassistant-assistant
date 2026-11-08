@@ -11,7 +11,7 @@ Skills and a safety hook for building Home Assistant automations, scripts, and c
 | `hooks/hooks.json` | Guard hook config, plugin format | Plugin installs (Claude Code, Copilot CLI) |
 | `.github/hooks/ssh-ha-readonly-guard.json` | Guard hook config, Copilot format | VS Code and Copilot CLI in a clone |
 | `.claude-plugin/` | Plugin and marketplace manifests, icon | Plugin installs |
-| `.github/workflows/tests.yml` | CI running both test suites | GitHub Actions; `.github/dependabot.yml` keeps its actions current |
+| `.github/workflows/tests.yml` | CI running every test suite | GitHub Actions; `.github/dependabot.yml` keeps its actions current |
 
 Claude Code in a plain clone loads the skills but not the guard; `claude --plugin-dir .` loads both.
 
@@ -52,6 +52,8 @@ Claude Code in a plain clone loads the skills but not the guard; `claude --plugi
 | Entity customizations (`customize.yaml`) | `.claude/skills/ha-config-fetch/fetch-ha-data.sh` → read `ha-data/customize.yaml` |
 | ESPHome device YAMLs | `.claude/skills/ha-config-fetch/fetch-ha-data.sh` → read `ha-data/esphome/*.yaml` (`secrets.yaml` is never fetched) |
 | Zigbee2MQTT config / devices / groups / state | `.claude/skills/ha-config-fetch/fetch-ha-data.sh` → read `ha-data/zigbee2mqtt/{configuration,devices,groups}.yaml` + `state.json` |
+| Files `configuration.yaml` includes (packages, automation and script folders) | `.claude/skills/ha-config-fetch/fetch-ha-data.sh` → read them under `ha-data/` at their path on the host |
+| Area, device, entity, and integration registries | `.claude/skills/ha-config-fetch/fetch-ha-data.sh` → read `ha-data/registry/*.json`, trimmed by `trim_registry.py` so no credentials reach the disk |
 | Home Assistant logs (for debugging) | `.claude/skills/ha-config-fetch/fetch-ha-data.sh` → read `ha-data/logs/{core,supervisor}.log` |
 
 The fetch script uses SSH (host alias: `homeassistant`, passwordless login assumed).
@@ -68,8 +70,11 @@ The fetch script uses SSH (host alias: `homeassistant`, passwordless login assum
 # Test the SSH read-only guard — run after any change under .github/hooks/
 python3 -m unittest discover -s .github/hooks -p 'test_*.py'
 
-# Test that the fetch script keeps input out of the remote shell — run after any change to fetch-ha-data.sh
+# Test that the fetch script keeps input out of the remote shell and credentials off the disk — run after any change in ha-config-fetch/
 python3 -m unittest discover -s .claude/skills/ha-config-fetch -p 'test_*.py'
+
+# Test the home map builder and page against made-up homes (needs PyYAML) — run after any change in ha-home-map/
+uv run --no-project --with pyyaml python3 -m unittest discover -s .claude/skills/ha-home-map -p 'test_*.py'
 
 # Validate the plugin and marketplace manifests
 claude plugin validate .
@@ -99,6 +104,7 @@ For every Markdown edit or generated report, including gitignored output, read a
 ## File Output Conventions
 
 - Implementation output (scratch YAML, test configs): write to `.temp/`
+- Home maps from the `ha-home-map` skill: write to `.temp/home-map/`
 - Release summaries from the `ha-release-notes` skill: write to `ha-release-notes/ha-release-[VERSION].md`
 
 Git ignores both folders on purpose: what goes there describes the user's home, so it stays on this machine. Write there (create the folder when it is missing) and leave it uncommitted; the gitignore is no reason to save the output anywhere else.

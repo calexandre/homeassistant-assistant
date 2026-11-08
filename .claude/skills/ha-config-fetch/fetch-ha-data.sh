@@ -13,6 +13,8 @@ SSH_HOST="homeassistant"
 DOCKER="/usr/local/bin/docker"
 LOG_SINCE="12h"
 SETUP_GUIDE="https://github.com/calexandre/homeassistant-assistant#-optional-ssh-snapshots"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+MAX_INCLUDED=500
 
 # Add-on / integration data directories on the server.
 # ESPHome device YAMLs live under the ESPHome add-on data dir (derived from HA_CONFIG_DIR).
@@ -23,6 +25,7 @@ Z2M_DIR="/share/zigbee2mqtt"
 # We will save the files inside the ha-data directory relative to the current workspace
 OUT_DIR="$(pwd)/ha-data"
 LOGS_DIR="${OUT_DIR}/logs"
+REGISTRY_OUT="${OUT_DIR}/registry"
 ESPHOME_OUT="${OUT_DIR}/esphome"
 Z2M_OUT="${OUT_DIR}/zigbee2mqtt"
 
@@ -47,6 +50,7 @@ echo ""
 # Paths and file names end up inside remote shell commands, so only plain ones are allowed.
 SAFE_PATH_RE='^/[A-Za-z0-9._/-]*$'
 SAFE_NAME_RE='^[A-Za-z0-9._-]+\.yaml$'
+SAFE_REL_RE='^[A-Za-z0-9_][A-Za-z0-9._/-]*$'
 
 if [[ ! "${HA_CONFIG_DIR}" =~ ${SAFE_PATH_RE} ]]; then
     echo "❌ Invalid config directory: '${HA_CONFIG_DIR}'"
@@ -81,6 +85,82 @@ for file in "${CONFIG_FILES[@]}"; do
     ssh "${SSH_HOST}" "cat '${HA_CONFIG_DIR}/${file}'" > "${OUT_DIR}/${file}" 2>/dev/null
     check_result "${OUT_DIR}/${file}" "${file}"
 done
+
+# --- Files that configuration.yaml includes ---
+# Packages and automation, script, and scene folders, fetched into the same layout under ha-data/.
+# include_paths.py names each target; every path is checked again here before it reaches ssh.
+safe_rel() {
+    [[ "$1" =~ ${SAFE_REL_RE} ]] && [[ "$1" != *..* ]] && [[ "$1" != */.* ]] && [[ "$(basename "$1")" != "secrets.yaml" ]]
+}
+
+if [ -s "${OUT_DIR}/configuration.yaml" ]; then
+    echo ""
+    echo "🧩 Fetching files that configuration.yaml includes..."
+    if ! command -v python3 >/dev/null 2>&1; then
+        echo "  ⏭️  Included files (python3 is needed to read the !include lines)"
+    else
+        seen=" configuration.yaml ${CONFIG_FILES[*]} "
+        queue=("configuration.yaml")
+        fetched=0
+        # Included files can include more; follow them up to three levels deep.
+        for _ in 1 2 3 4; do
+            [ "${#queue[@]}" -eq 0 ] && break
+            next=()
+            for rel in "${queue[@]}"; do
+                targets=()
+                while IFS= read -r line; do targets+=("$line"); done \
+                    < <(python3 -I "${SCRIPT_DIR}/include_paths.py" "${OUT_DIR}" "${rel}" 2>/dev/null)
+                for target in "${targets[@]+"${targets[@]}"}"; do
+                    kind="${target%% *}"
+                    path="${target#* }"
+                    safe_rel "${path}" || { echo "  ⏭️  ${path} (skipped: unsafe path)"; continue; }
+                    files=()
+                    if [ "${kind}" = "dir" ]; then
+                        while IFS= read -r line; do files+=("${line#"${HA_CONFIG_DIR}/"}"); done \
+                            < <(ssh -n "${SSH_HOST}" "find '${HA_CONFIG_DIR}/${path}' -type f -name '*.yaml'" 2>/dev/null)
+                    else
+                        files=("${path}")
+                    fi
+                    for file in "${files[@]+"${files[@]}"}"; do
+                        [[ "${seen}" == *" ${file} "* ]] && continue
+                        seen="${seen}${file} "
+                        safe_rel "${file}" && [[ "${file}" == *.yaml || "${file}" == *.yml ]] \
+                            || { echo "  ⏭️  ${file} (skipped: unsafe path)"; continue; }
+                        if [ "${fetched}" -ge "${MAX_INCLUDED}" ]; then
+                            echo "  ⚠️  Stopped after ${MAX_INCLUDED} included files"
+                            break 4
+                        fi
+                        mkdir -p "$(dirname "${OUT_DIR}/${file}")"
+                        ssh -n "${SSH_HOST}" "cat '${HA_CONFIG_DIR}/${file}'" > "${OUT_DIR}/${file}" 2>/dev/null
+                        check_result "${OUT_DIR}/${file}" "${file}" && next+=("${file}") && fetched=$((fetched + 1))
+                    done
+                done
+            done
+            queue=("${next[@]+"${next[@]}"}")
+        done
+        [ "${fetched}" -eq 0 ] && echo "  ⏭️  No included files"
+    fi
+fi
+
+# --- Registries ---
+# Areas, devices, entities, and integrations, read from .storage. trim_registry.py trims each one
+# in the pipe, so credentials, MAC addresses, and serial numbers never reach the disk.
+echo ""
+echo "🗂️  Fetching registries from ${SSH_HOST}:${HA_CONFIG_DIR}/.storage..."
+
+if ! command -v python3 >/dev/null 2>&1; then
+    echo "  ⏭️  Registries (python3 is needed to trim them)"
+else
+    mkdir -p "${REGISTRY_OUT}"
+    for entry in "core.area_registry:areas" "core.device_registry:devices" "core.entity_registry:entities" "core.config_entries:entries"; do
+        store="${entry%%:*}"
+        kind="${entry##*:}"
+        ssh "${SSH_HOST}" "cat '${HA_CONFIG_DIR}/.storage/${store}'" 2>/dev/null \
+            | python3 -I "${SCRIPT_DIR}/trim_registry.py" "${kind}" > "${REGISTRY_OUT}/${kind}.json" 2>/dev/null \
+            || rm -f "${REGISTRY_OUT}/${kind}.json"
+        check_result "${REGISTRY_OUT}/${kind}.json" "registry/${kind}.json"
+    done
+fi
 
 # --- ESPHome device YAMLs ---
 # Fetch every *.yaml in the ESPHome data dir EXCEPT secrets.yaml (never snapshot secrets).

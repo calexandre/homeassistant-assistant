@@ -57,6 +57,8 @@ After the script completes, read the file(s) you need:
 - `ha-data/scripts.yaml` — all scripts
 - `ha-data/configuration.yaml` — main configuration
 - `ha-data/customize.yaml` — entity customizations
+- `ha-data/<path>` — every file `configuration.yaml` includes (packages, automation, script, and scene folders), in the same folder layout as on the host; `secrets.yaml` is never fetched
+- `ha-data/registry/{areas,devices,entities,entries}.json` — the area, device, entity, and integration registries, trimmed while they download: no credentials, integration titles, MAC addresses, or serial numbers
 - `ha-data/esphome/*.yaml` — every ESPHome device YAML found under the ESPHome data dir (`secrets.yaml` is always skipped, never snapshotted)
 - `ha-data/zigbee2mqtt/configuration.yaml` — Zigbee2MQTT main config
 - `ha-data/zigbee2mqtt/devices.yaml` — Zigbee2MQTT device definitions

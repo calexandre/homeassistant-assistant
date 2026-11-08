@@ -42,6 +42,7 @@ carries a doc citation.
 | Creates or edits a Home Assistant automation, script, scene, blueprint, or configuration | `ha-implementation-format` |
 | Authors or edits ESPHome device YAML, components, or firmware | `esphome` |
 | Asks only for a documentation URL or docs-backed explanation | `ha-docs-sitemap` |
+| Asks for a map or diagram of the home's devices and the automations that link them | Suggest `/ha-home-map`, which runs only when the user calls it |
 
 ## Guardrails
 
