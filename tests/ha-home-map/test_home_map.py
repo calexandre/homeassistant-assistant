@@ -1,8 +1,9 @@
 """Tests for the home map: the graph builder against a made-up home, and the rendered page.
 
-Needs PyYAML. Run: python3 -m unittest discover -s .claude/skills/ha-home-map -p 'test_*.py'
+Needs PyYAML. Run: python3 -m unittest discover -s tests/ha-home-map -p 'test_*.py'
 """
 import json
+import os
 import pathlib
 import re
 import subprocess
@@ -11,19 +12,23 @@ import tempfile
 import textwrap
 import unittest
 
-SCRIPTS = pathlib.Path(__file__).resolve().parent / "scripts"
+ROOT = pathlib.Path(__file__).resolve().parents[2]
+SCRIPTS = ROOT / ".claude" / "skills" / "ha-home-map" / "scripts"
+DEMO_HOME = ROOT / "demo" / "demo_home.py"
 sys.path.insert(0, str(SCRIPTS))
+sys.dont_write_bytecode = True  # keep __pycache__ out of the skill folder
 
 import build_graph  # noqa: E402
 
 
-def run(script, *args):
+def run(script, *args, env=None):
+    """Run a script given by path, or by name from the skill's scripts folder."""
     return subprocess.run([sys.executable, "-I", str(SCRIPTS / script), *map(str, args)],
-                          capture_output=True, text=True, check=True, timeout=120)
+                          capture_output=True, text=True, check=True, timeout=120, env=env)
 
 
 def make_home(out, *flags):
-    run("demo_home.py", out, "--size", "medium", *flags)
+    run(DEMO_HOME, out, "--size", "medium", *flags)
     run("build_graph.py", "--registry", out / "registry", "--config", out / "config", "--out", out / "graph.json")
     return json.loads((out / "graph.json").read_text())
 
@@ -168,7 +173,8 @@ class RenderTests(unittest.TestCase):
         home = pathlib.Path(cls.tmp.name) / "home"
         make_home(home, "--edge-cases")
         out = home / "map.html"
-        cls.log = run("render.py", home / "graph.json", out, "--title", "<Test & home>", "--offline").stdout
+        cls.log = run("render.py", home / "graph.json", out, "--title", "<Test & home>", "--offline",
+                      env={**os.environ, "SOURCE_DATE_EPOCH": "1794096000"}).stdout
         cls.html = out.read_text()
 
     @classmethod
@@ -188,6 +194,9 @@ class RenderTests(unittest.TestCase):
         self.assertIsNone(re.search(r"<(script|link|img)\b[^>]*\b(src|href)=[\"']?(https?:)?//", self.html))
         self.assertNotIn("url(http", self.html)
         self.assertNotIn("@import", self.html)
+
+    def test_build_date_follows_source_date_epoch(self):
+        self.assertIn('"generated": "2026-11-08"', self.html)
 
     def test_offline_falls_back_for_unknown_icons(self):
         self.assertIn("icon mdi:not-a-real-icon unavailable", self.log)
