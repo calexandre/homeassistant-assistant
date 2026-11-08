@@ -27,6 +27,7 @@ Before answering, the agent checks what you actually have (via MCP) and how Home
 - [✅ Check that it works](#-check-that-it-works)
 - [📂 Optional: SSH snapshots](#-optional-ssh-snapshots)
 - [💡 Usage examples](#-usage-examples)
+- [🏡 Home map](#-home-map)
 - [🔒 Safety and privacy](#-safety-and-privacy)
 - [🧱 Project structure](#-project-structure)
 - [🧯 Troubleshooting](#-troubleshooting)
@@ -40,7 +41,7 @@ Before answering, the agent checks what you actually have (via MCP) and how Home
 - 🩺 **Troubleshooting playbook** — a guided flow through config checks, logs, traces, and Developer Tools when something misbehaves.
 - 🔧 **ESPHome support** — device YAML authoring backed by an esphome.io sitemap.
 - 📰 **Personalized release notes** — `/ha-release-notes` checks a Home Assistant release against your devices and configs and flags the breaking changes that affect you.
-- 🗺️ **Home map** — `/ha-home-map` draws an interactive map of your areas, devices, and the automations, scripts, and scenes that link them, as one HTML file that works offline.
+- 🏡 **Home map** — `/ha-home-map` draws an interactive map of your areas, devices, and the automations, scripts, and scenes that link them, as one HTML file that works offline. [See the demo](#-home-map).
 - 📂 **Config snapshots** — optional read-only SSH snapshots of automations, scripts, scenes, ESPHome YAMLs, Zigbee2MQTT data, and logs.
 - 🔐 **Read-only SSH guard** — a hook that blocks destructive SSH commands against your Home Assistant host, whether they run in Bash or PowerShell.
 - 🧩 **Cross-tool plugin** — the same skills and hook work in Claude Code, GitHub Copilot CLI, and VS Code.
@@ -226,16 +227,51 @@ The troubleshooting skill walks through config checks, automation traces, and lo
 
 Runs only when you call it (in Claude Code, as `/ha-release-notes`). Pass a version like `2026.11.0` (patch versions work too) or a release notes URL; with neither, it uses the latest release on the Home Assistant blog. It checks highlights, new integrations, and breaking changes against your live entities and config snapshots, and saves the summary to `ha-release-notes/ha-release-[VERSION].md` (gitignored).
 
-### 🗺️ Home map
+## 🏡 Home map
+
+`/ha-home-map` draws your home as one interactive page: each area is a card holding its devices, linked to the automations, scripts, and scenes that trigger or control them. The page is a single HTML file that opens straight from disk, with no server or internet connection.
+
+[![Home map of a made-up home: each room a card holding colored device icons and dark automation squares, linked by dashed trigger lines and solid control arrows, with display options, a legend, and filters in the sidebar](demo/assets/home-map.png)](demo/assets/home-map.html)
+
+**Try it first:** [demo/assets/home-map.html](demo/assets/home-map.html) maps a made-up home with 12 rooms, 166 devices, and 57 automations. GitHub shows the file as source, so use **Download raw file** and open the download in your browser.
+
+### Build your map
+
+The map reads your registries and automation YAML from [SSH snapshots](#-optional-ssh-snapshots), and its graph builder needs [PyYAML](https://pypi.org/project/PyYAML/) or [uv](https://docs.astral.sh/uv/). Run it in Claude Code, with an optional page title:
 
 ```text
 /ha-home-map
 /ha-home-map Beach house
 ```
 
-<img src="images/home-map-demo.png" alt="Home map of a made-up home: each room a card holding colored device icons and dark automation squares, linked by dashed trigger lines and solid control arrows, with filters and a legend in the sidebar" width="100%" />
+It runs only when you call it, and then:
 
-Runs only when you call it. It reads your [SSH snapshots](#-optional-ssh-snapshots) and saves one HTML file to `.temp/home-map/home-map.html` (gitignored) that opens straight from disk, with no server or internet connection. Each area is a card holding its devices, colored by how they connect (Zigbee, Wi-Fi, Z-Wave, and so on), and the automations, scripts, and scenes that act on them; dashed lines trigger, solid arrows control, and dotted arrows run another script or scene. Search by name or entity ID, filter by area, connection, device type, or integration, open any item for its details, switch to a table, or download the map as a PNG. Without SSH, it offers a preview built from a made-up home.
+1. Refreshes `ha-data/` over SSH when the snapshot is more than a day old, including every file `configuration.yaml` includes.
+2. Saves the map to `.temp/home-map/home-map.html` (gitignored).
+3. Replies with a link to the file (on WSL, also a `file://wsl.localhost/…` address for your Windows browser), counts of what's on the map, and the automations it left off because they touch no device.
+
+Without SSH access, it hands you the demo instead: the plugin ships it already built, so it needs no build and no PyYAML. Once your map exists, ask follow-up questions such as "what turns on the hallway light?": the agent answers from the map's data in `.temp/home-map/graph.json`.
+
+The map lists your rooms, devices, and routines, so it stays on your machine and the agent shares only its local path. [Safety and privacy](#-safety-and-privacy) covers the one network request a build makes.
+
+### Read the map
+
+| You see | It means |
+|---|---|
+| Card | An area. **Across rooms** holds the automations, scripts, and scenes that touch several areas, and **No area** holds devices without one |
+| Round icon | A device, colored by how it connects: Zigbee, Wi-Fi, Z-Wave, and so on |
+| Dark square | An automation, script, or scene |
+| Dashed line | Triggers: the device starts the automation |
+| Solid arrow | Controls: the automation, script, or scene acts on the device |
+| Dotted arrow | Runs: an automation or script starts another automation, script, or scene |
+
+### Find your way around
+
+- **Search** by name or entity ID, or press `/` to jump to the search box.
+- **Click** an item to highlight everything linked to it and open its details: what triggers it, what it controls, and what it runs. `Esc` clears the selection.
+- **Filter** by area, connection, device type, or integration in the sidebar: click a chip to show or hide it, or double-click it to show only that one. **Automated only** hides devices that no automation touches.
+- **Zoom** with the scroll wheel, a pinch, a double-click, or `+` and `-`; drag or use the arrow keys to pan, and press `0` to fit the whole home.
+- **Switch to Table** for a sortable list, **download** the current view as a PNG, or switch between light and dark.
 
 ## 🔒 Safety and privacy
 
@@ -253,8 +289,8 @@ Runs only when you call it. It reads your [SSH snapshots](#-optional-ssh-snapsho
 └── icon.png                     # Plugin icon
 .claude/skills/                  # Every skill, in the one folder all three clients read
 ├── homeassistant/               # Entry point: live-context gate and skill routing
-├── ha-config-fetch/             # fetch-ha-data.sh (SSH snapshots), its helpers, and their tests
-├── ha-home-map/                 # /ha-home-map, on demand only: graph builder, page template, and tests
+├── ha-config-fetch/             # fetch-ha-data.sh (SSH snapshots) and its helpers
+├── ha-home-map/                 # /ha-home-map, on demand only: graph builder and page template
 ├── ha-docs-sitemap/             # SITEMAP.md of home-assistant.io
 ├── ha-implementation-format/    # YAML / How This Works / Customization Ideas output
 ├── ha-release-notes/            # /ha-release-notes, on demand only
@@ -267,7 +303,12 @@ hooks/hooks.json                 # SSH read-only guard config for plugin install
 ├── instructions/                # Markdown rules for docs and generated reports
 ├── workflows/tests.yml          # CI: runs every test suite on pushes to main and on pull requests
 └── dependabot.yml               # Weekly updates for the GitHub Actions in workflows/
-images/                          # README logo and home map screenshot
+tests/                           # Test suites for the skills, one folder per skill, kept out of the skill folders
+demo/
+├── demo_home.py                 # Generates made-up homes for the demo and the tests
+├── build.sh                     # Rebuilds the demo home map; CI fails while the committed copy is stale
+└── assets/                      # Demo home map (home-map.html), shipped already built, and its screenshot
+images/                          # README logo
 AGENTS.md                        # Instructions for coding agents working on this repo
 CONTRIBUTING.md                  # Tests, version bumps, and commit style for contributors
 SECURITY.md                      # How to report a vulnerability privately

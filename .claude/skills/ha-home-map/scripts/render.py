@@ -6,12 +6,16 @@ Usage: render.py <graph.json> <output.html> [--title "My home"] [--offline]
 
 Area icons missing from assets/icons.json are fetched from the jsdelivr CDN by name, unless
 --offline is given; either way, an icon that cannot be found falls back to mdi:texture-box.
+
+The page shows today's date as its build date, or the UTC date of SOURCE_DATE_EPOCH when that is
+set, so a rebuild of the same graph gives the same file (demo/build.sh relies on it).
 """
 import argparse
 import base64
 import datetime
 import html as htmllib
 import json
+import os
 import pathlib
 import re
 import urllib.request
@@ -23,6 +27,13 @@ SCRIPTS = ["cytoscape.min.js", "layout-base.js", "cose-base.js", "cytoscape-fcos
 FONTS = [("400", "roboto-latin-400-normal.woff2"), ("500", "roboto-latin-500-normal.woff2")]
 MDI_SVG = "https://cdn.jsdelivr.net/npm/@mdi/svg@7.4.47/svg/{}.svg"
 FALLBACK_ICON = "mdi:texture-box"
+
+
+def build_date():
+    epoch = os.environ.get("SOURCE_DATE_EPOCH")
+    if epoch:
+        return datetime.datetime.fromtimestamp(int(epoch), datetime.timezone.utc).date().isoformat()
+    return datetime.date.today().isoformat()
 
 
 def fetch_icon(name):
@@ -57,7 +68,7 @@ def main():
                 print(f"icon {name} unavailable, using {FALLBACK_ICON}")
                 node["icon"] = FALLBACK_ICON
     graph["icons"] = icons
-    graph["meta"] = {"title": args.title, "generated": datetime.date.today().isoformat()}
+    graph["meta"] = {"title": args.title, "generated": build_date()}
 
     fonts = "\n".join(
         f'@font-face {{ font-family: "Roboto"; font-style: normal; font-weight: {weight}; font-display: block; '

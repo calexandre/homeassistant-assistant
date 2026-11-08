@@ -26,13 +26,15 @@ Set up the Home Assistant MCP server as described in the [README](README.md#-set
    python3 -m unittest discover -s .github/hooks -p 'test_*.py'
 
    # Fetch script (.claude/skills/ha-config-fetch/)
-   python3 -m unittest discover -s .claude/skills/ha-config-fetch -p 'test_*.py'
+   python3 -m unittest discover -s tests/ha-config-fetch -p 'test_*.py'
 
    # Home map (.claude/skills/ha-home-map/), which needs PyYAML
-   uv run --no-project --with pyyaml python3 -m unittest discover -s .claude/skills/ha-home-map -p 'test_*.py'
+   uv run --no-project --with pyyaml python3 -m unittest discover -s tests/ha-home-map -p 'test_*.py'
    ```
 
    The [Tests workflow](.github/workflows/tests.yml) runs every suite on every pull request.
+
+   After a change in `.claude/skills/ha-home-map/` or `demo/`, also run `demo/build.sh` and commit the rebuilt `demo/assets/home-map.html`, which the skill ships already built: the workflow fails while the committed demo is stale. When the change alters how the map looks, retake `demo/assets/home-map.png` from it too.
 
 2. Validate the plugin manifests:
 
@@ -48,7 +50,7 @@ Set up the Home Assistant MCP server as described in the [README](README.md#-set
 
 [AGENTS.md](AGENTS.md) holds the repo's working rules (and is what coding agents read), and the [README](README.md#-project-structure) maps the folders. A few conventions worth knowing up front:
 
-- **Skills** live in `.claude/skills/<name>/SKILL.md` with `name` and `description` front matter. A new skill also needs a row in the routing table of `.claude/skills/homeassistant/SKILL.md`; open an issue or discussion first, since that file routes every request.
+- **Skills** live in `.claude/skills/<name>/SKILL.md` with `name` and `description` front matter, and their tests in `tests/<name>/`, so the skill folder holds only what the skill runs. A new skill also needs a row in the routing table of `.claude/skills/homeassistant/SKILL.md`; open an issue or discussion first, since that file routes every request.
 - **The SSH guard** (`.github/hooks/ssh-ha-readonly-guard.py`) must always exit 0 and report decisions through stdout JSON, because Copilot treats a non-zero exit as a denial. Add a test case for every rule you change.
 - **Your Home Assistant data** stays out of commits: `ha-data/`, `ha-release-notes/`, and `.temp/` are gitignored.
 

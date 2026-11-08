@@ -14,8 +14,8 @@ import tempfile
 import unittest
 
 
-HERE = Path(__file__).resolve().parent
-SCRIPT = HERE / "fetch-ha-data.sh"
+SKILL = Path(__file__).resolve().parents[2] / ".claude" / "skills" / "ha-config-fetch"
+SCRIPT = SKILL / "fetch-ha-data.sh"
 
 FAKE_SSH = """#!/bin/bash
 cmd="${@: -1}"
@@ -109,7 +109,7 @@ class FetchHaDataTests(unittest.TestCase):
 
 
 def run_helper(name, *args, stdin=""):
-  return subprocess.run(["python3", "-I", str(HERE / name), *args], input=stdin,
+  return subprocess.run(["python3", "-I", str(SKILL / name), *args], input=stdin,
                         capture_output=True, text=True, timeout=30)
 
 
