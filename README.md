@@ -9,6 +9,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/github/license/calexandre/homeassistant-assistant" alt="License: MIT" /></a>
   <a href=".claude-plugin/plugin.json"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fcalexandre%2Fhomeassistant-assistant%2Fmain%2F.claude-plugin%2Fplugin.json&query=%24.version&label=plugin" alt="Plugin version" /></a>
   <a href="https://www.home-assistant.io/integrations/mcp_server/"><img src="https://img.shields.io/badge/Home%20Assistant-2026.11%2B-18BCF2?logo=homeassistant&logoColor=white" alt="Home Assistant 2026.11 or later" /></a>
+  <a href="https://calexandre.github.io/homeassistant-assistant/"><img src="https://img.shields.io/badge/demos-live-03A9F4" alt="Live demos" /></a>
 </p>
 
 > Your Home Assistant setup, understood by AI — grounded in your **live entities** and the **official docs**, not guesses.
@@ -16,6 +17,8 @@
 Skills and a safety hook for **Claude Code**, **GitHub Copilot CLI**, and **VS Code with GitHub Copilot** that help you build automations, scripts, scenes, and ESPHome configs for your existing Home Assistant installation. It is not for Home Assistant core development.
 
 Before answering, the agent checks what you actually have (via MCP) and how Home Assistant says to do it (via the official docs). That combination keeps it from inventing entity IDs or suggesting deprecated YAML.
+
+Try what the skills make, on a made-up home, in the [live demos](https://calexandre.github.io/homeassistant-assistant/).
 
 ## 📚 Contents
 
@@ -231,9 +234,9 @@ Runs only when you call it (in Claude Code, as `/ha-release-notes`). Pass a vers
 
 `/ha-home-map` draws your home as one interactive page: each area is a card holding its devices, linked to the automations, scripts, and scenes that trigger or control them. The page is a single HTML file that opens straight from disk, with no server or internet connection.
 
-[![Home map of a made-up home: each room a card holding colored device icons and dark automation squares, linked by dashed trigger lines and solid control arrows, with display options, a legend, and filters in the sidebar](demo/assets/home-map.png)](demo/assets/home-map.html)
+[![Home map of a made-up home: each room a card holding colored device icons and dark automation squares, linked by dashed trigger lines and solid control arrows, with display options, a legend, and filters in the sidebar](demo/assets/home-map.png)](https://calexandre.github.io/homeassistant-assistant/home-map.html)
 
-**Try it first:** [demo/assets/home-map.html](demo/assets/home-map.html) maps a made-up home with 12 rooms, 166 devices, and 57 automations. GitHub shows the file as source, so use **Download raw file** and open the download in your browser.
+**Try it first:** the [live demo](https://calexandre.github.io/homeassistant-assistant/home-map.html) maps a made-up home with 12 rooms, 166 devices, and 57 automations, right in your browser.
 
 ### Build your map
 
@@ -252,7 +255,7 @@ It runs only when you call it, and then:
 
 Without SSH access, it hands you the demo instead: the plugin ships it already built, so it needs no build and no PyYAML. Once your map exists, ask follow-up questions such as "what turns on the hallway light?": the agent answers from the map's data in `.temp/home-map/graph.json`.
 
-The map lists your rooms, devices, and routines, so it stays on your machine and the agent shares only its local path. [Safety and privacy](#-safety-and-privacy) covers the one network request a build makes.
+The page lists your rooms, devices, and routines, so it stays on your machine and the agent shares only its local path. What the agent reads to answer you, its counts and the parts of `graph.json` a follow-up question needs, reaches your AI provider like any other snapshot; [Safety and privacy](#-safety-and-privacy) covers that and the one network request a build makes.
 
 ### Read the map
 
@@ -277,7 +280,7 @@ The map lists your rooms, devices, and routines, so it stays on your machine and
 
 - **Read-only SSH guard.** A `PreToolUse` hook inspects every Bash and PowerShell command. Commands that reach the `homeassistant` host must match a read-only allowlist; interactive SSH, uploads (`scp`, `sftp`, `rsync`), and everything else are denied. It guards against mistakes; it is not a sandbox.
 - **Device control stays with you.** The skills only need `GetLiveContext` to read your home, and your client asks before each MCP tool call. For a hard guarantee, turn on the integration's **Read-only** option.
-- **What leaves your machine.** Entity names and states from `GetLiveContext`, and any snapshot the agent reads (automations, logs, Zigbee2MQTT state), are sent to your AI provider as part of the conversation. `secrets.yaml` is never fetched, and the registries are trimmed before they are saved, so integration credentials never reach the disk. The home map stays on your machine; building it fetches only area icons it doesn't bundle, by icon name, from the jsdelivr CDN.
+- **What leaves your machine.** Entity names and states from `GetLiveContext`, and any snapshot the agent reads (automations, logs, Zigbee2MQTT state, the home map's `graph.json`), are sent to your AI provider as part of the conversation. `secrets.yaml` is never fetched, and the registries are trimmed before they are saved, so integration credentials never reach the disk. The home map page stays on your machine; building it fetches only area icons it doesn't bundle, by icon name, from the jsdelivr CDN.
 - **No tokens to handle.** Every client signs in through Home Assistant's own login page, so there is no access token to copy, paste, or leak.
 
 ## 🧱 Project structure
@@ -302,12 +305,13 @@ hooks/hooks.json                 # SSH read-only guard config for plugin install
 ├── hooks/                       # SSH read-only guard script, its tests, and its config for clones
 ├── instructions/                # Markdown rules for docs and generated reports
 ├── workflows/tests.yml          # CI: runs every test suite on pushes to main and on pull requests
+├── workflows/pages.yml          # Publishes demo/assets/ to GitHub Pages on pushes to main
 └── dependabot.yml               # Weekly updates for the GitHub Actions in workflows/
 tests/                           # Test suites for the skills, one folder per skill, kept out of the skill folders
 demo/
 ├── demo_home.py                 # Generates made-up homes for the demo and the tests
 ├── build.sh                     # Rebuilds the demo home map; CI fails while the committed copy is stale
-└── assets/                      # Demo home map (home-map.html), shipped already built, and its screenshot
+└── assets/                      # GitHub Pages root: the showcase (index.html), each demo built, and its screenshot
 images/                          # README logo
 AGENTS.md                        # Instructions for coding agents working on this repo
 CONTRIBUTING.md                  # Tests, version bumps, and commit style for contributors
