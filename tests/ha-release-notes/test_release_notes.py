@@ -337,13 +337,13 @@ class PipelineTests(unittest.TestCase):
             self.assertEqual(result.returncode, 2, (case, result.stdout, result.stderr))
             self.assertEqual(path.read_text(), before)
 
-    def test_a_snapshot_missing_a_registry_is_refused(self):
+    def test_a_snapshot_missing_a_registry_or_its_yaml_is_refused(self):
         data = self.work / "ha-data"
         (data / "registry").mkdir(parents=True)
         (data / "registry" / "entries.json").write_text("{}")
         result = self.run_cli("build", "--source-dir", str(self.work / "posts"), "--ha-data", str(data))
         self.assertEqual(result.returncode, 2, result.stderr)
-        self.assertIn("Missing devices.json, entities.json", result.stderr)
+        self.assertIn("Missing registry/devices.json, registry/entities.json, configuration.yaml", result.stderr)
         self.assertFalse(self.out.exists())
 
     @unittest.skipUnless(HAS_YAML, "needs PyYAML")

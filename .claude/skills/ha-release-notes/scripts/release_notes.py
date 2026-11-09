@@ -37,7 +37,8 @@ POST_LINK = re.compile(r"/blog/(\d{4})/(\d{2})/(\d{2})/release-(\d{4})(\d{1,2})/
 VERSION = re.compile(r"^(\d{4})\.(\d{1,2})(?:\.(\d+))?([a-z][a-z0-9]*)?$")
 MAX_MONTHS = 24
 AFFECTS = ("action", "behavior", "opportunity", "none")
-REGISTRIES = ("entries.json", "devices.json", "entities.json")  # what inventory.from_snapshot reads
+SNAPSHOT = ("registry/entries.json", "registry/devices.json", "registry/entities.json",
+            "configuration.yaml")  # what inventory.from_snapshot reads
 TEXT_LIMIT = {"highlight": 1500, "default": 3000}
 
 
@@ -147,9 +148,9 @@ def build(args):
         fail("Pass --ha-data DIR (SSH snapshots) or --domains a,b,c (from GetLiveContext).", 2)
     import inventory
     if args.ha_data:
-        absent = [name for name in REGISTRIES if not (pathlib.Path(args.ha_data) / "registry" / name).is_file()]
+        absent = [name for name in SNAPSHOT if not (pathlib.Path(args.ha_data) / name).is_file()]
         if absent:
-            fail(f"Missing {', '.join(absent)} in {args.ha_data}/registry: refresh the snapshot, or pass --domains instead.", 2)
+            fail(f"Missing {', '.join(absent)} in {args.ha_data}: refresh the snapshot, or pass --domains instead.", 2)
         home = inventory.from_snapshot(args.ha_data)
     else:
         home = inventory.from_domains(args.domains.split(","))
