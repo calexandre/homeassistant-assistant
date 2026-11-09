@@ -1,0 +1,2542 @@
+{
+ "schema": 1,
+ "meta": {
+  "target": "2026.11.0",
+  "installed": "2026.9.3",
+  "installed_from": "argument",
+  "generated": "2026-11-09",
+  "inventory": "registries",
+  "author": "Demo home",
+  "model": "claude-opus-5-5",
+  "summary": "Two releases to catch up on: update the Z-Wave JS app first, expect some dashboard names to change, and the rest is new features for the lights, buttons, and cameras this home already has.",
+  "notes": []
+ },
+ "posts": [
+  {
+   "release": "2026.9",
+   "title": "2026.9: There's room on this bus",
+   "url": "https://www.home-assistant.io/blog/2026/09/02/release-20269/",
+   "date": "2026-09-02"
+  },
+  {
+   "release": "2026.10",
+   "title": "2026.10: You are here 📍",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/",
+   "date": "2026-10-07"
+  },
+  {
+   "release": "2026.11",
+   "title": "2026.11: A lot in store!",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/",
+   "date": "2026-11-04"
+  }
+ ],
+ "inventory": {
+  "source": "registries",
+  "logic": {
+   "automation.alex_arrives_home": "Alex arrives home",
+   "automation.alex_arrives_home_2": "Alex arrives home 2",
+   "automation.bathroom_motion_lights": "Bathroom motion lights",
+   "automation.bathroom_motion_lights_2": "Bathroom motion lights 2",
+   "automation.bathroom_motion_lights_3": "Bathroom motion lights 3",
+   "automation.close_dining_room_blinds_at_sunset": "Close Dining Room blinds at sunset",
+   "automation.close_guest_room_blinds_at_sunset": "Close Guest Room blinds at sunset",
+   "automation.close_kids_room_blinds_at_sunset": "Close Kids Room blinds at sunset",
+   "automation.close_main_bedroom_blinds_at_sunset": "Close Main Bedroom blinds at sunset",
+   "automation.close_main_bedroom_blinds_at_sunset_2": "Close Main Bedroom blinds at sunset 2",
+   "automation.close_office_blinds_at_sunset": "Close Office blinds at sunset",
+   "automation.close_office_blinds_at_sunset_2": "Close Office blinds at sunset 2",
+   "automation.dining_room_motion_lights": "Dining Room motion lights",
+   "automation.dining_room_motion_lights_2": "Dining Room motion lights 2",
+   "automation.garage_motion_lights": "Garage motion lights",
+   "automation.garage_motion_lights_2": "Garage motion lights 2",
+   "automation.garage_motion_lights_3": "Garage motion lights 3",
+   "automation.garden_motion_lights": "Garden motion lights",
+   "automation.garden_motion_lights_2": "Garden motion lights 2",
+   "automation.garden_motion_lights_3": "Garden motion lights 3",
+   "automation.good_night": "Good night",
+   "automation.guest_room_button": "Guest Room button",
+   "automation.guest_room_button_2": "Guest Room button 2",
+   "automation.guest_room_motion_lights": "Guest Room motion lights",
+   "automation.guest_room_motion_lights_2": "Guest Room motion lights 2",
+   "automation.guest_room_motion_lights_3": "Guest Room motion lights 3",
+   "automation.guest_room_too_warm": "Guest Room too warm",
+   "automation.hallway_button": "Hallway button",
+   "automation.hallway_motion_lights": "Hallway motion lights",
+   "automation.hallway_motion_lights_2": "Hallway motion lights 2",
+   "automation.hallway_motion_lights_3": "Hallway motion lights 3",
+   "automation.kids_room_button": "Kids Room button",
+   "automation.kids_room_door_opened": "Kids Room door opened",
+   "automation.kids_room_door_opened_2": "Kids Room door opened 2",
+   "automation.kids_room_motion_lights": "Kids Room motion lights",
+   "automation.kids_room_motion_lights_2": "Kids Room motion lights 2",
+   "automation.kids_room_motion_lights_3": "Kids Room motion lights 3",
+   "automation.kids_room_too_warm": "Kids Room too warm",
+   "automation.kitchen_motion_lights": "Kitchen motion lights",
+   "automation.living_room_lights_at_sunset": "Living Room lights at sunset",
+   "automation.living_room_motion_lights": "Living Room motion lights",
+   "automation.living_room_motion_lights_2": "Living Room motion lights 2",
+   "automation.living_room_motion_lights_3": "Living Room motion lights 3",
+   "automation.living_room_motion_lights_4": "Living Room motion lights 4",
+   "automation.main_bedroom_button": "Main Bedroom button",
+   "automation.main_bedroom_button_2": "Main Bedroom button 2",
+   "automation.main_bedroom_button_runs_living_room_lights_at_sunset": "Main Bedroom button runs Living Room lights at sunset",
+   "automation.main_bedroom_door_opened": "Main Bedroom door opened",
+   "automation.main_bedroom_too_warm": "Main Bedroom too warm",
+   "automation.main_bedroom_too_warm_2": "Main Bedroom too warm 2",
+   "automation.office_button": "Office button",
+   "automation.office_motion_lights": "Office motion lights",
+   "automation.office_motion_lights_2": "Office motion lights 2",
+   "automation.sam_arrives_home": "Sam arrives home",
+   "scene.bathroom_relax": "Bathroom Relax",
+   "scene.dining_room_relax": "Dining Room Relax",
+   "scene.garage_relax": "Garage Relax",
+   "scene.garden_relax": "Garden Relax",
+   "scene.guest_room_relax": "Guest Room Relax",
+   "scene.hallway_relax": "Hallway Relax",
+   "scene.kids_room_relax": "Kids Room Relax",
+   "scene.kitchen_bright": "Kitchen Bright",
+   "scene.kitchen_relax": "Kitchen Relax",
+   "scene.laundry_relax": "Laundry Relax",
+   "scene.living_room_bright": "Living Room Bright",
+   "scene.living_room_relax": "Living Room Relax",
+   "scene.main_bedroom_relax": "Main Bedroom Relax",
+   "scene.office_relax": "Office Relax",
+   "script.leave_home": "Leave home"
+  }
+ },
+ "items": [
+  {
+   "id": "2026.9.4/patch/181972",
+   "kind": "patch",
+   "release": "2026.9.4",
+   "title": "Turn off Tuya fans when the speed is set to 0%",
+   "url": "https://www.home-assistant.io/blog/2026/09/02/release-20269/#202694---september-27",
+   "domains": [],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/181972"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": {
+    "affects": "behavior",
+    "summary": "Setting a Tuya fan's speed to 0% now turns it off.",
+    "impact": "The Bathroom extractor fan turns off when its speed slider goes to 0%, instead of staying on at the lowest speed."
+   }
+  },
+  {
+   "id": "2026.10/highlight/cloud-becomes-link",
+   "kind": "highlight",
+   "release": "2026.10",
+   "title": "Cloud becomes Link",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#cloud-becomes-link",
+   "domains": [],
+   "prs": [],
+   "match": null,
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "Home Assistant Cloud is being renamed Home Assistant Link in December, and remote access got faster with more servers and automatic server picking."
+   }
+  },
+  {
+   "id": "2026.10/highlight/a-whole-new-map",
+   "kind": "highlight",
+   "release": "2026.10",
+   "title": "A whole new map",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#a-whole-new-map",
+   "domains": [
+    "map_tiles"
+   ],
+   "prs": [],
+   "match": null,
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "Maps now draw OpenStreetMap vector tiles on your device, fetched through Home Assistant, with redesigned markers and a dark style."
+   }
+  },
+  {
+   "id": "2026.10/highlight/a-tidier-profile-page",
+   "kind": "highlight",
+   "release": "2026.10",
+   "title": "A tidier profile page",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#a-tidier-profile-page",
+   "domains": [
+    "person"
+   ],
+   "prs": [],
+   "match": null,
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "The user profile is split into short sections (appearance, localization, this browser, security), and people can now change their own name and picture."
+   }
+  },
+  {
+   "id": "2026.10/highlight/the-best-automation-feature-you-never-used",
+   "kind": "highlight",
+   "release": "2026.10",
+   "title": "The best automation feature you never used",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#the-best-automation-feature-you-never-used",
+   "domains": [],
+   "prs": [],
+   "match": null,
+   "general": false,
+   "assessment": {
+    "affects": "opportunity",
+    "summary": "Trigger IDs get a proper editor: in a Triggered by condition you tick the triggers to match, and Home Assistant manages the IDs.",
+    "impact": "Most rooms here have two or three motion-light automations, such as Garden motion lights 1 to 3. Each set could become one automation with a Triggered by condition."
+   }
+  },
+  {
+   "id": "2026.10/improvement/matter",
+   "kind": "improvement",
+   "release": "2026.10",
+   "title": "Matter",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#noteworthy-improvements-to-existing-integrations",
+   "domains": [
+    "matter"
+   ],
+   "prs": [],
+   "match": {
+    "domains": [
+     "matter"
+    ],
+    "used_by": [
+     "automation.dining_room_motion_lights",
+     "automation.dining_room_motion_lights_2",
+     "automation.good_night",
+     "automation.guest_room_motion_lights",
+     "automation.guest_room_motion_lights_3",
+     "automation.hallway_motion_lights_2",
+     "automation.hallway_motion_lights_3",
+     "automation.main_bedroom_door_opened",
+     "scene.dining_room_relax",
+     "scene.guest_room_relax",
+     "scene.hallway_relax",
+     "scene.kitchen_bright",
+     "scene.kitchen_relax",
+     "scene.main_bedroom_relax",
+     "script.leave_home"
+    ]
+   },
+   "general": false,
+   "assessment": {
+    "affects": "opportunity",
+    "summary": "Matter adds switches for leak sensor alarms and for one-touch locking, plus frequency and power factor for power meters.",
+    "impact": "The Hallway door lock is a Matter lock, so you can now decide whether one touch on its keypad locks the door."
+   }
+  },
+  {
+   "id": "2026.10/improvement/tuya",
+   "kind": "improvement",
+   "release": "2026.10",
+   "title": "Tuya",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#noteworthy-improvements-to-existing-integrations",
+   "domains": [
+    "tuya"
+   ],
+   "prs": [],
+   "match": {
+    "domains": [
+     "tuya"
+    ],
+    "used_by": []
+   },
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "Tuya supports more devices: DIN rail meters, breakers, EV chargers, water valves, and more readings for three-phase meters."
+   }
+  },
+  {
+   "id": "2026.10/improvement/esphome",
+   "kind": "improvement",
+   "release": "2026.10",
+   "title": "ESPHome",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#noteworthy-improvements-to-existing-integrations",
+   "domains": [
+    "esphome"
+   ],
+   "prs": [],
+   "match": {
+    "domains": [
+     "esphome"
+    ],
+    "used_by": [
+     "automation.dining_room_motion_lights",
+     "automation.hallway_motion_lights",
+     "automation.hallway_motion_lights_3",
+     "automation.kids_room_motion_lights",
+     "automation.kids_room_motion_lights_2",
+     "automation.kids_room_motion_lights_3"
+    ]
+   },
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "ESPHome devices can open the connection to Home Assistant themselves, for networks where Home Assistant can't reach them."
+   }
+  },
+  {
+   "id": "2026.10/improvement/reolink",
+   "kind": "improvement",
+   "release": "2026.10",
+   "title": "Reolink",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#noteworthy-improvements-to-existing-integrations",
+   "domains": [
+    "reolink"
+   ],
+   "prs": [],
+   "match": {
+    "domains": [
+     "reolink"
+    ],
+    "used_by": []
+   },
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "Reolink can pan and tilt the lenses of multi-lens cameras behind an NVR or Home Hub."
+   }
+  },
+  {
+   "id": "2026.10/improvement/roborock",
+   "kind": "improvement",
+   "release": "2026.10",
+   "title": "Roborock",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#noteworthy-improvements-to-existing-integrations",
+   "domains": [
+    "roborock"
+   ],
+   "prs": [],
+   "match": {
+    "domains": [
+     "roborock"
+    ],
+    "used_by": []
+   },
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "Roborock wet and dry vacuums now update in real time."
+   }
+  },
+  {
+   "id": "2026.10/improvement/zwave_js",
+   "kind": "improvement",
+   "release": "2026.10",
+   "title": "Z-Wave",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#noteworthy-improvements-to-existing-integrations",
+   "domains": [
+    "zwave_js"
+   ],
+   "prs": [],
+   "match": {
+    "domains": [
+     "zwave_js"
+    ],
+    "used_by": [
+     "automation.guest_room_too_warm",
+     "automation.kids_room_door_opened",
+     "automation.kids_room_door_opened_2",
+     "automation.kids_room_too_warm",
+     "automation.main_bedroom_too_warm",
+     "automation.main_bedroom_too_warm_2"
+    ]
+   },
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "Z-Wave gets automation editor conditions and triggers for node status, configuration parameters, and other values."
+   }
+  },
+  {
+   "id": "2026.10/improvement/unifiprotect",
+   "kind": "improvement",
+   "release": "2026.10",
+   "title": "UniFi Protect",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#noteworthy-improvements-to-existing-integrations",
+   "domains": [
+    "unifiprotect"
+   ],
+   "prs": [],
+   "match": {
+    "domains": [
+     "unifiprotect"
+    ],
+    "used_by": []
+   },
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "UniFi Protect supports the key fob and relay inputs, and API-key-only mode covers more devices and settings."
+   }
+  },
+  {
+   "id": "2026.10/removed/dublin-bus",
+   "kind": "removed",
+   "release": "2026.10",
+   "title": "Dublin Bus",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#farewell-to-the-following",
+   "domains": [
+    "dublin_bus"
+   ],
+   "prs": [],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.10/removed/etherscan",
+   "kind": "removed",
+   "release": "2026.10",
+   "title": "Etherscan",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#farewell-to-the-following",
+   "domains": [
+    "etherscan"
+   ],
+   "prs": [],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.10/removed/melnor-raincloud",
+   "kind": "removed",
+   "release": "2026.10",
+   "title": "Melnor RainCloud",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#farewell-to-the-following",
+   "domains": [
+    "melnor_raincloud"
+   ],
+   "prs": [],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.10/removed/orange-and-rockland-utility-oru",
+   "kind": "removed",
+   "release": "2026.10",
+   "title": "Orange and Rockland Utility (ORU)",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#farewell-to-the-following",
+   "domains": [
+    "orange_and_rockland_utility",
+    "oru"
+   ],
+   "prs": [],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.10/removed/sigfox",
+   "kind": "removed",
+   "release": "2026.10",
+   "title": "Sigfox",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#farewell-to-the-following",
+   "domains": [
+    "sigfox"
+   ],
+   "prs": [],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.10/removed/solaredge-local",
+   "kind": "removed",
+   "release": "2026.10",
+   "title": "SolarEdge Local",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#farewell-to-the-following",
+   "domains": [
+    "solaredge_local"
+   ],
+   "prs": [],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.10/removed/travis-ci",
+   "kind": "removed",
+   "release": "2026.10",
+   "title": "Travis-CI",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#farewell-to-the-following",
+   "domains": [
+    "travis_ci"
+   ],
+   "prs": [],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.10/removed/zestimate",
+   "kind": "removed",
+   "release": "2026.10",
+   "title": "Zestimate",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#farewell-to-the-following",
+   "domains": [
+    "zestimate"
+   ],
+   "prs": [],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.10/noteworthy/binary-sensor",
+   "kind": "noteworthy",
+   "release": "2026.10",
+   "title": "Binary sensor",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#other-noteworthy-changes",
+   "domains": [
+    "homematicip_cloud",
+    "simplisafe",
+    "zwave_js",
+    "hive",
+    "binary_sensor"
+   ],
+   "prs": [],
+   "match": {
+    "domains": [
+     "zwave_js",
+     "binary_sensor"
+    ],
+    "used_by": [
+     "automation.bathroom_motion_lights",
+     "automation.bathroom_motion_lights_2",
+     "automation.bathroom_motion_lights_3",
+     "automation.dining_room_motion_lights",
+     "automation.dining_room_motion_lights_2",
+     "automation.garage_motion_lights",
+     "automation.garage_motion_lights_2",
+     "automation.garage_motion_lights_3",
+     "automation.garden_motion_lights",
+     "automation.garden_motion_lights_2",
+     "automation.garden_motion_lights_3",
+     "automation.guest_room_motion_lights",
+     "automation.guest_room_motion_lights_2",
+     "automation.guest_room_motion_lights_3",
+     "automation.guest_room_too_warm",
+     "automation.hallway_motion_lights",
+     "automation.hallway_motion_lights_2",
+     "automation.hallway_motion_lights_3",
+     "automation.kids_room_door_opened",
+     "automation.kids_room_door_opened_2",
+     "automation.kids_room_motion_lights",
+     "automation.kids_room_motion_lights_2",
+     "automation.kids_room_motion_lights_3",
+     "automation.kids_room_too_warm",
+     "automation.kitchen_motion_lights",
+     "automation.living_room_motion_lights",
+     "automation.living_room_motion_lights_2",
+     "automation.living_room_motion_lights_3",
+     "automation.living_room_motion_lights_4",
+     "automation.main_bedroom_door_opened",
+     "automation.main_bedroom_too_warm",
+     "automation.main_bedroom_too_warm_2",
+     "automation.office_motion_lights",
+     "automation.office_motion_lights_2"
+    ]
+   },
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "Binary sensors get a glass break device class, treated as a security sensor."
+   }
+  },
+  {
+   "id": "2026.10/noteworthy/z-wave",
+   "kind": "noteworthy",
+   "release": "2026.10",
+   "title": "Z-Wave",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#other-noteworthy-changes",
+   "domains": [
+    "zwave_js"
+   ],
+   "prs": [],
+   "match": {
+    "domains": [
+     "zwave_js"
+    ],
+    "used_by": [
+     "automation.guest_room_too_warm",
+     "automation.kids_room_door_opened",
+     "automation.kids_room_door_opened_2",
+     "automation.kids_room_too_warm",
+     "automation.main_bedroom_too_warm",
+     "automation.main_bedroom_too_warm_2"
+    ]
+   },
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "The Z-Wave network map can show the real mesh between devices."
+   }
+  },
+  {
+   "id": "2026.10/noteworthy/climate",
+   "kind": "noteworthy",
+   "release": "2026.10",
+   "title": "Climate",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#other-noteworthy-changes",
+   "domains": [
+    "climate"
+   ],
+   "prs": [],
+   "match": {
+    "domains": [
+     "climate"
+    ],
+    "used_by": [
+     "automation.guest_room_too_warm",
+     "automation.kids_room_too_warm",
+     "automation.main_bedroom_too_warm",
+     "automation.main_bedroom_too_warm_2"
+    ]
+   },
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "Climate fan modes can be set by voice."
+   }
+  },
+  {
+   "id": "2026.10/breaking/authentication",
+   "kind": "breaking",
+   "release": "2026.10",
+   "title": "Authentication",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes",
+   "domains": [],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/175613"
+   ],
+   "match": null,
+   "general": true,
+   "assessment": {
+    "affects": "none",
+    "summary": "The legacy mode of the login provider is removed, and usernames are always lowercase without surrounding spaces.",
+    "impact": "Only matters if Home Assistant showed a repair about usernames."
+   }
+  },
+  {
+   "id": "2026.10/breaking/easyenergy",
+   "kind": "breaking",
+   "release": "2026.10",
+   "title": "easyEnergy",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes",
+   "domains": [
+    "easyenergy"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/181431"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.10/breaking/energyflip",
+   "kind": "breaking",
+   "release": "2026.10",
+   "title": "EnergyFlip",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes",
+   "domains": [
+    "huisbaasje"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/179723"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.10/breaking/energyzero",
+   "kind": "breaking",
+   "release": "2026.10",
+   "title": "EnergyZero",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes",
+   "domains": [
+    "energyzero"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/181492"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.10/breaking/google-sheets",
+   "kind": "breaking",
+   "release": "2026.10",
+   "title": "Google Sheets",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes",
+   "domains": [
+    "google_sheets"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/181692"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.10/breaking/google-wifi",
+   "kind": "breaking",
+   "release": "2026.10",
+   "title": "Google Wifi",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes",
+   "domains": [
+    "google_wifi"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/177525"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.10/breaking/iotawatt",
+   "kind": "breaking",
+   "release": "2026.10",
+   "title": "IoTaWatt",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes",
+   "domains": [
+    "iotawatt"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/180913"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.10/breaking/libre-hardware-monitor",
+   "kind": "breaking",
+   "release": "2026.10",
+   "title": "Libre Hardware Monitor",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes",
+   "domains": [
+    "libre_hardware_monitor"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/181928"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.10/breaking/linode-and-tank-utility",
+   "kind": "breaking",
+   "release": "2026.10",
+   "title": "Linode and Tank Utility",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes",
+   "domains": [
+    "linode",
+    "tank_utility"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/182842"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.10/breaking/mealie",
+   "kind": "breaking",
+   "release": "2026.10",
+   "title": "Mealie",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes",
+   "domains": [
+    "mealie"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/180609"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.10/breaking/mqtt",
+   "kind": "breaking",
+   "release": "2026.10",
+   "title": "MQTT",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes",
+   "domains": [
+    "mqtt"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/182045"
+   ],
+   "match": {
+    "domains": [
+     "mqtt"
+    ],
+    "used_by": [
+     "automation.dining_room_motion_lights_2",
+     "automation.garage_motion_lights",
+     "automation.garage_motion_lights_2",
+     "automation.garden_motion_lights",
+     "automation.garden_motion_lights_2",
+     "automation.garden_motion_lights_3",
+     "automation.good_night",
+     "automation.guest_room_motion_lights",
+     "automation.guest_room_motion_lights_3",
+     "automation.hallway_button",
+     "automation.hallway_motion_lights",
+     "automation.hallway_motion_lights_2",
+     "automation.hallway_motion_lights_3",
+     "automation.kids_room_button",
+     "automation.kids_room_door_opened",
+     "automation.kids_room_door_opened_2",
+     "automation.kids_room_motion_lights_2",
+     "automation.living_room_motion_lights",
+     "automation.living_room_motion_lights_2",
+     "automation.living_room_motion_lights_3",
+     "automation.living_room_motion_lights_4",
+     "automation.main_bedroom_button",
+     "automation.main_bedroom_button_2",
+     "automation.main_bedroom_button_runs_living_room_lights_at_sunset",
+     "automation.main_bedroom_door_opened",
+     "automation.office_button",
+     "automation.office_motion_lights_2",
+     "scene.dining_room_relax",
+     "scene.garden_relax",
+     "scene.guest_room_relax",
+     "scene.hallway_relax",
+     "scene.kids_room_relax",
+     "scene.living_room_bright",
+     "scene.living_room_relax",
+     "scene.office_relax"
+    ]
+   },
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "The mqtt.publish and mqtt.dump actions now require an administrator when a person calls them.",
+    "impact": "No automation or script here calls mqtt.publish."
+   }
+  },
+  {
+   "id": "2026.10/breaking/openevse",
+   "kind": "breaking",
+   "release": "2026.10",
+   "title": "OpenEVSE",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes",
+   "domains": [
+    "openevse"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/180329"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.10/breaking/proxmox-ve",
+   "kind": "breaking",
+   "release": "2026.10",
+   "title": "Proxmox VE",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes",
+   "domains": [
+    "proxmoxve"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/169704"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.10/breaking/rejseplanen",
+   "kind": "breaking",
+   "release": "2026.10",
+   "title": "Rejseplanen",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes",
+   "domains": [
+    "rejseplanen"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/152200"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.10/breaking/sofar",
+   "kind": "breaking",
+   "release": "2026.10",
+   "title": "Sofar",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes",
+   "domains": [
+    "sofar"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/181729"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.10/breaking/state-conditions",
+   "kind": "breaking",
+   "release": "2026.10",
+   "title": "State conditions",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes",
+   "domains": [],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/174083"
+   ],
+   "match": null,
+   "general": true,
+   "assessment": {
+    "affects": "none",
+    "summary": "State conditions that combine for with an attribute, a list of states, or another entity's state now fail validation.",
+    "impact": "No automation here has a state condition."
+   }
+  },
+  {
+   "id": "2026.10/breaking/synology-dsm",
+   "kind": "breaking",
+   "release": "2026.10",
+   "title": "Synology DSM",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes",
+   "domains": [
+    "synology_dsm"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/182050"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.10/breaking/telegram-bot",
+   "kind": "breaking",
+   "release": "2026.10",
+   "title": "Telegram bot",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes",
+   "domains": [
+    "telegram_bot"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/182460"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.10/breaking/teslemetry",
+   "kind": "breaking",
+   "release": "2026.10",
+   "title": "Teslemetry",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes",
+   "domains": [
+    "teslemetry"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/181351"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.10/breaking/unifi-network",
+   "kind": "breaking",
+   "release": "2026.10",
+   "title": "UniFi Network",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes",
+   "domains": [
+    "unifi"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/182201"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.10/breaking/upcloud",
+   "kind": "breaking",
+   "release": "2026.10",
+   "title": "UpCloud",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes",
+   "domains": [
+    "upcloud"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/181327"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.10/breaking/xbox",
+   "kind": "breaking",
+   "release": "2026.10",
+   "title": "Xbox",
+   "url": "https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes",
+   "domains": [
+    "xbox"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/182734"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/highlight/welcome-to-the-marketplace",
+   "kind": "highlight",
+   "release": "2026.11",
+   "title": "Welcome to the Marketplace",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#welcome-to-the-marketplace",
+   "domains": [
+    "marketplace"
+   ],
+   "prs": [],
+   "match": null,
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "HACS becomes the built-in Marketplace under Settings, for installing community integrations, cards, themes, and templates without a restart."
+   }
+  },
+  {
+   "id": "2026.11/highlight/exclude-items-from-a-target",
+   "kind": "highlight",
+   "release": "2026.11",
+   "title": "Exclude items from a target",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#exclude-items-from-a-target",
+   "domains": [],
+   "prs": [],
+   "match": null,
+   "general": false,
+   "assessment": {
+    "affects": "opportunity",
+    "summary": "Targets can now leave out entities, devices, areas, floors, or labels, and the exclusion keeps applying as things are added.",
+    "impact": "The sunset automations close every blind in an area; an exclusion could keep one open, such as the Office blinds on work days, without listing the others by hand."
+   }
+  },
+  {
+   "id": "2026.11/highlight/copy-and-paste-dashboard-sections",
+   "kind": "highlight",
+   "release": "2026.11",
+   "title": "Copy and paste dashboard sections",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#copy-and-paste-dashboard-sections",
+   "domains": [],
+   "prs": [],
+   "match": null,
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "Dashboard sections can be copied or cut and pasted, also into another view or dashboard."
+   }
+  },
+  {
+   "id": "2026.11/highlight/sections-that-fill-themselves",
+   "kind": "highlight",
+   "release": "2026.11",
+   "title": "Sections that fill themselves",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#sections-that-fill-themselves",
+   "domains": [],
+   "prs": [],
+   "match": null,
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "Automatic dashboard sections pick their own cards, such as every light on a floor or every entity of one device, and stay current as devices change."
+   }
+  },
+  {
+   "id": "2026.11/highlight/new-cards-and-badges",
+   "kind": "highlight",
+   "release": "2026.11",
+   "title": "New cards and badges",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#new-cards-and-badges",
+   "domains": [],
+   "prs": [],
+   "match": null,
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "New Date card and Alert badge, a color option for the Sensor card, buttons or a slider for target temperatures, and a visual editor for the Alert card."
+   }
+  },
+  {
+   "id": "2026.11/highlight/color-control-on-light-tiles",
+   "kind": "highlight",
+   "release": "2026.11",
+   "title": "Color control on light tiles",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#color-control-on-light-tiles",
+   "domains": [],
+   "prs": [],
+   "match": null,
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "Light tiles get a hue strip with an optional saturation slider."
+   }
+  },
+  {
+   "id": "2026.11/highlight/name-it-once-home-assistant-adds-the-context",
+   "kind": "highlight",
+   "release": "2026.11",
+   "title": "Name it once, Home Assistant adds the context",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#name-it-once-home-assistant-adds-the-context",
+   "domains": [],
+   "prs": [],
+   "match": null,
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "Entities are named once and Home Assistant adds the device or area around them where it helps, so renaming a device renames its entities.",
+    "impact": "See Entity names under You'll notice for what changes on the dashboards."
+   }
+  },
+  {
+   "id": "2026.11/highlight/forms-that-ask-only-what-they-need",
+   "kind": "highlight",
+   "release": "2026.11",
+   "title": "Forms that ask only what they need",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#forms-that-ask-only-what-they-need",
+   "domains": [],
+   "prs": [],
+   "match": null,
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "Setup forms and blueprints show a field only when an earlier answer makes it relevant."
+   }
+  },
+  {
+   "id": "2026.11/highlight/from-power-to-energy-in-one-step",
+   "kind": "highlight",
+   "release": "2026.11",
+   "title": "From power to energy in one step",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#from-power-to-energy-in-one-step",
+   "domains": [],
+   "prs": [],
+   "match": null,
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "The Energy dashboard offers to derive an energy sensor from a power-only sensor, and the same for gas and water flow."
+   }
+  },
+  {
+   "id": "2026.11/highlight/why-did-that-happen",
+   "kind": "highlight",
+   "release": "2026.11",
+   "title": "Why did that happen?",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#why-did-that-happen",
+   "domains": [],
+   "prs": [],
+   "match": null,
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "The Activity panel filters by what triggered a change, traces link to the script run they started, and integrations with debug logging show their own live log."
+   }
+  },
+  {
+   "id": "2026.11/highlight/cameras-matter",
+   "kind": "highlight",
+   "release": "2026.11",
+   "title": "Cameras Matter",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#cameras-matter",
+   "domains": [
+    "matter",
+    "reolink"
+   ],
+   "prs": [],
+   "match": {
+    "domains": [
+     "matter",
+     "reolink"
+    ],
+    "used_by": [
+     "automation.dining_room_motion_lights",
+     "automation.dining_room_motion_lights_2",
+     "automation.good_night",
+     "automation.guest_room_motion_lights",
+     "automation.guest_room_motion_lights_3",
+     "automation.hallway_motion_lights_2",
+     "automation.hallway_motion_lights_3",
+     "automation.main_bedroom_door_opened",
+     "scene.dining_room_relax",
+     "scene.guest_room_relax",
+     "scene.hallway_relax",
+     "scene.kitchen_bright",
+     "scene.kitchen_relax",
+     "scene.main_bedroom_relax",
+     "script.leave_home"
+    ]
+   },
+   "general": false,
+   "assessment": {
+    "affects": "opportunity",
+    "summary": "Matter 1.5 cameras are supported, and a Labs preview adds two-way audio to camera streams.",
+    "impact": "The Reolink doorbells in the Hallway and Garden can use two-way audio once it is turned on in Labs, as long as they stream over RTSP and the app is opened over HTTPS."
+   }
+  },
+  {
+   "id": "2026.11/highlight/store-backups-and-media-on-local-drives",
+   "kind": "highlight",
+   "release": "2026.11",
+   "title": "Store backups and media on local drives",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#store-backups-and-media-on-local-drives",
+   "domains": [],
+   "prs": [],
+   "match": null,
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "Internal and USB drives can hold backups, media, and shared files, and restores no longer copy the whole backup first."
+   }
+  },
+  {
+   "id": "2026.11/highlight/reach-the-far-corners-with-lorawan",
+   "kind": "highlight",
+   "release": "2026.11",
+   "title": "Reach the far corners with LoRaWAN",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#reach-the-far-corners-with-lorawan",
+   "domains": [
+    "chirpstack",
+    "thethingsnetwork_lorawan",
+    "sensecap_lorawan"
+   ],
+   "prs": [],
+   "match": null,
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "Home Assistant connects to LoRaWAN network servers such as ChirpStack and The Things Network, with a new LoRaWAN page under Connectivity."
+   }
+  },
+  {
+   "id": "2026.11/highlight/batteryless-switches-with-zigbee-green-power",
+   "kind": "highlight",
+   "release": "2026.11",
+   "title": "Batteryless switches with Zigbee Green Power",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#batteryless-switches-with-zigbee-green-power",
+   "domains": [
+    "zha"
+   ],
+   "prs": [],
+   "match": {
+    "domains": [
+     "zha"
+    ],
+    "used_by": [
+     "automation.bathroom_motion_lights",
+     "automation.bathroom_motion_lights_2",
+     "automation.bathroom_motion_lights_3",
+     "automation.garage_motion_lights",
+     "automation.garage_motion_lights_2",
+     "automation.garage_motion_lights_3",
+     "automation.garden_motion_lights",
+     "automation.garden_motion_lights_2",
+     "automation.garden_motion_lights_3",
+     "automation.good_night",
+     "automation.guest_room_button",
+     "automation.guest_room_button_2",
+     "automation.guest_room_motion_lights",
+     "automation.guest_room_motion_lights_2",
+     "automation.guest_room_motion_lights_3",
+     "automation.hallway_motion_lights_2",
+     "automation.kids_room_motion_lights_3",
+     "automation.kitchen_motion_lights",
+     "automation.living_room_motion_lights_2",
+     "automation.living_room_motion_lights_3",
+     "automation.main_bedroom_button_runs_living_room_lights_at_sunset",
+     "automation.office_motion_lights",
+     "automation.office_motion_lights_2",
+     "scene.bathroom_relax",
+     "scene.garage_relax",
+     "scene.laundry_relax",
+     "scene.main_bedroom_relax",
+     "scene.office_relax"
+    ]
+   },
+   "general": false,
+   "assessment": {
+    "affects": "opportunity",
+    "summary": "ZHA now pairs Zigbee Green Power devices, such as batteryless wall switches that run on the press itself.",
+    "impact": "This home runs ZHA, so a batteryless switch (a Friends of Hue switch, for example) could join the Zigbee network and drive the motion-light rooms by hand."
+   }
+  },
+  {
+   "id": "2026.11/improvement/esphome",
+   "kind": "improvement",
+   "release": "2026.11",
+   "title": "ESPHome",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#noteworthy-improvements-to-existing-integrations",
+   "domains": [
+    "esphome",
+    "zha"
+   ],
+   "prs": [],
+   "match": {
+    "domains": [
+     "esphome",
+     "zha"
+    ],
+    "used_by": [
+     "automation.bathroom_motion_lights",
+     "automation.bathroom_motion_lights_2",
+     "automation.bathroom_motion_lights_3",
+     "automation.dining_room_motion_lights",
+     "automation.garage_motion_lights",
+     "automation.garage_motion_lights_2",
+     "automation.garage_motion_lights_3",
+     "automation.garden_motion_lights",
+     "automation.garden_motion_lights_2",
+     "automation.garden_motion_lights_3",
+     "automation.good_night",
+     "automation.guest_room_button",
+     "automation.guest_room_button_2",
+     "automation.guest_room_motion_lights",
+     "automation.guest_room_motion_lights_2",
+     "automation.guest_room_motion_lights_3",
+     "automation.hallway_motion_lights",
+     "automation.hallway_motion_lights_2",
+     "automation.hallway_motion_lights_3",
+     "automation.kids_room_motion_lights",
+     "automation.kids_room_motion_lights_2",
+     "automation.kids_room_motion_lights_3",
+     "automation.kitchen_motion_lights",
+     "automation.living_room_motion_lights_2",
+     "automation.living_room_motion_lights_3",
+     "automation.main_bedroom_button_runs_living_room_lights_at_sunset",
+     "automation.office_motion_lights",
+     "automation.office_motion_lights_2",
+     "scene.bathroom_relax",
+     "scene.garage_relax",
+     "scene.laundry_relax",
+     "scene.main_bedroom_relax",
+     "scene.office_relax"
+    ]
+   },
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "ESPHome devices can share a serial port over the network, which ZHA can use for a Zigbee adapter plugged into one."
+   }
+  },
+  {
+   "id": "2026.11/improvement/shelly",
+   "kind": "improvement",
+   "release": "2026.11",
+   "title": "Shelly",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#noteworthy-improvements-to-existing-integrations",
+   "domains": [
+    "shelly"
+   ],
+   "prs": [],
+   "match": {
+    "domains": [
+     "shelly"
+    ],
+    "used_by": []
+   },
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "Shelly adds support for the BLU TRV, a Last seen sensor for battery devices, and a combined cover position and tilt action."
+   }
+  },
+  {
+   "id": "2026.11/improvement/tuya",
+   "kind": "improvement",
+   "release": "2026.11",
+   "title": "Tuya",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#noteworthy-improvements-to-existing-integrations",
+   "domains": [
+    "tuya"
+   ],
+   "prs": [],
+   "match": {
+    "domains": [
+     "tuya"
+    ],
+    "used_by": []
+   },
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "Tuya supports heated towel racks, irrigation valves, and the missing switches on multi-gang wall switches."
+   }
+  },
+  {
+   "id": "2026.11/improvement/unifiprotect",
+   "kind": "improvement",
+   "release": "2026.11",
+   "title": "UniFi Protect",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#noteworthy-improvements-to-existing-integrations",
+   "domains": [
+    "unifiprotect"
+   ],
+   "prs": [],
+   "match": {
+    "domains": [
+     "unifiprotect"
+    ],
+    "used_by": []
+   },
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "UniFi Protect supports the Alarm Hub, and API-key-only mode gains chimes, doorbell messages, and pan and tilt."
+   }
+  },
+  {
+   "id": "2026.11/improvement/zha",
+   "kind": "improvement",
+   "release": "2026.11",
+   "title": "Zigbee Home Automation",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#noteworthy-improvements-to-existing-integrations",
+   "domains": [
+    "zha"
+   ],
+   "prs": [],
+   "match": {
+    "domains": [
+     "zha"
+    ],
+    "used_by": [
+     "automation.bathroom_motion_lights",
+     "automation.bathroom_motion_lights_2",
+     "automation.bathroom_motion_lights_3",
+     "automation.garage_motion_lights",
+     "automation.garage_motion_lights_2",
+     "automation.garage_motion_lights_3",
+     "automation.garden_motion_lights",
+     "automation.garden_motion_lights_2",
+     "automation.garden_motion_lights_3",
+     "automation.good_night",
+     "automation.guest_room_button",
+     "automation.guest_room_button_2",
+     "automation.guest_room_motion_lights",
+     "automation.guest_room_motion_lights_2",
+     "automation.guest_room_motion_lights_3",
+     "automation.hallway_motion_lights_2",
+     "automation.kids_room_motion_lights_3",
+     "automation.kitchen_motion_lights",
+     "automation.living_room_motion_lights_2",
+     "automation.living_room_motion_lights_3",
+     "automation.main_bedroom_button_runs_living_room_lights_at_sunset",
+     "automation.office_motion_lights",
+     "automation.office_motion_lights_2",
+     "scene.bathroom_relax",
+     "scene.garage_relax",
+     "scene.laundry_relax",
+     "scene.main_bedroom_relax",
+     "scene.office_relax"
+    ]
+   },
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "Each ZHA group gets its own device, which can have its own area."
+   }
+  },
+  {
+   "id": "2026.11/improvement/mqtt",
+   "kind": "improvement",
+   "release": "2026.11",
+   "title": "MQTT",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#noteworthy-improvements-to-existing-integrations",
+   "domains": [
+    "mqtt"
+   ],
+   "prs": [],
+   "match": {
+    "domains": [
+     "mqtt"
+    ],
+    "used_by": [
+     "automation.dining_room_motion_lights_2",
+     "automation.garage_motion_lights",
+     "automation.garage_motion_lights_2",
+     "automation.garden_motion_lights",
+     "automation.garden_motion_lights_2",
+     "automation.garden_motion_lights_3",
+     "automation.good_night",
+     "automation.guest_room_motion_lights",
+     "automation.guest_room_motion_lights_3",
+     "automation.hallway_button",
+     "automation.hallway_motion_lights",
+     "automation.hallway_motion_lights_2",
+     "automation.hallway_motion_lights_3",
+     "automation.kids_room_button",
+     "automation.kids_room_door_opened",
+     "automation.kids_room_door_opened_2",
+     "automation.kids_room_motion_lights_2",
+     "automation.living_room_motion_lights",
+     "automation.living_room_motion_lights_2",
+     "automation.living_room_motion_lights_3",
+     "automation.living_room_motion_lights_4",
+     "automation.main_bedroom_button",
+     "automation.main_bedroom_button_2",
+     "automation.main_bedroom_button_runs_living_room_lights_at_sunset",
+     "automation.main_bedroom_door_opened",
+     "automation.office_button",
+     "automation.office_motion_lights_2",
+     "scene.dining_room_relax",
+     "scene.garden_relax",
+     "scene.guest_room_relax",
+     "scene.hallway_relax",
+     "scene.kids_room_relax",
+     "scene.living_room_bright",
+     "scene.living_room_relax",
+     "scene.office_relax"
+    ]
+   },
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "MQTT devices can have child devices, and the MQTT entity editor gets a unit picker."
+   }
+  },
+  {
+   "id": "2026.11/improvement/wled",
+   "kind": "improvement",
+   "release": "2026.11",
+   "title": "WLED",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#noteworthy-improvements-to-existing-integrations",
+   "domains": [
+    "wled"
+   ],
+   "prs": [],
+   "match": {
+    "domains": [
+     "wled"
+    ],
+    "used_by": [
+     "automation.bathroom_motion_lights_2",
+     "automation.bathroom_motion_lights_3",
+     "automation.garden_motion_lights",
+     "automation.garden_motion_lights_2",
+     "automation.garden_motion_lights_3",
+     "automation.guest_room_motion_lights_2",
+     "automation.kids_room_motion_lights",
+     "automation.kids_room_motion_lights_2",
+     "automation.kitchen_motion_lights",
+     "automation.living_room_motion_lights",
+     "automation.living_room_motion_lights_3",
+     "automation.living_room_motion_lights_4",
+     "scene.bathroom_relax",
+     "scene.garden_relax",
+     "scene.guest_room_relax",
+     "scene.kitchen_bright",
+     "scene.kitchen_relax",
+     "scene.living_room_bright",
+     "scene.living_room_relax"
+    ]
+   },
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "WLED adds an AudioReactive switch, a next-playlist-entry button, and temperature and humidity sensors for devices with those usermods."
+   }
+  },
+  {
+   "id": "2026.11/removed/flipr",
+   "kind": "removed",
+   "release": "2026.11",
+   "title": "Flipr",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#farewell-to-the-following",
+   "domains": [
+    "flipr"
+   ],
+   "prs": [],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/noteworthy/combine-calendars-into-one",
+   "kind": "noteworthy",
+   "release": "2026.11",
+   "title": "Combine calendars into one.",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#other-noteworthy-changes",
+   "domains": [
+    "group",
+    "calendar"
+   ],
+   "prs": [],
+   "match": {
+    "domains": [
+     "group"
+    ],
+    "used_by": [
+     "automation.living_room_lights_at_sunset"
+    ]
+   },
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "The Group integration can combine several calendars into one."
+   }
+  },
+  {
+   "id": "2026.11/breaking/adguard-home",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "AdGuard Home",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "adguard"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/184349"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/alert-card",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Alert card",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [],
+   "prs": [
+    "https://github.com/home-assistant/frontend/pull/54880"
+   ],
+   "match": null,
+   "general": true,
+   "assessment": {
+    "affects": "none",
+    "summary": "The Alert card only colors and pulses during an alert, and its color option is now alert_color.",
+    "impact": "Only YAML dashboards that added the card by hand need the new option name."
+   }
+  },
+  {
+   "id": "2026.11/breaking/apple-icloud",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Apple iCloud",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "icloud"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/186175"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/auth",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Auth",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "auth"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/186537",
+    "https://github.com/home-assistant/core/pull/186543"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/besen",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Besen",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "besen"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/186968"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/bitcoin",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Bitcoin",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "bitcoin"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/180515"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/bluesound",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Bluesound",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "bluesound"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/184755"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/calendar-and-sun",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Calendar and Sun",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "calendar",
+    "sun"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/184855"
+   ],
+   "match": {
+    "domains": [
+     "sun"
+    ],
+    "used_by": [
+     "automation.close_dining_room_blinds_at_sunset",
+     "automation.close_guest_room_blinds_at_sunset",
+     "automation.close_kids_room_blinds_at_sunset",
+     "automation.close_main_bedroom_blinds_at_sunset",
+     "automation.close_main_bedroom_blinds_at_sunset_2",
+     "automation.close_office_blinds_at_sunset",
+     "automation.close_office_blinds_at_sunset_2",
+     "automation.living_room_lights_at_sunset"
+    ]
+   },
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "The new sun and calendar event triggers now read the sign of their offset: negative fires before the event, positive after.",
+    "impact": "The sunset automations use the classic sun trigger with a negative offset, which this does not change."
+   }
+  },
+  {
+   "id": "2026.11/breaking/control4",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Control4",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "control4"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/185879"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/device-tracker",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Device tracker",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "device_tracker"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/188883"
+   ],
+   "match": {
+    "domains": [
+     "device_tracker"
+    ],
+    "used_by": [
+     "automation.alex_arrives_home",
+     "automation.alex_arrives_home_2",
+     "automation.sam_arrives_home"
+    ]
+   },
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "Device trackers from network scanners such as UniFi, FRITZ!Box, and Nmap now always have a device, and new ones start disabled.",
+    "impact": "Alex's and Sam's trackers come from the companion app, not a network scanner."
+   }
+  },
+  {
+   "id": "2026.11/breaking/doorbird",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "DoorBird",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "doorbird"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/186147"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/electra-smart",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Electra Smart",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "electrasmart"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/184595"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/entity-names",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Entity names",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/184340",
+    "https://github.com/home-assistant/core/pull/184341",
+    "https://github.com/home-assistant/frontend/pull/54725"
+   ],
+   "match": null,
+   "general": true,
+   "assessment": {
+    "affects": "behavior",
+    "summary": "Entity names are now built from the entity name plus its device name.",
+    "impact": "Dashboard cards without their own name will show names like Hallway motion sensor Occupancy. The old name stays as a voice alias, and automations are not affected. Set a name on a card, or rename the device, where you want it shorter."
+   }
+  },
+  {
+   "id": "2026.11/breaking/flow-it",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Flow-it",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "flow_it"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/187082"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/frontend",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Frontend",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "frontend"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/frontend/pull/55138"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/general-transit-feed-specification-gtfs",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "General Transit Feed Specification (GTFS)",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "gtfs"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/187429"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/hayward-omnilogic",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Hayward Omnilogic",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "omnilogic"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/184380"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/hive",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Hive",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "hive"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/184251"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/holiday-and-workday",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Holiday and Workday",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "holiday",
+    "workday"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/187605"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/honeywell-total-connect-comfort-europe",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Honeywell Total Connect Comfort (Europe)",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "evohome"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/185704",
+    "https://github.com/home-assistant/core/pull/185705"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/irobot-roomba-and-braava",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "iRobot Roomba and Braava",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "roomba"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/184198"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/keenetic-ndms2-router",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Keenetic NDMS2 Router",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "keenetic_ndms2"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/184257"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/kraken",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Kraken",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "kraken"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/184381"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/matter",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Matter",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "matter"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/167177",
+    "https://github.com/home-assistant/core/pull/181458",
+    "https://github.com/home-assistant/core/pull/188787"
+   ],
+   "match": {
+    "domains": [
+     "matter"
+    ],
+    "used_by": [
+     "automation.dining_room_motion_lights",
+     "automation.dining_room_motion_lights_2",
+     "automation.good_night",
+     "automation.guest_room_motion_lights",
+     "automation.guest_room_motion_lights_3",
+     "automation.hallway_motion_lights_2",
+     "automation.hallway_motion_lights_3",
+     "automation.main_bedroom_door_opened",
+     "scene.dining_room_relax",
+     "scene.guest_room_relax",
+     "scene.hallway_relax",
+     "scene.kitchen_bright",
+     "scene.kitchen_relax",
+     "scene.main_bedroom_relax",
+     "script.leave_home"
+    ]
+   },
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "Matter concentration sensors use the device's own unit, climate entities resume their last mode when turned on, and tilt-only covers become tilt covers.",
+    "impact": "The Matter devices here are bulbs, up-and-down blinds, and a lock, none of which change."
+   }
+  },
+  {
+   "id": "2026.11/breaking/mqtt",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "MQTT",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "mqtt"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/187856"
+   ],
+   "match": {
+    "domains": [
+     "mqtt"
+    ],
+    "used_by": [
+     "automation.dining_room_motion_lights_2",
+     "automation.garage_motion_lights",
+     "automation.garage_motion_lights_2",
+     "automation.garden_motion_lights",
+     "automation.garden_motion_lights_2",
+     "automation.garden_motion_lights_3",
+     "automation.good_night",
+     "automation.guest_room_motion_lights",
+     "automation.guest_room_motion_lights_3",
+     "automation.hallway_button",
+     "automation.hallway_motion_lights",
+     "automation.hallway_motion_lights_2",
+     "automation.hallway_motion_lights_3",
+     "automation.kids_room_button",
+     "automation.kids_room_door_opened",
+     "automation.kids_room_door_opened_2",
+     "automation.kids_room_motion_lights_2",
+     "automation.living_room_motion_lights",
+     "automation.living_room_motion_lights_2",
+     "automation.living_room_motion_lights_3",
+     "automation.living_room_motion_lights_4",
+     "automation.main_bedroom_button",
+     "automation.main_bedroom_button_2",
+     "automation.main_bedroom_button_runs_living_room_lights_at_sunset",
+     "automation.main_bedroom_door_opened",
+     "automation.office_button",
+     "automation.office_motion_lights_2",
+     "scene.dining_room_relax",
+     "scene.garden_relax",
+     "scene.guest_room_relax",
+     "scene.hallway_relax",
+     "scene.kids_room_relax",
+     "scene.living_room_bright",
+     "scene.living_room_relax",
+     "scene.office_relax"
+    ]
+   },
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "MQTT entities without a unique_id no longer create a device from their device settings.",
+    "impact": "The Zigbee2MQTT devices here are discovered with unique IDs."
+   }
+  },
+  {
+   "id": "2026.11/breaking/nanoleaf",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Nanoleaf",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "nanoleaf"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/188656"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/nina",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "NINA",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "nina"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/188355"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/philips-hue",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Philips Hue",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "hue"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/188867"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/plaato",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Plaato",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "plaato"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/184376"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/python-dependencies",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Python dependencies",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/168155"
+   ],
+   "match": null,
+   "general": true,
+   "assessment": {
+    "affects": "none",
+    "summary": "Home Assistant no longer installs Python packages into the deps folder of the config directory.",
+    "impact": "Only Home Assistant Core outside a virtual environment is affected."
+   }
+  },
+  {
+   "id": "2026.11/breaking/ring",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Ring",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "ring"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/187592",
+    "https://github.com/home-assistant/core/pull/187596",
+    "https://github.com/home-assistant/core/pull/188108"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/risco",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Risco",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "risco"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/184386"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/rituals-perfume-genie",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Rituals Perfume Genie",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "rituals_perfume_genie"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/186995"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/smtp",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "SMTP",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "smtp"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/188876"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/telegram",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Telegram",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "telegram_bot"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/188196"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/telldus-live",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Telldus Live",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "tellduslive"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/185838"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/tomorrow-io",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Tomorrow.io",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "tomorrowio"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/177911"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/tuya",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Tuya",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "tuya"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/184915",
+    "https://github.com/home-assistant/core/pull/188169",
+    "https://github.com/home-assistant/core/pull/188237",
+    "https://github.com/home-assistant/core/pull/188255",
+    "https://github.com/home-assistant/core/pull/188258",
+    "https://github.com/home-assistant/core/pull/188674",
+    "https://github.com/home-assistant/core/pull/188675"
+   ],
+   "match": {
+    "domains": [
+     "tuya"
+    ],
+    "used_by": []
+   },
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "Multi-channel Tuya devices put each channel's entities on a child device, so their names change.",
+    "impact": "The only Tuya device here is the Bathroom extractor fan, which has one channel and keeps its name."
+   }
+  },
+  {
+   "id": "2026.11/breaking/unifi-protect",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "UniFi Protect",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "unifiprotect"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/184425",
+    "https://github.com/home-assistant/core/pull/184473"
+   ],
+   "match": {
+    "domains": [
+     "unifiprotect"
+    ],
+    "used_by": []
+   },
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "The deprecated HDR mode switch and the read-only UP Sense setting entities are removed.",
+    "impact": "No automation or script here uses them; a repair would list any that did."
+   }
+  },
+  {
+   "id": "2026.11/breaking/uptime-kuma",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Uptime Kuma",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "uptime_kuma"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/187418"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/watergate",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Watergate",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "watergate"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/186035"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/xiaomi-ble",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Xiaomi BLE",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "xiaomi_ble"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/173260"
+   ],
+   "match": {
+    "domains": [
+     "xiaomi_ble"
+    ],
+    "used_by": [
+     "automation.guest_room_too_warm",
+     "automation.kids_room_too_warm",
+     "automation.main_bedroom_too_warm",
+     "automation.main_bedroom_too_warm_2"
+    ]
+   },
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "The S400 scale's impedance sensors are corrected and split into low and high.",
+    "impact": "The Xiaomi devices here are climate sensors, not scales."
+   }
+  },
+  {
+   "id": "2026.11/breaking/xiaomi-home",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Xiaomi Home",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "xiaomi_miio"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/179544"
+   ],
+   "match": null,
+   "general": false,
+   "assessment": null
+  },
+  {
+   "id": "2026.11/breaking/z-wave",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Z-Wave",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "zwave_js"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/184901",
+    "https://github.com/home-assistant/core/pull/185985"
+   ],
+   "match": {
+    "domains": [
+     "zwave_js"
+    ],
+    "used_by": [
+     "automation.guest_room_too_warm",
+     "automation.kids_room_door_opened",
+     "automation.kids_room_door_opened_2",
+     "automation.kids_room_too_warm",
+     "automation.main_bedroom_too_warm",
+     "automation.main_bedroom_too_warm_2"
+    ]
+   },
+   "general": false,
+   "assessment": {
+    "affects": "action",
+    "summary": "Z-Wave now needs zwave-js-server 3.11.0 or later, and multi-endpoint devices get a child device per endpoint.",
+    "impact": "The radiator valves, thermostat, and door and window sensors all run on Z-Wave, and the too-warm and door automations depend on them. Entity IDs stay the same, so the automations keep working once the server is current.",
+    "action": "Update the Z-Wave JS app to 1.9.0 or later before upgrading Home Assistant."
+   }
+  },
+  {
+   "id": "2026.11/breaking/zigbee-home-automation",
+   "kind": "breaking",
+   "release": "2026.11",
+   "title": "Zigbee Home Automation",
+   "url": "https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes",
+   "domains": [
+    "zha"
+   ],
+   "prs": [
+    "https://github.com/home-assistant/core/pull/188830"
+   ],
+   "match": {
+    "domains": [
+     "zha"
+    ],
+    "used_by": [
+     "automation.bathroom_motion_lights",
+     "automation.bathroom_motion_lights_2",
+     "automation.bathroom_motion_lights_3",
+     "automation.garage_motion_lights",
+     "automation.garage_motion_lights_2",
+     "automation.garage_motion_lights_3",
+     "automation.garden_motion_lights",
+     "automation.garden_motion_lights_2",
+     "automation.garden_motion_lights_3",
+     "automation.good_night",
+     "automation.guest_room_button",
+     "automation.guest_room_button_2",
+     "automation.guest_room_motion_lights",
+     "automation.guest_room_motion_lights_2",
+     "automation.guest_room_motion_lights_3",
+     "automation.hallway_motion_lights_2",
+     "automation.kids_room_motion_lights_3",
+     "automation.kitchen_motion_lights",
+     "automation.living_room_motion_lights_2",
+     "automation.living_room_motion_lights_3",
+     "automation.main_bedroom_button_runs_living_room_lights_at_sunset",
+     "automation.office_motion_lights",
+     "automation.office_motion_lights_2",
+     "scene.bathroom_relax",
+     "scene.garage_relax",
+     "scene.laundry_relax",
+     "scene.main_bedroom_relax",
+     "scene.office_relax"
+    ]
+   },
+   "general": false,
+   "assessment": {
+    "affects": "none",
+    "summary": "ZHA groups with group entities move from the coordinator to their own device.",
+    "impact": "This home has no ZHA groups, and no automation targets the coordinator."
+   }
+  }
+ ],
+ "verdict": {
+  "level": "review",
+  "reason": "Update the Z-Wave JS app to 1.9.0 or later before you upgrade, or the radiator valves and door sensors go offline. Nothing else in this home needs a change."
+ }
+}

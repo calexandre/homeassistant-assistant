@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Home Assistant 2026.9.3 → 2026.11.0 · Release notes</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8F%A0%3C/text%3E%3C/svg%3E">
+<script>document.documentElement.className = "js";</script>
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --surface: #ffffff;
+    --text: #1f2328;
+    --text-2: #5d6470;
+    --line: #e1e4e8;
+    --primary: #0398dc;
+    --chip: #eef1f4;
+    --chip-ink: #3b4350;
+    --release: #e8f4fb;
+    --release-ink: #0b6b99;
+    --do-bg: #fff4e5;
+    --do-line: #ffd8a8;
+    --shadow: 0 1px 2px rgb(16 24 40 / 6%), 0 4px 16px rgb(16 24 40 / 5%);
+    --upgrade: #2e7d32;
+    --check: #0277bd;
+    --review: #e65100;
+    --wait: #6a1b9a;
+    --hold: #c62828;
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1116;
+      --surface: #181b22;
+      --text: #e6e8ec;
+      --text-2: #a2a9b4;
+      --line: #2a2f39;
+      --primary: #29b6f6;
+      --chip: #232833;
+      --chip-ink: #c9ced6;
+      --release: #12303f;
+      --release-ink: #8fd6f7;
+      --do-bg: #33240f;
+      --do-line: #6b4a17;
+      --shadow: 0 1px 2px rgb(0 0 0 / 40%);
+      --upgrade: #81c784;
+      --check: #4fc3f7;
+      --review: #ffb74d;
+      --wait: #ce93d8;
+      --hold: #ef9a9a;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.55 Roboto, "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif; }
+  a { color: var(--primary); }
+  a:focus-visible, summary:focus-visible, .filter input:focus-visible + span { outline: 3px solid var(--primary); outline-offset: 3px; border-radius: 6px; }
+  code { font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; font-size: .9em; background: var(--chip); border-radius: 6px; padding: 1px 6px; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 16px; }
+
+  header.top { padding: 32px 0 8px; }
+  .eyebrow { margin: 0 0 4px; color: var(--text-2); font-size: 14px; font-weight: 500; letter-spacing: .02em; }
+  h1 { margin: 0 0 8px; font-size: clamp(26px, 4.5vw, 36px); line-height: 1.2; font-weight: 600; }
+  .lede { margin: 0 0 6px; color: var(--text-2); font-size: 17px; max-width: 760px; }
+  .byline { margin: 0; color: var(--text-2); font-size: 13px; }
+
+  .verdict {
+    display: flex; gap: 16px; align-items: center;
+    margin: 20px 0 12px; padding: 18px 20px;
+    background: var(--surface); border: 1px solid var(--line); border-left: 6px solid var(--level); border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+  .verdict-emoji { font-size: 34px; line-height: 1; }
+  .verdict-label { margin: 0; font-size: 20px; font-weight: 600; color: var(--level); }
+  .verdict-reason { margin: 2px 0 0; }
+  .level-upgrade { --level: var(--upgrade); }
+  .level-check { --level: var(--check); }
+  .level-review { --level: var(--review); }
+  .level-wait { --level: var(--wait); }
+  .level-hold { --level: var(--hold); }
+  .note { margin: 8px 0; padding: 10px 14px; border-radius: 10px; background: var(--chip); color: var(--text-2); font-size: 14px; }
+  .calm { margin: 16px 0; color: var(--text-2); }
+
+  .toolbar { display: flex; justify-content: flex-end; margin: 14px 0 4px; }
+  .filter { display: none; align-items: center; gap: 10px; cursor: pointer; font-size: 14px; font-weight: 500; user-select: none; }
+  .js .filter { display: inline-flex; }
+  .filter input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .filter span { position: relative; width: 38px; height: 22px; border-radius: 999px; background: var(--line); transition: background .15s; flex: none; }
+  .filter span::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgb(0 0 0 / 30%); transition: transform .15s; }
+  .filter input:checked + span { background: var(--primary); }
+  .filter input:checked + span::after { transform: translateX(16px); }
+  .mine .section:not([data-section="action"]):not([data-section="behavior"]) { display: none; }
+
+  .section { margin: 14px 0; }
+  .section > summary { list-style: none; cursor: pointer; padding: 8px 0; }
+  .section > summary::-webkit-details-marker { display: none; }
+  .section > summary h2 { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 21px; font-weight: 600; }
+  .section > summary h2::after { content: ""; width: 8px; height: 8px; margin-left: 2px; border-right: 2px solid var(--text-2); border-bottom: 2px solid var(--text-2); transform: rotate(-45deg); transition: transform .15s; }
+  .section[open] > summary h2::after { transform: rotate(45deg); }
+  .count { min-width: 26px; padding: 0 8px; border-radius: 999px; background: var(--chip); color: var(--chip-ink); font-size: 13px; font-weight: 600; text-align: center; line-height: 22px; }
+
+  .items { display: grid; gap: 12px; margin-top: 6px; }
+  .item { padding: 16px 18px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+  .item[data-affects="action"] { border-left: 4px solid var(--review); }
+  .item[data-affects="behavior"] { border-left: 4px solid var(--check); }
+  .item[data-affects="opportunity"] { border-left: 4px solid var(--upgrade); }
+  .item h3 { margin: 0 0 6px; font-size: 17px; font-weight: 600; line-height: 1.35; }
+  .item h3 a { color: inherit; text-decoration: none; }
+  .item h3 a:hover { text-decoration: underline; }
+  .item p { margin: 8px 0 0; }
+  .summary { color: var(--text); }
+  .impact { color: var(--text-2); }
+  .impact b, .do b, .used b { color: var(--text); font-weight: 600; margin-right: 4px; }
+  .do { padding: 8px 12px; border-radius: 10px; background: var(--do-bg); border: 1px solid var(--do-line); }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { display: inline-block; padding: 1px 9px; border-radius: 999px; background: var(--chip); color: var(--chip-ink); font-size: 12px; font-weight: 500; line-height: 20px; }
+  .tag.release { background: var(--release); color: var(--release-ink); }
+  .tag.idea { background: color-mix(in srgb, var(--upgrade) 14%, transparent); color: var(--upgrade); }
+  .tag.domain { font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; }
+  .used { margin-top: 10px; font-size: 14px; color: var(--text-2); }
+  .used ul { display: inline; margin: 0; padding: 0; list-style: none; }
+  .used li { display: inline; }
+  .used li + li::before { content: " · "; }
+  .lines { margin: 6px 0 0; padding: 4px 18px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); list-style: none; }
+  .lines li { padding: 9px 0; border-bottom: 1px solid var(--line); display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+  .lines li:last-child { border-bottom: 0; }
+  .muted { color: var(--text-2); font-size: 13px; }
+
+  footer { margin: 36px 0 40px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--text-2); font-size: 14px; }
+  footer h2 { margin: 0 0 6px; font-size: 14px; font-weight: 600; color: var(--text); }
+  footer ul { margin: 0 0 12px; padding-left: 18px; }
+
+  @media (max-width: 560px) {
+    .verdict { align-items: flex-start; padding: 14px 16px; }
+    .verdict-emoji { font-size: 28px; }
+    .item { padding: 14px; }
+  }
+  @media print {
+    body { background: #fff; }
+    .toolbar { display: none; }
+    .item, .verdict, .lines { box-shadow: none; break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <p class="eyebrow">Release notes for your home</p>
+    <h1>Home Assistant 2026.9.3 → 2026.11.0</h1>
+    <p class="lede">Two releases to catch up on: update the Z-Wave JS app first, expect some dashboard names to change, and the rest is new features for the lights, buttons, and cameras this home already has.</p>
+    <p class="byline">Generated 2026-11-09 · claude-opus-5-5 · Demo home</p>
+  </header>
+  <div class="toolbar">
+    <label class="filter"><input type="checkbox" id="mine"><span aria-hidden="true"></span>Only what affects me (3)</label>
+  </div>
+  <main>
+<section class="verdict level-review" aria-label="Verdict">
+<div class="verdict-emoji" aria-hidden="true">⚠️</div>
+<div><p class="verdict-label">Review first</p><p class="verdict-reason">Update the Z-Wave JS app to 1.9.0 or later before you upgrade, or the radiator valves and door sensors go offline. Nothing else in this home needs a change.</p></div>
+</section>
+<details class="section" data-section="action" open>
+<summary><h2><span aria-hidden="true">⚠️</span> Needs your action <span class="count">1</span></h2></summary>
+<div class="items"><article class="item" data-affects="action">
+<h3><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Z-Wave</a></h3>
+<div class="tags"><span class="tag release">2026.11</span><span class="tag kind">Breaking change</span><span class="tag domain">zwave_js</span></div>
+<p class="summary">Z-Wave now needs zwave-js-server 3.11.0 or later, and multi-endpoint devices get a child device per endpoint.</p>
+<p class="impact"><b>For your setup</b> The radiator valves, thermostat, and door and window sensors all run on Z-Wave, and the too-warm and door automations depend on them. Entity IDs stay the same, so the automations keep working once the server is current.</p>
+<p class="do"><b>Do this</b> Update the Z-Wave JS app to 1.9.0 or later before upgrading Home Assistant.</p>
+<div class="used"><b>Used by</b><ul><li>Guest Room too warm</li><li>Kids Room door opened</li><li>Kids Room door opened 2</li><li>Kids Room too warm</li><li>Main Bedroom too warm</li><li>Main Bedroom too warm 2</li></ul></div>
+</article></div>
+</details>
+<details class="section" data-section="behavior" open>
+<summary><h2><span aria-hidden="true">ℹ️</span> You&#x27;ll notice <span class="count">2</span></h2></summary>
+<div class="items"><article class="item" data-affects="behavior">
+<h3><a href="https://www.home-assistant.io/blog/2026/09/02/release-20269/#202694---september-27">Turn off Tuya fans when the speed is set to 0%</a></h3>
+<div class="tags"><span class="tag release">2026.9.4</span><span class="tag kind">Patch fix</span></div>
+<p class="summary">Setting a Tuya fan&#x27;s speed to 0% now turns it off.</p>
+<p class="impact"><b>For your setup</b> The Bathroom extractor fan turns off when its speed slider goes to 0%, instead of staying on at the lowest speed.</p>
+</article>
+<article class="item" data-affects="behavior">
+<h3><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Entity names</a></h3>
+<div class="tags"><span class="tag release">2026.11</span><span class="tag kind">Breaking change</span></div>
+<p class="summary">Entity names are now built from the entity name plus its device name.</p>
+<p class="impact"><b>For your setup</b> Dashboard cards without their own name will show names like Hallway motion sensor Occupancy. The old name stays as a voice alias, and automations are not affected. Set a name on a card, or rename the device, where you want it shorter.</p>
+</article></div>
+</details>
+<details class="section" data-section="highlights" open>
+<summary><h2><span aria-hidden="true">✨</span> Highlights <span class="count">18</span></h2></summary>
+<div class="items"><article class="item" data-affects="none">
+<h3><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#cloud-becomes-link">Cloud becomes Link</a></h3>
+<div class="tags"><span class="tag release">2026.10</span><span class="tag kind">Highlight</span></div>
+<p class="summary">Home Assistant Cloud is being renamed Home Assistant Link in December, and remote access got faster with more servers and automatic server picking.</p>
+</article>
+<article class="item" data-affects="none">
+<h3><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#a-whole-new-map">A whole new map</a></h3>
+<div class="tags"><span class="tag release">2026.10</span><span class="tag kind">Highlight</span></div>
+<p class="summary">Maps now draw OpenStreetMap vector tiles on your device, fetched through Home Assistant, with redesigned markers and a dark style.</p>
+</article>
+<article class="item" data-affects="none">
+<h3><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#a-tidier-profile-page">A tidier profile page</a></h3>
+<div class="tags"><span class="tag release">2026.10</span><span class="tag kind">Highlight</span></div>
+<p class="summary">The user profile is split into short sections (appearance, localization, this browser, security), and people can now change their own name and picture.</p>
+</article>
+<article class="item" data-affects="opportunity">
+<h3><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#the-best-automation-feature-you-never-used">The best automation feature you never used</a></h3>
+<div class="tags"><span class="tag release">2026.10</span><span class="tag kind">Highlight</span><span class="tag idea">💡 Worth a look</span></div>
+<p class="summary">Trigger IDs get a proper editor: in a Triggered by condition you tick the triggers to match, and Home Assistant manages the IDs.</p>
+<p class="impact"><b>For your setup</b> Most rooms here have two or three motion-light automations, such as Garden motion lights 1 to 3. Each set could become one automation with a Triggered by condition.</p>
+</article>
+<article class="item" data-affects="none">
+<h3><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#welcome-to-the-marketplace">Welcome to the Marketplace</a></h3>
+<div class="tags"><span class="tag release">2026.11</span><span class="tag kind">Highlight</span></div>
+<p class="summary">HACS becomes the built-in Marketplace under Settings, for installing community integrations, cards, themes, and templates without a restart.</p>
+</article>
+<article class="item" data-affects="opportunity">
+<h3><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#exclude-items-from-a-target">Exclude items from a target</a></h3>
+<div class="tags"><span class="tag release">2026.11</span><span class="tag kind">Highlight</span><span class="tag idea">💡 Worth a look</span></div>
+<p class="summary">Targets can now leave out entities, devices, areas, floors, or labels, and the exclusion keeps applying as things are added.</p>
+<p class="impact"><b>For your setup</b> The sunset automations close every blind in an area; an exclusion could keep one open, such as the Office blinds on work days, without listing the others by hand.</p>
+</article>
+<article class="item" data-affects="none">
+<h3><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#copy-and-paste-dashboard-sections">Copy and paste dashboard sections</a></h3>
+<div class="tags"><span class="tag release">2026.11</span><span class="tag kind">Highlight</span></div>
+<p class="summary">Dashboard sections can be copied or cut and pasted, also into another view or dashboard.</p>
+</article>
+<article class="item" data-affects="none">
+<h3><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#sections-that-fill-themselves">Sections that fill themselves</a></h3>
+<div class="tags"><span class="tag release">2026.11</span><span class="tag kind">Highlight</span></div>
+<p class="summary">Automatic dashboard sections pick their own cards, such as every light on a floor or every entity of one device, and stay current as devices change.</p>
+</article>
+<article class="item" data-affects="none">
+<h3><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#new-cards-and-badges">New cards and badges</a></h3>
+<div class="tags"><span class="tag release">2026.11</span><span class="tag kind">Highlight</span></div>
+<p class="summary">New Date card and Alert badge, a color option for the Sensor card, buttons or a slider for target temperatures, and a visual editor for the Alert card.</p>
+</article>
+<article class="item" data-affects="none">
+<h3><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#color-control-on-light-tiles">Color control on light tiles</a></h3>
+<div class="tags"><span class="tag release">2026.11</span><span class="tag kind">Highlight</span></div>
+<p class="summary">Light tiles get a hue strip with an optional saturation slider.</p>
+</article>
+<article class="item" data-affects="none">
+<h3><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#name-it-once-home-assistant-adds-the-context">Name it once, Home Assistant adds the context</a></h3>
+<div class="tags"><span class="tag release">2026.11</span><span class="tag kind">Highlight</span></div>
+<p class="summary">Entities are named once and Home Assistant adds the device or area around them where it helps, so renaming a device renames its entities.</p>
+<p class="impact"><b>For your setup</b> See Entity names under You&#x27;ll notice for what changes on the dashboards.</p>
+</article>
+<article class="item" data-affects="none">
+<h3><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#forms-that-ask-only-what-they-need">Forms that ask only what they need</a></h3>
+<div class="tags"><span class="tag release">2026.11</span><span class="tag kind">Highlight</span></div>
+<p class="summary">Setup forms and blueprints show a field only when an earlier answer makes it relevant.</p>
+</article>
+<article class="item" data-affects="none">
+<h3><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#from-power-to-energy-in-one-step">From power to energy in one step</a></h3>
+<div class="tags"><span class="tag release">2026.11</span><span class="tag kind">Highlight</span></div>
+<p class="summary">The Energy dashboard offers to derive an energy sensor from a power-only sensor, and the same for gas and water flow.</p>
+</article>
+<article class="item" data-affects="none">
+<h3><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#why-did-that-happen">Why did that happen?</a></h3>
+<div class="tags"><span class="tag release">2026.11</span><span class="tag kind">Highlight</span></div>
+<p class="summary">The Activity panel filters by what triggered a change, traces link to the script run they started, and integrations with debug logging show their own live log.</p>
+</article>
+<article class="item" data-affects="opportunity">
+<h3><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#cameras-matter">Cameras Matter</a></h3>
+<div class="tags"><span class="tag release">2026.11</span><span class="tag kind">Highlight</span><span class="tag idea">💡 Worth a look</span><span class="tag domain">matter</span><span class="tag domain">reolink</span></div>
+<p class="summary">Matter 1.5 cameras are supported, and a Labs preview adds two-way audio to camera streams.</p>
+<p class="impact"><b>For your setup</b> The Reolink doorbells in the Hallway and Garden can use two-way audio once it is turned on in Labs, as long as they stream over RTSP and the app is opened over HTTPS.</p>
+</article>
+<article class="item" data-affects="none">
+<h3><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#store-backups-and-media-on-local-drives">Store backups and media on local drives</a></h3>
+<div class="tags"><span class="tag release">2026.11</span><span class="tag kind">Highlight</span></div>
+<p class="summary">Internal and USB drives can hold backups, media, and shared files, and restores no longer copy the whole backup first.</p>
+</article>
+<article class="item" data-affects="none">
+<h3><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#reach-the-far-corners-with-lorawan">Reach the far corners with LoRaWAN</a></h3>
+<div class="tags"><span class="tag release">2026.11</span><span class="tag kind">Highlight</span></div>
+<p class="summary">Home Assistant connects to LoRaWAN network servers such as ChirpStack and The Things Network, with a new LoRaWAN page under Connectivity.</p>
+</article>
+<article class="item" data-affects="opportunity">
+<h3><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#batteryless-switches-with-zigbee-green-power">Batteryless switches with Zigbee Green Power</a></h3>
+<div class="tags"><span class="tag release">2026.11</span><span class="tag kind">Highlight</span><span class="tag idea">💡 Worth a look</span><span class="tag domain">zha</span></div>
+<p class="summary">ZHA now pairs Zigbee Green Power devices, such as batteryless wall switches that run on the press itself.</p>
+<p class="impact"><b>For your setup</b> This home runs ZHA, so a batteryless switch (a Friends of Hue switch, for example) could join the Zigbee network and drive the motion-light rooms by hand.</p>
+</article></div>
+</details>
+<details class="section" data-section="opportunity" open>
+<summary><h2><span aria-hidden="true">💡</span> Worth a look <span class="count">1</span></h2></summary>
+<div class="items"><article class="item" data-affects="opportunity">
+<h3><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#noteworthy-improvements-to-existing-integrations">Matter</a></h3>
+<div class="tags"><span class="tag release">2026.10</span><span class="tag kind">Improvement</span><span class="tag idea">💡 Worth a look</span><span class="tag domain">matter</span></div>
+<p class="summary">Matter adds switches for leak sensor alarms and for one-touch locking, plus frequency and power factor for power meters.</p>
+<p class="impact"><b>For your setup</b> The Hallway door lock is a Matter lock, so you can now decide whether one touch on its keypad locks the door.</p>
+</article></div>
+</details>
+<details class="section" data-section="improvements">
+<summary><h2><span aria-hidden="true">🔧</span> Improvements to your integrations <span class="count">17</span></h2></summary>
+<div class="items"><article class="item" data-affects="none">
+<h3><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#noteworthy-improvements-to-existing-integrations">Tuya</a></h3>
+<div class="tags"><span class="tag release">2026.10</span><span class="tag kind">Improvement</span><span class="tag domain">tuya</span></div>
+<p class="summary">Tuya supports more devices: DIN rail meters, breakers, EV chargers, water valves, and more readings for three-phase meters.</p>
+</article>
+<article class="item" data-affects="none">
+<h3><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#noteworthy-improvements-to-existing-integrations">ESPHome</a></h3>
+<div class="tags"><span class="tag release">2026.10</span><span class="tag kind">Improvement</span><span class="tag domain">esphome</span></div>
+<p class="summary">ESPHome devices can open the connection to Home Assistant themselves, for networks where Home Assistant can&#x27;t reach them.</p>
+</article>
+<article class="item" data-affects="none">
+<h3><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#noteworthy-improvements-to-existing-integrations">Reolink</a></h3>
+<div class="tags"><span class="tag release">2026.10</span><span class="tag kind">Improvement</span><span class="tag domain">reolink</span></div>
+<p class="summary">Reolink can pan and tilt the lenses of multi-lens cameras behind an NVR or Home Hub.</p>
+</article>
+<article class="item" data-affects="none">
+<h3><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#noteworthy-improvements-to-existing-integrations">Roborock</a></h3>
+<div class="tags"><span class="tag release">2026.10</span><span class="tag kind">Improvement</span><span class="tag domain">roborock</span></div>
+<p class="summary">Roborock wet and dry vacuums now update in real time.</p>
+</article>
+<article class="item" data-affects="none">
+<h3><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#noteworthy-improvements-to-existing-integrations">Z-Wave</a></h3>
+<div class="tags"><span class="tag release">2026.10</span><span class="tag kind">Improvement</span><span class="tag domain">zwave_js</span></div>
+<p class="summary">Z-Wave gets automation editor conditions and triggers for node status, configuration parameters, and other values.</p>
+</article>
+<article class="item" data-affects="none">
+<h3><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#noteworthy-improvements-to-existing-integrations">UniFi Protect</a></h3>
+<div class="tags"><span class="tag release">2026.10</span><span class="tag kind">Improvement</span><span class="tag domain">unifiprotect</span></div>
+<p class="summary">UniFi Protect supports the key fob and relay inputs, and API-key-only mode covers more devices and settings.</p>
+</article>
+<article class="item" data-affects="none">
+<h3><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#other-noteworthy-changes">Binary sensor</a></h3>
+<div class="tags"><span class="tag release">2026.10</span><span class="tag kind">Noteworthy</span><span class="tag domain">zwave_js</span><span class="tag domain">binary_sensor</span></div>
+<p class="summary">Binary sensors get a glass break device class, treated as a security sensor.</p>
+</article>
+<article class="item" data-affects="none">
+<h3><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#other-noteworthy-changes">Z-Wave</a></h3>
+<div class="tags"><span class="tag release">2026.10</span><span class="tag kind">Noteworthy</span><span class="tag domain">zwave_js</span></div>
+<p class="summary">The Z-Wave network map can show the real mesh between devices.</p>
+</article>
+<article class="item" data-affects="none">
+<h3><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#other-noteworthy-changes">Climate</a></h3>
+<div class="tags"><span class="tag release">2026.10</span><span class="tag kind">Noteworthy</span><span class="tag domain">climate</span></div>
+<p class="summary">Climate fan modes can be set by voice.</p>
+</article>
+<article class="item" data-affects="none">
+<h3><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#noteworthy-improvements-to-existing-integrations">ESPHome</a></h3>
+<div class="tags"><span class="tag release">2026.11</span><span class="tag kind">Improvement</span><span class="tag domain">esphome</span><span class="tag domain">zha</span></div>
+<p class="summary">ESPHome devices can share a serial port over the network, which ZHA can use for a Zigbee adapter plugged into one.</p>
+</article>
+<article class="item" data-affects="none">
+<h3><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#noteworthy-improvements-to-existing-integrations">Shelly</a></h3>
+<div class="tags"><span class="tag release">2026.11</span><span class="tag kind">Improvement</span><span class="tag domain">shelly</span></div>
+<p class="summary">Shelly adds support for the BLU TRV, a Last seen sensor for battery devices, and a combined cover position and tilt action.</p>
+</article>
+<article class="item" data-affects="none">
+<h3><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#noteworthy-improvements-to-existing-integrations">Tuya</a></h3>
+<div class="tags"><span class="tag release">2026.11</span><span class="tag kind">Improvement</span><span class="tag domain">tuya</span></div>
+<p class="summary">Tuya supports heated towel racks, irrigation valves, and the missing switches on multi-gang wall switches.</p>
+</article>
+<article class="item" data-affects="none">
+<h3><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#noteworthy-improvements-to-existing-integrations">UniFi Protect</a></h3>
+<div class="tags"><span class="tag release">2026.11</span><span class="tag kind">Improvement</span><span class="tag domain">unifiprotect</span></div>
+<p class="summary">UniFi Protect supports the Alarm Hub, and API-key-only mode gains chimes, doorbell messages, and pan and tilt.</p>
+</article>
+<article class="item" data-affects="none">
+<h3><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#noteworthy-improvements-to-existing-integrations">Zigbee Home Automation</a></h3>
+<div class="tags"><span class="tag release">2026.11</span><span class="tag kind">Improvement</span><span class="tag domain">zha</span></div>
+<p class="summary">Each ZHA group gets its own device, which can have its own area.</p>
+</article>
+<article class="item" data-affects="none">
+<h3><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#noteworthy-improvements-to-existing-integrations">MQTT</a></h3>
+<div class="tags"><span class="tag release">2026.11</span><span class="tag kind">Improvement</span><span class="tag domain">mqtt</span></div>
+<p class="summary">MQTT devices can have child devices, and the MQTT entity editor gets a unit picker.</p>
+</article>
+<article class="item" data-affects="none">
+<h3><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#noteworthy-improvements-to-existing-integrations">WLED</a></h3>
+<div class="tags"><span class="tag release">2026.11</span><span class="tag kind">Improvement</span><span class="tag domain">wled</span></div>
+<p class="summary">WLED adds an AudioReactive switch, a next-playlist-entry button, and temperature and humidity sensors for devices with those usermods.</p>
+</article>
+<article class="item" data-affects="none">
+<h3><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#other-noteworthy-changes">Combine calendars into one.</a></h3>
+<div class="tags"><span class="tag release">2026.11</span><span class="tag kind">Noteworthy</span><span class="tag domain">group</span></div>
+<p class="summary">The Group integration can combine several calendars into one.</p>
+</article></div>
+</details>
+<details class="section" data-section="unaffected">
+<summary><h2><span aria-hidden="true">✅</span> Doesn&#x27;t affect you <span class="count">74</span></h2></summary>
+<ul class="lines"><li><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#farewell-to-the-following">Dublin Bus</a> <span class="tag release">2026.10</span> <span class="muted">Removed</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#farewell-to-the-following">Etherscan</a> <span class="tag release">2026.10</span> <span class="muted">Removed</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#farewell-to-the-following">Melnor RainCloud</a> <span class="tag release">2026.10</span> <span class="muted">Removed</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#farewell-to-the-following">Orange and Rockland Utility (ORU)</a> <span class="tag release">2026.10</span> <span class="muted">Removed</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#farewell-to-the-following">Sigfox</a> <span class="tag release">2026.10</span> <span class="muted">Removed</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#farewell-to-the-following">SolarEdge Local</a> <span class="tag release">2026.10</span> <span class="muted">Removed</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#farewell-to-the-following">Travis-CI</a> <span class="tag release">2026.10</span> <span class="muted">Removed</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#farewell-to-the-following">Zestimate</a> <span class="tag release">2026.10</span> <span class="muted">Removed</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes">Authentication</a> <span class="tag release">2026.10</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes">easyEnergy</a> <span class="tag release">2026.10</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes">EnergyFlip</a> <span class="tag release">2026.10</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes">EnergyZero</a> <span class="tag release">2026.10</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes">Google Sheets</a> <span class="tag release">2026.10</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes">Google Wifi</a> <span class="tag release">2026.10</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes">IoTaWatt</a> <span class="tag release">2026.10</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes">Libre Hardware Monitor</a> <span class="tag release">2026.10</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes">Linode and Tank Utility</a> <span class="tag release">2026.10</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes">Mealie</a> <span class="tag release">2026.10</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes">MQTT</a> <span class="tag release">2026.10</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes">OpenEVSE</a> <span class="tag release">2026.10</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes">Proxmox VE</a> <span class="tag release">2026.10</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes">Rejseplanen</a> <span class="tag release">2026.10</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes">Sofar</a> <span class="tag release">2026.10</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes">State conditions</a> <span class="tag release">2026.10</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes">Synology DSM</a> <span class="tag release">2026.10</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes">Telegram bot</a> <span class="tag release">2026.10</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes">Teslemetry</a> <span class="tag release">2026.10</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes">UniFi Network</a> <span class="tag release">2026.10</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes">UpCloud</a> <span class="tag release">2026.10</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/#backward-incompatible-changes">Xbox</a> <span class="tag release">2026.10</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#farewell-to-the-following">Flipr</a> <span class="tag release">2026.11</span> <span class="muted">Removed</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">AdGuard Home</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Alert card</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Apple iCloud</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Auth</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Besen</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Bitcoin</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Bluesound</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Calendar and Sun</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Control4</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Device tracker</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">DoorBird</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Electra Smart</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Flow-it</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Frontend</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">General Transit Feed Specification (GTFS)</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Hayward Omnilogic</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Hive</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Holiday and Workday</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Honeywell Total Connect Comfort (Europe)</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">iRobot Roomba and Braava</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Keenetic NDMS2 Router</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Kraken</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Matter</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">MQTT</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Nanoleaf</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">NINA</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Philips Hue</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Plaato</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Python dependencies</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Ring</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Risco</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Rituals Perfume Genie</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">SMTP</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Telegram</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Telldus Live</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Tomorrow.io</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Tuya</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">UniFi Protect</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Uptime Kuma</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Watergate</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Xiaomi BLE</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Xiaomi Home</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li>
+<li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/#backward-incompatible-changes">Zigbee Home Automation</a> <span class="tag release">2026.11</span> <span class="muted">Breaking change</span></li></ul>
+</details>
+  </main>
+  <footer>
+    <h2>Sources</h2>
+    <ul><li><a href="https://www.home-assistant.io/blog/2026/09/02/release-20269/">2026.9: There&#x27;s room on this bus</a></li><li><a href="https://www.home-assistant.io/blog/2026/10/07/release-202610/">2026.10: You are here 📍</a></li><li><a href="https://www.home-assistant.io/blog/2026/11/04/release-202611/">2026.11: A lot in store!</a></li></ul>
+    <p>Made by <code>/ha-release-notes</code> from the official release posts. Links open the matching section of each post.</p>
+  </footer>
+</div>
+<script>
+(() => {
+  const toggle = document.getElementById("mine");
+  const apply = () => document.body.classList.toggle("mine", toggle.checked);
+  toggle.addEventListener("change", apply);
+  apply();
+  // Print every section, then restore what was open.
+  const all = () => document.querySelectorAll("details");
+  addEventListener("beforeprint", () => all().forEach((d) => { d.dataset.open = d.open; d.open = true; }));
+  addEventListener("afterprint", () => all().forEach((d) => { d.open = d.dataset.open === "true"; }));
+})();
+</script>
+</body>
+</html>

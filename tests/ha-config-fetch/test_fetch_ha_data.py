@@ -89,6 +89,12 @@ class FetchHaDataTests(unittest.TestCase):
     self.assertEqual(result.returncode, 0, result.stdout)
     self.assertIn("cat '/homeassistant/automations.yaml'", self.remote_commands())
 
+  def test_saves_the_installed_version(self):
+    result = self.run_script()
+    self.assertEqual(result.returncode, 0, result.stdout)
+    self.assertIn("cat '/config/.HA_VERSION'", self.remote_commands())
+    self.assertTrue((self.work / "ha-data" / ".HA_VERSION").exists())
+
 
   def test_follows_includes_inside_the_config_dir_only(self):
     result = self.run_script()
