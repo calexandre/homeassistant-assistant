@@ -29,10 +29,10 @@ Call `GetLiveContext`. Note the entity domains it shows, the part of each entity
 
 ## Step 2 — Snapshot
 
-The matching reads the registries and YAML in `ha-data/`, and the installed version in `ha-data/.HA_VERSION`. Check them in one go:
+The matching reads the three registries and the YAML in `ha-data/`, and the installed version in `ha-data/.HA_VERSION`. Check that each is there, not empty, and under a day old; one fetch saves `configuration.yaml` and the files it includes together, so its age stands for theirs:
 
 ```bash
-[ -s ha-data/registry/entries.json ] && [ -s ha-data/.HA_VERSION ] && [ -z "$(find ha-data/registry/entries.json ha-data/.HA_VERSION -mmin +1440)" ] && echo FRESH || echo STALE
+[ "$(find ha-data/configuration.yaml ha-data/.HA_VERSION ha-data/registry/entries.json ha-data/registry/devices.json ha-data/registry/entities.json -mmin -1440 ! -empty 2>/dev/null | wc -l)" -eq 5 ] && echo FRESH || echo STALE
 ```
 
 - FRESH: go to Step 3 with `--ha-data ha-data`.
@@ -94,7 +94,7 @@ python3 -I <skill>/scripts/release_notes.py assess ha-release-notes/ha-release-<
 EOF
 ```
 
-- `summary` is required for every item, `impact` unless `affects` is `none`, and `action` when `affects` is `action`.
+- `summary` is required for every item, `affects` for every item but a highlight (which counts as `none` without one), `impact` unless `affects` is `none`, and `action` when `affects` is `action`.
 - The text renders `` `code` `` and `[links](https://…)`; everything else stays plain text.
 - Exit code 1 lists the ids still missing: send them in another `assess` call, which merges with the first.
 - Exit code 2 names a field to fix; nothing was saved.

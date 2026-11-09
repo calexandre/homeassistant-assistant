@@ -296,6 +296,12 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(report.link(item, html=False), "Trap")
         self.assertEqual(report.link({"title": "Ok [1]", "url": "https://example.org/#a"}, html=False),
                          "[Ok \\[1\\]](https://example.org/#a)")
+        self.assertEqual(report.link({"title": "Paren", "url": "https://example.org/a_(b) c"}, html=False),
+                         "[Paren](https://example.org/a_%28b%29%20c)")
+        self.assertEqual(report.md_text("Run [this](javascript:alert(1)), see [docs](https://example.org/x)\nor <vbscript:x>."),
+                         "Run this, see [docs](https://example.org/x) or vbscript:x.")
+        self.assertEqual(report.md_text("Keep `[x](y)` as code; break [deep](javascript:a((1)))."),
+                         "Keep `[x](y)` as code; break [deep] (javascript:a((1))).")
 
     def test_assess_rejects_bad_judgments_without_saving(self):
         self.build("--domains", "hue", "--target", "2026.10.1")
@@ -307,11 +313,22 @@ class PipelineTests(unittest.TestCase):
             {"items": {"2026.10/improvement/hue": {"affects": "maybe", "summary": "x"}}},
             {"verdict": {"level": "panic", "reason": "x"}},
             {"items": {}, "extra": 1},
+            {"items": []},
+            {"items": {"2026.10/improvement/hue": {"summary": "x"}}},  # affects left out
         ]
         for case in cases:
             result = self.run_cli("assess", str(path), stdin=json.dumps(case))
             self.assertEqual(result.returncode, 2, (case, result.stdout, result.stderr))
             self.assertEqual(path.read_text(), before)
+
+    def test_a_snapshot_missing_a_registry_is_refused(self):
+        data = self.work / "ha-data"
+        (data / "registry").mkdir(parents=True)
+        (data / "registry" / "entries.json").write_text("{}")
+        result = self.run_cli("build", "--source-dir", str(self.work / "posts"), "--ha-data", str(data))
+        self.assertEqual(result.returncode, 2, result.stderr)
+        self.assertIn("Missing devices.json, entities.json", result.stderr)
+        self.assertFalse(self.out.exists())
 
     @unittest.skipUnless(HAS_YAML, "needs PyYAML")
     def test_snapshot_inventory_finds_integrations_and_their_automations(self):

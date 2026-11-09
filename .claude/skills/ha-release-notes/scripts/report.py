@@ -32,6 +32,7 @@ SECTIONS = (  # key, emoji, title, open by default
     ("unaffected", "✅", "Doesn't affect you", False),
 )
 TEMPLATE = pathlib.Path(__file__).resolve().parent.parent / "assets" / "template.html"
+WEB = re.compile(r"https?://")
 
 
 def affects(item):
@@ -98,12 +99,12 @@ def inline(text):
 def link(item, html=True):
     """The item's title, linked to its post only when the address is http(s)."""
     url = str(item.get("url") or "")
-    if not re.match(r"https?://", url):
+    if not WEB.match(url):
         return esc(item["title"]) if html else item["title"]
     if html:
         return f'<a href="{esc(url)}">{esc(item["title"])}</a>'
     title = item["title"].replace("[", "\\[").replace("]", "\\]")
-    return f"[{title}]({url})"
+    return f"[{title}]({md_url(url)})"
 
 
 def html_item(report, item):
@@ -180,6 +181,26 @@ def one_line(text):
     return re.sub(r"\s+", " ", str(text)).strip()
 
 
+def md_url(url):
+    """Percent-encode what would end or break a Markdown link target."""
+    return re.sub(r"[()<>\s]", lambda m: f"%{ord(m.group(0)):02X}", url)
+
+
+MD_LINK = re.compile(r"\[([^\]]*)\]\(\s*<?((?:[^()<>\s]|\([^()\s]*\))*)>?(?:\s+\"[^\"]*\")?\s*\)")
+MD_AUTOLINK = re.compile(r"<([a-zA-Z][\w+.-]*:[^<>\s]*)>")
+
+
+def md_text(text):
+    """Agent text on one line, keeping only links to http(s), as the HTML does. `code` stays as written."""
+    parts = re.split(r"(`[^`]+`)", one_line(text))
+    for n in range(0, len(parts), 2):
+        part = MD_LINK.sub(lambda m: m.group(0) if WEB.match(m.group(2)) else m.group(1), parts[n])
+        part = MD_AUTOLINK.sub(lambda m: m.group(0) if WEB.match(m.group(1)) else m.group(1), part)
+        # Whatever link the patterns above could not parse loses the "](" that makes it one.
+        parts[n] = re.sub(r"\]\((?!\s*<?https?://)", "] (", part)
+    return "".join(parts)
+
+
 def render_md(report):
     meta = report["meta"]
     emoji, label = LEVELS[report["verdict"]["level"]]
@@ -189,9 +210,9 @@ def render_md(report):
              "  - release-notes", "tags:", f"  - ha-{meta['target']}", f"model: {json.dumps(meta.get('model') or '')}",
              f"summary: {json.dumps(one_line(meta.get('summary') or ''), ensure_ascii=False)}",
              f"date: {json.dumps(meta['generated'])}", "---", "",
-             f"## {emoji} {label}", "", one_line(report["verdict"]["reason"]), ""]
+             f"## {emoji} {label}", "", md_text(report["verdict"]["reason"]), ""]
     for note in meta.get("notes") or []:
-        lines += [f"> {one_line(note)}", ""]
+        lines += [f"> {md_text(note)}", ""]
     for key, s_emoji, title, _, found in sections(report):
         lines += [f"## {s_emoji} {title}", ""]
         if key == "unaffected":
@@ -202,11 +223,11 @@ def render_md(report):
             lines += [f"### {link(item, html=False)} · {item['release']} · {KIND_LABEL[item['kind']]}", ""]
             label_new = "What's new" if item["kind"] == "highlight" else "What changed"
             if a.get("summary"):
-                lines.append(f"- **{label_new}**: {one_line(a['summary'])}")
+                lines.append(f"- **{label_new}**: {md_text(a['summary'])}")
             if a.get("impact"):
-                lines.append(f"- **For your setup**: {one_line(a['impact'])}")
+                lines.append(f"- **For your setup**: {md_text(a['impact'])}")
             if a.get("action"):
-                lines.append(f"- **Do this**: {one_line(a['action'])}")
+                lines.append(f"- **Do this**: {md_text(a['action'])}")
             names = used_by(report, item)
             if names and affects(item) in ("action", "behavior"):
                 lines.append(f"- **Used by**: {', '.join(names[:12])}{f' and {len(names) - 12} more' if len(names) > 12 else ''}")

@@ -37,6 +37,7 @@ POST_LINK = re.compile(r"/blog/(\d{4})/(\d{2})/(\d{2})/release-(\d{4})(\d{1,2})/
 VERSION = re.compile(r"^(\d{4})\.(\d{1,2})(?:\.(\d+))?([a-z][a-z0-9]*)?$")
 MAX_MONTHS = 24
 AFFECTS = ("action", "behavior", "opportunity", "none")
+REGISTRIES = ("entries.json", "devices.json", "entities.json")  # what inventory.from_snapshot reads
 TEXT_LIMIT = {"highlight": 1500, "default": 3000}
 
 
@@ -146,8 +147,9 @@ def build(args):
         fail("Pass --ha-data DIR (SSH snapshots) or --domains a,b,c (from GetLiveContext).", 2)
     import inventory
     if args.ha_data:
-        if not (pathlib.Path(args.ha_data) / "registry" / "entries.json").is_file():
-            fail(f"No registries in {args.ha_data}/registry: refresh the snapshot, or pass --domains instead.", 2)
+        absent = [name for name in REGISTRIES if not (pathlib.Path(args.ha_data) / "registry" / name).is_file()]
+        if absent:
+            fail(f"Missing {', '.join(absent)} in {args.ha_data}/registry: refresh the snapshot, or pass --domains instead.", 2)
         home = inventory.from_snapshot(args.ha_data)
     else:
         home = inventory.from_domains(args.domains.split(","))
@@ -314,7 +316,7 @@ def missing(report):
     return out
 
 
-def check_assessment(ident, value):
+def check_assessment(ident, value, kind):
     if value is None:
         return None
     if not isinstance(value, dict):
@@ -322,9 +324,9 @@ def check_assessment(ident, value):
     unknown = set(value) - {"affects", "summary", "impact", "action"}
     if unknown:
         fail(f"{ident}: unknown fields {sorted(unknown)}", 2)
-    affects = value.get("affects", "none")
+    affects = value.get("affects", "none" if kind == "highlight" else None)  # a highlight may carry only a summary
     if affects not in AFFECTS:
-        fail(f"{ident}: affects must be one of {', '.join(AFFECTS)}", 2)
+        fail(f"{ident}: affects is required, one of {', '.join(AFFECTS)}", 2)
     clean = {"affects": affects}
     for field in ("summary", "impact", "action"):
         text = value.get(field)
@@ -355,10 +357,13 @@ def assess(args):
         fail(f"Unknown top-level fields: {sorted(unknown)}", 2)
     by_id = {item["id"]: item for item in report["items"]}
     updates = {}
-    for ident, value in (judgments.get("items") or {}).items():
+    items = judgments.get("items", {})
+    if not isinstance(items, dict):
+        fail("items must be an object that maps item ids to judgments", 2)
+    for ident, value in items.items():
         if ident not in by_id:
             fail(f"No item with id {ident!r} in {path}", 2)
-        updates[ident] = check_assessment(ident, value)
+        updates[ident] = check_assessment(ident, value, by_id[ident]["kind"])
     verdict = judgments.get("verdict")
     if verdict is not None:
         if not isinstance(verdict, dict) or verdict.get("level") not in report_render.LEVELS \
@@ -386,7 +391,7 @@ def assess(args):
     relevant = [i for i in report["items"] if (i.get("assessment") or {}).get("affects") in rank]
     for item in sorted(relevant, key=lambda i: rank[i["assessment"]["affects"]]):
         a = item["assessment"]
-        print(f"- {a['affects']}: [{item['title']}]({item['url']}) ({item['release']}): {a.get('action') or a['impact']}")
+        print(f"- {a['affects']}: {report_render.link(item, html=False)} ({item['release']}): {a.get('action') or a['impact']}")
 
 
 def render_files(report, path, html_path=None, md_path=None):
