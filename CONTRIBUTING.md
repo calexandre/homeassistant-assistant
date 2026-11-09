@@ -30,11 +30,14 @@ Set up the Home Assistant MCP server as described in the [README](README.md#-set
 
    # Home map (.claude/skills/ha-home-map/), which needs PyYAML
    uv run --no-project --with pyyaml python3 -m unittest discover -s tests/ha-home-map -p 'test_*.py'
+
+   # Release notes (.claude/skills/ha-release-notes/); the snapshot test needs PyYAML
+   uv run --no-project --with pyyaml python3 -m unittest discover -s tests/ha-release-notes -p 'test_*.py'
    ```
 
    The [Tests workflow](.github/workflows/tests.yml) runs every suite on every pull request.
 
-   After a change in `.claude/skills/ha-home-map/` or `demo/`, also run `demo/build.sh` and commit the rebuilt `demo/assets/home-map.html`, which the skill ships already built: the workflow fails while the committed demo is stale. When the change alters how the map looks, retake `demo/assets/home-map.png` from it too.
+   After a change in `.claude/skills/ha-home-map/`, `.claude/skills/ha-release-notes/`, or `demo/`, also run `demo/build.sh` and commit the pages it rebuilds in `demo/assets/`: the workflow fails while a committed demo is stale. When the change alters how a page looks, retake its screenshot (`home-map.png` or `release-notes.png`) too. To move the release notes demo to a newer release, judge a fresh report for the made-up home and trim it with `demo/trim_release_report.py`, which drops the posts' own text.
 
 2. Validate the plugin manifests:
 

@@ -13,7 +13,7 @@ Skills and a safety hook for building Home Assistant automations, scripts, and c
 | `.claude-plugin/` | Plugin and marketplace manifests, icon | Plugin installs |
 | `.github/workflows/tests.yml` | CI running every test suite | GitHub Actions; `.github/dependabot.yml` keeps its actions current |
 | `tests/<skill>/` | Test suites for the skills | Contributors and CI |
-| `demo/` | `demo_home.py` (made-up homes), `build.sh`, and its output `assets/home-map.html`, shipped already built, with its screenshot | The README; the `ha-home-map` skill, which hands the built demo to users without SSH snapshots; the tests |
+| `demo/` | `demo_home.py` (made-up homes), `release-notes.json` (a made-up home's judged release notes report, trimmed by `trim_release_report.py`), and `build.sh`, which renders both into `assets/` | The README; the `ha-home-map` skill, which hands the built home map to users without SSH snapshots; the tests |
 | `demo/assets/` | GitHub Pages root: the showcase `index.html` with a card per demo and install steps that mirror the README's, each demo as one self-contained HTML file, and its screenshot | `.github/workflows/pages.yml`, which publishes it on pushes to `main` and stamps the plugin version into its `__PLUGIN_VERSION__` placeholders |
 
 Claude Code in a plain clone loads the skills but not the guard; `claude --plugin-dir .` loads both.
@@ -29,7 +29,7 @@ Claude Code in a plain clone loads the skills but not the guard; `claude --plugi
 - Treat the `homeassistant` SSH host as read-only, whether or not the guard hook is loaded in this session
 - Change the guard's launch command in both hook configs (`hooks/hooks.json` and `.github/hooks/ssh-ha-readonly-guard.json`)
 - Put a skill's tests in `tests/<skill>/`, outside the skill folder, so plugin users get only what the skill runs; add every new test suite to `.github/workflows/tests.yml`
-- Rebuild the demo with `demo/build.sh` after any change in `.claude/skills/ha-home-map/` or `demo/` and commit `demo/assets/home-map.html` with it — the skill ships it already built, and CI fails while the committed copy is stale
+- Rebuild the demos with `demo/build.sh` after any change in `.claude/skills/ha-home-map/`, `.claude/skills/ha-release-notes/`, or `demo/`, and commit the pages it changes in `demo/assets/` — the home map skill ships its demo already built, and CI fails while a committed page is stale
 - Bump `version` in `.claude-plugin/plugin.json` in any change that ships to plugin users — the version pins installed copies, so an unbumped change never reaches them
 
 ⚠️ Ask first:
@@ -80,7 +80,10 @@ python3 -m unittest discover -s tests/ha-config-fetch -p 'test_*.py'
 # Test the home map builder and page against made-up homes (needs PyYAML) — run after any change in ha-home-map/
 uv run --no-project --with pyyaml python3 -m unittest discover -s tests/ha-home-map -p 'test_*.py'
 
-# Rebuild the demo home map in demo/assets/ — run after any change in ha-home-map/ or demo/
+# Test the release notes parser, matcher, and report against made-up posts (the snapshot test needs PyYAML) — run after any change in ha-release-notes/
+uv run --no-project --with pyyaml python3 -m unittest discover -s tests/ha-release-notes -p 'test_*.py'
+
+# Rebuild the demo pages in demo/assets/ — run after any change in ha-home-map/, ha-release-notes/, or demo/
 demo/build.sh
 
 # Validate the plugin and marketplace manifests
@@ -112,6 +115,6 @@ For every Markdown edit or generated report, including gitignored output, read a
 
 - Implementation output (scratch YAML, test configs): write to `.temp/`
 - Home maps from the `ha-home-map` skill: write to `.temp/home-map/`
-- Release summaries from the `ha-release-notes` skill: write to `ha-release-notes/ha-release-[VERSION].md`
+- Release notes from the `ha-release-notes` skill: `ha-release-notes/ha-release-[VERSION].json`, `.html`, and `.md`, with the agent's to-do in `.temp/release-notes/`
 
 Git ignores both folders on purpose: what goes there describes the user's home, so it stays on this machine. Write there (create the folder when it is missing) and leave it uncommitted; the gitignore is no reason to save the output anywhere else.

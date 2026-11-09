@@ -31,6 +31,7 @@ Try what the skills make, on a made-up home, in the [live demos](https://calexan
 - [📂 Optional: SSH snapshots](#-optional-ssh-snapshots)
 - [💡 Usage examples](#-usage-examples)
 - [🏡 Home map](#-home-map)
+- [📰 Release notes](#-release-notes)
 - [🔒 Safety and privacy](#-safety-and-privacy)
 - [🧱 Project structure](#-project-structure)
 - [🧯 Troubleshooting](#-troubleshooting)
@@ -43,7 +44,7 @@ Try what the skills make, on a made-up home, in the [live demos](https://calexan
 - 📚 **Docs-grounded answers** — looks up the official Home Assistant and ESPHome docs and cites the exact section used.
 - 🩺 **Troubleshooting playbook** — a guided flow through config checks, logs, traces, and Developer Tools when something misbehaves.
 - 🔧 **ESPHome support** — device YAML authoring backed by an esphome.io sitemap.
-- 📰 **Personalized release notes** — `/ha-release-notes` checks a Home Assistant release against your devices and configs and flags the breaking changes that affect you.
+- 📰 **Personalized release notes** — `/ha-release-notes` checks every release between your version and the newest against your integrations and automations, and gives an upgrade verdict. [See it](#-release-notes).
 - 🏡 **Home map** — `/ha-home-map` draws an interactive map of your areas, devices, and the automations, scripts, and scenes that link them, as one HTML file that works offline. [See the demo](#-home-map).
 - 📂 **Config snapshots** — optional read-only SSH snapshots of automations, scripts, scenes, ESPHome YAMLs, Zigbee2MQTT data, and logs.
 - 🔐 **Read-only SSH guard** — a hook that blocks destructive SSH commands against your Home Assistant host, whether they run in Bash or PowerShell.
@@ -71,7 +72,7 @@ Every request starts at the `homeassistant` skill, which calls `GetLiveContext` 
 | `ha-state-presentation` | Summarizes live states grouped by area or function |
 | `ha-config-fetch` | Refreshes `ha-data/` snapshots over SSH when they are older than 24 hours, and always before debugging |
 | `ha-docs-sitemap` | Maps a topic to the right home-assistant.io page instead of crawling the docs |
-| `ha-release-notes` | On demand only (`/ha-release-notes`): summarizes a release against your setup and flags breaking changes that affect you |
+| `ha-release-notes` | On demand only (`/ha-release-notes`): checks every release from your version up to the target against your setup, and saves an HTML and Markdown report with an upgrade verdict |
 | `ha-home-map` | On demand only (`/ha-home-map`): draws your areas, devices, automations, scripts, and scenes as an offline, interactive map |
 | `esphome` | Authors ESPHome device YAML with an esphome.io sitemap |
 
@@ -221,14 +222,7 @@ The troubleshooting skill walks through config checks, automation traces, and lo
 > Add a BME280 sensor to the hall corridor wall switch over I2C.
 ```
 
-### 📰 Release notes
-
-```text
-/ha-release-notes
-/ha-release-notes 2026.11.0
-```
-
-Runs only when you call it (in Claude Code, as `/ha-release-notes`). Pass a version like `2026.11.0` (patch versions work too) or a release notes URL; with neither, it uses the latest release on the Home Assistant blog. It checks highlights, new integrations, and breaking changes against your live entities and config snapshots, and saves the summary to `ha-release-notes/ha-release-[VERSION].md` (gitignored).
+For what an upgrade means for your home, see [Release notes](#-release-notes).
 
 ## 🏡 Home map
 
@@ -276,11 +270,42 @@ The page lists your rooms, devices, and routines, so it stays on your machine an
 - **Zoom** with the scroll wheel, a pinch, a double-click, or `+` and `-`; drag or use the arrow keys to pan, and press `0` to fit the whole home.
 - **Switch to Table** for a sortable list, **download** the current view as a PNG, or switch between light and dark.
 
+## 📰 Release notes
+
+`/ha-release-notes` tells you what an upgrade means for your home: every release between the version you run and the one you want, checked against your integrations and automations, with a verdict on whether to upgrade.
+
+[![Release notes for a made-up home upgrading from 2026.9.3 to 2026.11.0: a Review first verdict to update the Z-Wave JS app, then the one change that needs action](demo/assets/release-notes.png)](https://calexandre.github.io/homeassistant-assistant/release-notes.html)
+
+**Try it first:** the [live demo](https://calexandre.github.io/homeassistant-assistant/release-notes.html) checks a made-up home's upgrade from 2026.9.3 to 2026.11.0.
+
+### Check your upgrade
+
+Run it in Claude Code, optionally with the release you want and the version you run:
+
+```text
+/ha-release-notes
+/ha-release-notes 2026.11.1
+/ha-release-notes 2026.11.1 from 2026.9.3
+```
+
+It runs only when you call it, and then:
+
+1. Reads your installed version, registries, and YAML from the [SSH snapshots](#-optional-ssh-snapshots), refreshing them when they are more than a day old.
+2. Fetches the official release post of every release from your version up to the target (the newest, unless you name one), and matches each highlight, new integration, improvement, breaking change, and patch fix to the integrations and automations that use them.
+3. Has the agent judge what matched, in its own words, and pick a verdict: ✅ Upgrade, ℹ️ Upgrade and check, ⚠️ Review first, ⏳ Wait for a patch, or 🛑 Hold.
+4. Saves the report to `ha-release-notes/ha-release-<version>.html` and `.md` (gitignored), and replies with the changes that affect you, the verdict, and a link to the page.
+
+Without SSH access, it matches the entity domains `GetLiveContext` shows, says so in the report, and covers only the target release unless you pass `from`. The build needs [PyYAML](https://pypi.org/project/PyYAML/) or [uv](https://docs.astral.sh/uv/) to read your YAML.
+
+### Read the report
+
+The page leads with the verdict, then what needs your action, what you'll notice, the highlights, and the new features worth a look. **Only what affects me** hides everything else, and each breaking change that doesn't touch your home gets one line with a link to the post. The Markdown copy holds the same sections, with front matter for notes apps.
+
 ## 🔒 Safety and privacy
 
 - **Read-only SSH guard.** A `PreToolUse` hook inspects every Bash and PowerShell command. Commands that reach the `homeassistant` host must match a read-only allowlist; interactive SSH, uploads (`scp`, `sftp`, `rsync`), and everything else are denied. It guards against mistakes; it is not a sandbox.
 - **Device control stays with you.** The skills only need `GetLiveContext` to read your home, and your client asks before each MCP tool call. For a hard guarantee, turn on the integration's **Read-only** option.
-- **What leaves your machine.** Entity names and states from `GetLiveContext`, and any snapshot the agent reads (automations, logs, Zigbee2MQTT state, the home map's `graph.json`), are sent to your AI provider as part of the conversation. `secrets.yaml` is never fetched, and the registries are trimmed before they are saved, so integration credentials never reach the disk. The home map page stays on your machine; building it fetches only area icons it doesn't bundle, by icon name, from the jsdelivr CDN.
+- **What leaves your machine.** Entity names and states from `GetLiveContext`, and any snapshot the agent reads (automations, logs, Zigbee2MQTT state, the home map's `graph.json`, the release notes to-do with your matching automations), are sent to your AI provider as part of the conversation. `secrets.yaml` is never fetched, and the registries are trimmed before they are saved, so integration credentials never reach the disk. The home map page stays on your machine; building it fetches only area icons it doesn't bundle, by icon name, from the jsdelivr CDN. Release notes fetch only the public release posts, from GitHub and the Home Assistant blog feed, and send nothing about your home.
 - **No tokens to handle.** Every client signs in through Home Assistant's own login page, so there is no access token to copy, paste, or leak.
 
 ## 🧱 Project structure
@@ -296,7 +321,7 @@ The page lists your rooms, devices, and routines, so it stays on your machine an
 ├── ha-home-map/                 # /ha-home-map, on demand only: graph builder and page template
 ├── ha-docs-sitemap/             # SITEMAP.md of home-assistant.io
 ├── ha-implementation-format/    # YAML / How This Works / Customization Ideas output
-├── ha-release-notes/            # /ha-release-notes, on demand only
+├── ha-release-notes/            # /ha-release-notes, on demand only: release post parser, matcher, and report page
 ├── ha-state-presentation/       # Live states grouped by area or function
 ├── ha-troubleshooting/          # Config, logs, traces, Developer Tools
 └── esphome/                     # ESPHome YAML guidance and SITEMAP.md of esphome.io
@@ -309,8 +334,10 @@ hooks/hooks.json                 # SSH read-only guard config for plugin install
 └── dependabot.yml               # Weekly updates for the GitHub Actions in workflows/
 tests/                           # Test suites for the skills, one folder per skill, kept out of the skill folders
 demo/
-├── demo_home.py                 # Generates made-up homes for the demo and the tests
-├── build.sh                     # Rebuilds the demo home map; CI fails while the committed copy is stale
+├── demo_home.py                 # Generates made-up homes for the demos and the tests
+├── release-notes.json           # The made-up home's release notes report, the source of its demo page
+├── trim_release_report.py       # Trims a judged report into release-notes.json
+├── build.sh                     # Rebuilds the demo pages; CI fails while a committed page is stale
 └── assets/                      # GitHub Pages root: the showcase (index.html), each demo built, and its screenshot
 images/                          # README logo
 AGENTS.md                        # Instructions for coding agents working on this repo

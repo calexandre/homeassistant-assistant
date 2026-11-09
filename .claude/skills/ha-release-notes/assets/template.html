@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>__TITLE__ · Release notes</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8F%A0%3C/text%3E%3C/svg%3E">
+<script>document.documentElement.className = "js";</script>
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --surface: #ffffff;
+    --text: #1f2328;
+    --text-2: #5d6470;
+    --line: #e1e4e8;
+    --primary: #0398dc;
+    --chip: #eef1f4;
+    --chip-ink: #3b4350;
+    --release: #e8f4fb;
+    --release-ink: #0b6b99;
+    --do-bg: #fff4e5;
+    --do-line: #ffd8a8;
+    --shadow: 0 1px 2px rgb(16 24 40 / 6%), 0 4px 16px rgb(16 24 40 / 5%);
+    --upgrade: #2e7d32;
+    --check: #0277bd;
+    --review: #e65100;
+    --wait: #6a1b9a;
+    --hold: #c62828;
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1116;
+      --surface: #181b22;
+      --text: #e6e8ec;
+      --text-2: #a2a9b4;
+      --line: #2a2f39;
+      --primary: #29b6f6;
+      --chip: #232833;
+      --chip-ink: #c9ced6;
+      --release: #12303f;
+      --release-ink: #8fd6f7;
+      --do-bg: #33240f;
+      --do-line: #6b4a17;
+      --shadow: 0 1px 2px rgb(0 0 0 / 40%);
+      --upgrade: #81c784;
+      --check: #4fc3f7;
+      --review: #ffb74d;
+      --wait: #ce93d8;
+      --hold: #ef9a9a;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.55 Roboto, "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif; }
+  a { color: var(--primary); }
+  a:focus-visible, summary:focus-visible, .filter input:focus-visible + span { outline: 3px solid var(--primary); outline-offset: 3px; border-radius: 6px; }
+  code { font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; font-size: .9em; background: var(--chip); border-radius: 6px; padding: 1px 6px; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 16px; }
+
+  header.top { padding: 32px 0 8px; }
+  .eyebrow { margin: 0 0 4px; color: var(--text-2); font-size: 14px; font-weight: 500; letter-spacing: .02em; }
+  h1 { margin: 0 0 8px; font-size: clamp(26px, 4.5vw, 36px); line-height: 1.2; font-weight: 600; }
+  .lede { margin: 0 0 6px; color: var(--text-2); font-size: 17px; max-width: 760px; }
+  .byline { margin: 0; color: var(--text-2); font-size: 13px; }
+
+  .verdict {
+    display: flex; gap: 16px; align-items: center;
+    margin: 20px 0 12px; padding: 18px 20px;
+    background: var(--surface); border: 1px solid var(--line); border-left: 6px solid var(--level); border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+  .verdict-emoji { font-size: 34px; line-height: 1; }
+  .verdict-label { margin: 0; font-size: 20px; font-weight: 600; color: var(--level); }
+  .verdict-reason { margin: 2px 0 0; }
+  .level-upgrade { --level: var(--upgrade); }
+  .level-check { --level: var(--check); }
+  .level-review { --level: var(--review); }
+  .level-wait { --level: var(--wait); }
+  .level-hold { --level: var(--hold); }
+  .note { margin: 8px 0; padding: 10px 14px; border-radius: 10px; background: var(--chip); color: var(--text-2); font-size: 14px; }
+  .calm { margin: 16px 0; color: var(--text-2); }
+
+  .toolbar { display: flex; justify-content: flex-end; margin: 14px 0 4px; }
+  .filter { display: none; align-items: center; gap: 10px; cursor: pointer; font-size: 14px; font-weight: 500; user-select: none; }
+  .js .filter { display: inline-flex; }
+  .filter input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .filter span { position: relative; width: 38px; height: 22px; border-radius: 999px; background: var(--line); transition: background .15s; flex: none; }
+  .filter span::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgb(0 0 0 / 30%); transition: transform .15s; }
+  .filter input:checked + span { background: var(--primary); }
+  .filter input:checked + span::after { transform: translateX(16px); }
+  .mine .section:not([data-section="action"]):not([data-section="behavior"]) { display: none; }
+
+  .section { margin: 14px 0; }
+  .section > summary { list-style: none; cursor: pointer; padding: 8px 0; }
+  .section > summary::-webkit-details-marker { display: none; }
+  .section > summary h2 { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 21px; font-weight: 600; }
+  .section > summary h2::after { content: ""; width: 8px; height: 8px; margin-left: 2px; border-right: 2px solid var(--text-2); border-bottom: 2px solid var(--text-2); transform: rotate(-45deg); transition: transform .15s; }
+  .section[open] > summary h2::after { transform: rotate(45deg); }
+  .count { min-width: 26px; padding: 0 8px; border-radius: 999px; background: var(--chip); color: var(--chip-ink); font-size: 13px; font-weight: 600; text-align: center; line-height: 22px; }
+
+  .items { display: grid; gap: 12px; margin-top: 6px; }
+  .item { padding: 16px 18px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+  .item[data-affects="action"] { border-left: 4px solid var(--review); }
+  .item[data-affects="behavior"] { border-left: 4px solid var(--check); }
+  .item[data-affects="opportunity"] { border-left: 4px solid var(--upgrade); }
+  .item h3 { margin: 0 0 6px; font-size: 17px; font-weight: 600; line-height: 1.35; }
+  .item h3 a { color: inherit; text-decoration: none; }
+  .item h3 a:hover { text-decoration: underline; }
+  .item p { margin: 8px 0 0; }
+  .summary { color: var(--text); }
+  .impact { color: var(--text-2); }
+  .impact b, .do b, .used b { color: var(--text); font-weight: 600; margin-right: 4px; }
+  .do { padding: 8px 12px; border-radius: 10px; background: var(--do-bg); border: 1px solid var(--do-line); }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { display: inline-block; padding: 1px 9px; border-radius: 999px; background: var(--chip); color: var(--chip-ink); font-size: 12px; font-weight: 500; line-height: 20px; }
+  .tag.release { background: var(--release); color: var(--release-ink); }
+  .tag.idea { background: color-mix(in srgb, var(--upgrade) 14%, transparent); color: var(--upgrade); }
+  .tag.domain { font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; }
+  .used { margin-top: 10px; font-size: 14px; color: var(--text-2); }
+  .used ul { display: inline; margin: 0; padding: 0; list-style: none; }
+  .used li { display: inline; }
+  .used li + li::before { content: " · "; }
+  .lines { margin: 6px 0 0; padding: 4px 18px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); list-style: none; }
+  .lines li { padding: 9px 0; border-bottom: 1px solid var(--line); display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+  .lines li:last-child { border-bottom: 0; }
+  .muted { color: var(--text-2); font-size: 13px; }
+
+  footer { margin: 36px 0 40px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--text-2); font-size: 14px; }
+  footer h2 { margin: 0 0 6px; font-size: 14px; font-weight: 600; color: var(--text); }
+  footer ul { margin: 0 0 12px; padding-left: 18px; }
+
+  @media (max-width: 560px) {
+    .verdict { align-items: flex-start; padding: 14px 16px; }
+    .verdict-emoji { font-size: 28px; }
+    .item { padding: 14px; }
+  }
+  @media print {
+    body { background: #fff; }
+    .toolbar { display: none; }
+    .item, .verdict, .lines { box-shadow: none; break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <p class="eyebrow">Release notes for your home</p>
+    <h1>__TITLE__</h1>
+    <p class="lede">__SUMMARY__</p>
+    <p class="byline">__BYLINE__</p>
+  </header>
+  <div class="toolbar">
+    <label class="filter"><input type="checkbox" id="mine"><span aria-hidden="true"></span>Only what affects me (__COUNT_MINE__)</label>
+  </div>
+  <main>
+__BODY__
+  </main>
+  <footer>
+    <h2>Sources</h2>
+    <ul>__SOURCES__</ul>
+    <p>Made by <code>/ha-release-notes</code> from the official release posts. Links open the matching section of each post.</p>
+  </footer>
+</div>
+<script>
+(() => {
+  const toggle = document.getElementById("mine");
+  const apply = () => document.body.classList.toggle("mine", toggle.checked);
+  toggle.addEventListener("change", apply);
+  apply();
+  // Print every section, then restore what was open.
+  const all = () => document.querySelectorAll("details");
+  addEventListener("beforeprint", () => all().forEach((d) => { d.dataset.open = d.open; d.open = true; }));
+  addEventListener("afterprint", () => all().forEach((d) => { d.open = d.dataset.open === "true"; }));
+})();
+</script>
+</body>
+</html>

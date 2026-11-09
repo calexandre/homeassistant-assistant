@@ -139,7 +139,7 @@
     box-shadow: var(--shadow);
     overflow: hidden;
   }
-  .demo-inner { display: grid; }
+  .demo-inner { display: grid; grid-template-rows: auto 1fr; height: 100%; }
   .shot { display: block; background: var(--code-bg); border-bottom: 1px solid var(--line); }
   .shot img { display: block; width: 100%; height: auto; transition: opacity .15s; }
   .shot:hover img { opacity: .92; }
@@ -150,9 +150,9 @@
   .body p { margin: 0; color: var(--text-2); }
   .facts { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
   .facts li { background: var(--chip); color: var(--chip-ink); border-radius: 999px; padding: 2px 10px; font-size: 13px; font-weight: 500; }
-  .own { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); font-size: 14px; color: var(--text-2); }
+  .body .own { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); font-size: 14px; color: var(--text-2); }
   @container (min-width: 760px) {
-    .demo-inner { grid-template-columns: 3fr 2fr; }
+    .demo-inner { grid-template-columns: 3fr 2fr; grid-template-rows: auto; }
     .shot { border-bottom: 0; border-right: 1px solid var(--line); display: flex; align-items: center; }
     .body { padding: 26px 28px; }
   }
@@ -281,6 +281,28 @@
                 <a class="btn ghost" href="https://github.com/calexandre/homeassistant-assistant#-home-map">How it works</a>
               </div>
               <p class="own">Map your own home: <code>/ha-home-map</code></p>
+            </div>
+          </div>
+        </article>
+
+        <article class="demo">
+          <div class="demo-inner">
+            <a class="shot" href="release-notes.html" aria-label="Open the release notes demo">
+              <img src="release-notes.png" width="1600" height="950" loading="lazy" alt="Release notes for a made-up home upgrading from 2026.9.3 to 2026.11.0: a Review first verdict to update the Z-Wave JS app, then the one change that needs action">
+            </a>
+            <div class="body">
+              <h3><a href="release-notes.html">Release notes</a></h3>
+              <p>Every release between the installed version and the newest, checked against the home's integrations and automations. A verdict up top, then what needs doing, what will look different, and the new features worth a look, here for a made-up home going from 2026.9.3 to 2026.11.0.</p>
+              <ul class="facts" aria-label="Highlights">
+                <li>Verdict first</li>
+                <li>Covers skipped releases</li>
+                <li>Only what affects you</li>
+              </ul>
+              <div class="actions">
+                <a class="btn primary" href="release-notes.html">Open the demo</a>
+                <a class="btn ghost" href="https://github.com/calexandre/homeassistant-assistant#-release-notes">How it works</a>
+              </div>
+              <p class="own">Check your own upgrade: <code>/ha-release-notes</code></p>
             </div>
           </div>
         </article>

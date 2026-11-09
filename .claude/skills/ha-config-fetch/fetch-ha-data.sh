@@ -86,6 +86,10 @@ for file in "${CONFIG_FILES[@]}"; do
     check_result "${OUT_DIR}/${file}" "${file}"
 done
 
+# The installed version, where /ha-release-notes starts the releases it covers.
+ssh "${SSH_HOST}" "cat '${HA_CONFIG_DIR}/.HA_VERSION'" > "${OUT_DIR}/.HA_VERSION" 2>/dev/null
+check_result "${OUT_DIR}/.HA_VERSION" ".HA_VERSION"
+
 # --- Files that configuration.yaml includes ---
 # Packages and automation, script, and scene folders, fetched into the same layout under ha-data/.
 # include_paths.py names each target; every path is checked again here before it reaches ssh.
