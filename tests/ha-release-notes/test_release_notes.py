@@ -287,6 +287,8 @@ class PipelineTests(unittest.TestCase):
         self.assertIn("- [Old Car](https://www.home-assistant.io/blog/2026/10/01/release-202610/"
                       "#backward-incompatible-changes) · 2026.10 · Breaking change", markdown)
         self.assertNotIn("|", markdown.split("---", 2)[2])
+        self.assertIn("The map is redrawn \\<script\\>alert(1)\\</script\\>.", markdown)
+        self.assertIn("Remove `for` from [the check](https://example.org/x).", markdown)
 
     def test_only_web_addresses_become_links(self):
         sys.path.insert(0, str(SCRIPTS))
@@ -299,9 +301,9 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(report.link({"title": "Paren", "url": "https://example.org/a_(b) c"}, html=False),
                          "[Paren](https://example.org/a_%28b%29%20c)")
         self.assertEqual(report.md_text("Run [this](javascript:alert(1)), see [docs](https://example.org/x)\nor <vbscript:x>."),
-                         "Run this, see [docs](https://example.org/x) or vbscript:x.")
-        self.assertEqual(report.md_text("Keep `[x](y)` as code; break [deep](javascript:a((1)))."),
-                         "Keep `[x](y)` as code; break [deep] (javascript:a((1))).")
+                         "Run \\[this\\](javascript:alert(1)), see [docs](https://example.org/x) or \\<vbscript:x\\>.")
+        self.assertEqual(report.md_text("Keep `[x](y)` as code; **not bold**, [a (b)](https://example.org/a_(b))."),
+                         "Keep `[x](y)` as code; \\*\\*not bold\\*\\*, [a (b)](https://example.org/a_%28b%29).")
 
     def test_assess_rejects_bad_judgments_without_saving(self):
         self.build("--domains", "hue", "--target", "2026.10.1")

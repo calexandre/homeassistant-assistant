@@ -33,6 +33,8 @@ SECTIONS = (  # key, emoji, title, open by default
 )
 TEMPLATE = pathlib.Path(__file__).resolve().parent.parent / "assets" / "template.html"
 WEB = re.compile(r"https?://")
+# The one link form agent text may use, in both renderers: [text](http(s) address, one level of parentheses).
+AGENT_LINK = re.compile(r"\[([^\]]+)\]\((https?://(?:[^()\s]|\([^()\s]*\))+)\)")
 
 
 def affects(item):
@@ -88,7 +90,7 @@ def inline(text):
             out.append(f"<code>{esc(part)}</code>")
             continue
         pos = 0
-        for match in re.finditer(r"\[([^\]]+)\]\((https?://[^)\s]+)\)", part):
+        for match in AGENT_LINK.finditer(part):
             out.append(esc(part[pos:match.start()]))
             out.append(f'<a href="{esc(match.group(2))}">{esc(match.group(1))}</a>')
             pos = match.end()
@@ -100,11 +102,10 @@ def link(item, html=True):
     """The item's title, linked to its post only when the address is http(s)."""
     url = str(item.get("url") or "")
     if not WEB.match(url):
-        return esc(item["title"]) if html else item["title"]
+        return esc(item["title"]) if html else md_plain(item["title"])
     if html:
         return f'<a href="{esc(url)}">{esc(item["title"])}</a>'
-    title = item["title"].replace("[", "\\[").replace("]", "\\]")
-    return f"[{title}]({md_url(url)})"
+    return f"[{md_plain(item['title'])}]({md_url(url)})"
 
 
 def html_item(report, item):
@@ -186,19 +187,25 @@ def md_url(url):
     return re.sub(r"[()<>\s]", lambda m: f"%{ord(m.group(0)):02X}", url)
 
 
-MD_LINK = re.compile(r"\[([^\]]*)\]\(\s*<?((?:[^()<>\s]|\([^()\s]*\))*)>?(?:\s+\"[^\"]*\")?\s*\)")
-MD_AUTOLINK = re.compile(r"<([a-zA-Z][\w+.-]*:[^<>\s]*)>")
+def md_plain(text):
+    """Text that Markdown shows as written: no emphasis, links, or HTML."""
+    return re.sub(r"([\\`*_~<>\[\]])", r"\\\1", text)
 
 
 def md_text(text):
-    """Agent text on one line, keeping only links to http(s), as the HTML does. `code` stays as written."""
-    parts = re.split(r"(`[^`]+`)", one_line(text))
-    for n in range(0, len(parts), 2):
-        part = MD_LINK.sub(lambda m: m.group(0) if WEB.match(m.group(2)) else m.group(1), parts[n])
-        part = MD_AUTOLINK.sub(lambda m: m.group(0) if WEB.match(m.group(1)) else m.group(1), part)
-        # Whatever link the patterns above could not parse loses the "](" that makes it one.
-        parts[n] = re.sub(r"\]\((?!\s*<?https?://)", "] (", part)
-    return "".join(parts)
+    """Agent text on one line, rendering only `code` and [links](https://…), as the HTML does."""
+    out = []
+    for n, part in enumerate(re.split(r"`([^`]+)`", one_line(text))):
+        if n % 2:
+            out.append(f"`{part}`")
+            continue
+        pos = 0
+        for match in AGENT_LINK.finditer(part):
+            out.append(md_plain(part[pos:match.start()]))
+            out.append(f"[{md_plain(match.group(1))}]({md_url(match.group(2))})")
+            pos = match.end()
+        out.append(md_plain(part[pos:]))
+    return "".join(out)
 
 
 def render_md(report):
@@ -230,7 +237,7 @@ def render_md(report):
                 lines.append(f"- **Do this**: {md_text(a['action'])}")
             names = used_by(report, item)
             if names and affects(item) in ("action", "behavior"):
-                lines.append(f"- **Used by**: {', '.join(names[:12])}{f' and {len(names) - 12} more' if len(names) > 12 else ''}")
+                lines.append(f"- **Used by**: {', '.join(md_plain(n) for n in names[:12])}{f' and {len(names) - 12} more' if len(names) > 12 else ''}")
             lines.append("")
     lines += ["## 📚 Sources", ""] + [f"- {link({'url': p['url'], 'title': p['title'] or p['release']}, html=False)}"
                                      for p in report["posts"]]
