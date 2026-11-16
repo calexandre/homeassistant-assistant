@@ -13,7 +13,8 @@ description: >-
 ## When to use
 
 - The request involves existing automations, scenes, scripts, `configuration.yaml`, or logs.
-- The MCP server does not expose these — `ha-data/` snapshots are the only source.
+- No MCP tool set exposes automation, scene, or script definitions, config files, or Zigbee2MQTT data — `ha-data/` snapshots are the only source.
+- Logs and ESPHome device YAMLs come from the MCP's Home Assistant and ESPHome Device Builder tool sets when the client has them (see the `homeassistant` skill); fetch them here only when it doesn't.
 
 ## Freshness gate
 

@@ -83,6 +83,7 @@ Every request starts at the `homeassistant` skill, which calls `GetLiveContext` 
 | Home Assistant 2026.11 or later with the [Model Context Protocol Server](https://www.home-assistant.io/integrations/mcp_server/) integration (the first release with the complete OAuth support browser sign-in relies on: Client ID Metadata Documents, PKCE, and discovery for public clients) | Everything |
 | One client: [Claude Code](https://claude.com/product/claude-code), [GitHub Copilot CLI](https://docs.github.com/en/copilot/concepts/agents/about-plugins), or VS Code with GitHub Copilot | Everything |
 | Python 3 | The SSH read-only guard hook, which every client runs |
+| A Home Assistant administrator account, and the **ESPHome Device Builder** add-on for the ESPHome tools | Optional: the [extra tool sets](#optional-extra-tool-sets) for logs, statistics, templates, and live ESPHome YAMLs over MCP |
 | SSH access to the Home Assistant host through a passwordless host alias named exactly `homeassistant` in `~/.ssh/config` | Optional: [snapshots](#-optional-ssh-snapshots) of automations, scripts, scenes, config files, and logs, and the home map |
 | [PyYAML](https://pypi.org/project/PyYAML/) or [uv](https://docs.astral.sh/uv/) | Optional: the home map |
 
@@ -97,6 +98,25 @@ Claude Code runs the hook as `python3` on every platform, including Windows. The
 All three clients sign in through Home Assistant's own login page in your browser (OAuth), so there is no token to create or copy. Use an HTTPS URL that matches the **Internal URL** or **External URL** configured in Home Assistant (Home Assistant Cloud, a reverse proxy, or Home Assistant's own TLS): the Home Assistant docs note that Claude Code only connects to MCP servers over HTTPS.
 
 The integration's options control which tools it exposes and whether it requires an administrator account (on by default). See the [integration docs](https://www.home-assistant.io/integrations/mcp_server/) for the details.
+
+### Optional: extra tool sets
+
+The skills need only the default **Device control** set. Two more sets let the agent read logs, statistics, and live ESPHome YAMLs over MCP instead of [SSH snapshots](#-optional-ssh-snapshots):
+
+| Tool set | What the agent gets | Needs in Home Assistant |
+|---|---|---|
+| **Device control** | `GetLiveContext` and the device intents (`HassTurnOn`, `HassLightSet`, and so on), for exposed entities only | Nothing beyond the setup above |
+| **Home Assistant** | Logs (Core, Supervisor, and add-ons), long-term statistics, templates, search across entities, automations, and labels, integration status, and any action | An administrator account |
+| **ESPHome Device Builder** | Device YAMLs: list, read, and validate them, and also edit, compile, and flash | The **ESPHome Device Builder** add-on, and an administrator account |
+
+To get them on the `/api/mcp` URL the clients use, open the integration's options (the gear next to the main URL):
+
+1. Turn on **Expose all AI tools**, or pick the sets under **AI tools**. New setups have it on; setups created before the option existed keep it off.
+2. Sign in as an administrator. With the **Home Assistant** set on the main URL, an administrator account is always required.
+3. Optionally turn on **Read-only** to keep only the tools that change nothing. That also removes the device intents, such as `HassTurnOn`.
+4. Reconnect your client so it reloads the tool list: `/mcp` → **Reconnect** in Claude Code, or restart the client.
+
+Each set also has its own URL under `/api/mcp/`. Those URLs ignore the options above and are never read-only.
 
 ## 📦 Installation
 
@@ -144,7 +164,7 @@ The answer should name your real entities. If the agent says it cannot reach Hom
 
 ## 📂 Optional: SSH snapshots
 
-The MCP server exposes live entity state, but not your automation, script, or scene definitions, config files, or logs. With SSH access, the agent pulls read-only snapshots of those into `ha-data/` in your working directory (gitignored in this repo).
+The MCP server exposes live entity state, but not your automation, script, or scene definitions or config files, and it exposes logs and ESPHome YAMLs only through the [extra tool sets](#optional-extra-tool-sets). With SSH access, the agent pulls read-only snapshots of all of these into `ha-data/` in your working directory (gitignored in this repo).
 
 > [!IMPORTANT]
 > SSH access requires a host alias named exactly `homeassistant` in `~/.ssh/config`. The fetch script connects to that name, and the read-only guard only protects commands that target it: under any other alias, snapshots fail and the guard can't block writes to your host.
@@ -304,8 +324,8 @@ The page leads with the verdict, then what needs your action, what you'll notice
 ## 🔒 Safety and privacy
 
 - **Read-only SSH guard.** A `PreToolUse` hook inspects every Bash and PowerShell command. Commands that reach the `homeassistant` host must match a read-only allowlist; interactive SSH, uploads (`scp`, `sftp`, `rsync`), and everything else are denied. It guards against mistakes; it is not a sandbox.
-- **Device control stays with you.** The skills only need `GetLiveContext` to read your home, and your client asks before each MCP tool call. For a hard guarantee, turn on the integration's **Read-only** option.
-- **What leaves your machine.** Entity names and states from `GetLiveContext`, and any snapshot the agent reads (automations, logs, Zigbee2MQTT state, the home map's `graph.json`, the release notes to-do with your matching automations), are sent to your AI provider as part of the conversation. `secrets.yaml` is never fetched, and the registries are trimmed before they are saved, so integration credentials never reach the disk. The home map page stays on your machine; building it fetches only area icons it doesn't bundle, by icon name, from the jsdelivr CDN. Release notes fetch only the public release posts, from GitHub and the Home Assistant blog feed, and send nothing about your home.
+- **Device control stays with you.** The skills only need `GetLiveContext` to read your home, and your client asks before each MCP tool call. The [extra tool sets](#optional-extra-tool-sets) can change anything, from calling any action to flashing an ESPHome device, so the skills ask before using a tool that changes something. For a hard guarantee, turn on the integration's **Read-only** option.
+- **What leaves your machine.** Entity names and states from `GetLiveContext`, any log, statistic, or ESPHome YAML read through the extra tool sets, and any snapshot the agent reads (automations, logs, Zigbee2MQTT state, the home map's `graph.json`, the release notes to-do with your matching automations), are sent to your AI provider as part of the conversation. `secrets.yaml` is never fetched, and the registries are trimmed before they are saved, so integration credentials never reach the disk. The home map page stays on your machine; building it fetches only area icons it doesn't bundle, by icon name, from the jsdelivr CDN. Release notes fetch only the public release posts, from GitHub and the Home Assistant blog feed, and send nothing about your home.
 - **No tokens to handle.** Every client signs in through Home Assistant's own login page, so there is no access token to copy, paste, or leak.
 
 ## 🧱 Project structure
@@ -359,6 +379,8 @@ ha-release-notes/                # Generated release reports (gitignored)
 4. The integration requires an administrator account by default, so signing in as a non-admin user fails. Sign in as an administrator or change that option in the integration.
 
 **The agent says a device doesn't exist:** expose it under **Settings → Voice assistants → Expose**. The **Device control** tools only see exposed entities.
+
+**Log, statistics, or ESPHome tools are missing:** check the integration's options and add-ons against [Optional: extra tool sets](#optional-extra-tool-sets), then reconnect your client. Clients load the tool list when they connect, so new sets appear only after a reconnect.
 
 **The plugin doesn't load in Claude Code or Copilot CLI:**
 

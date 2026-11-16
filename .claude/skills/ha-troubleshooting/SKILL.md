@@ -14,7 +14,7 @@ description: >-
 
 - An automation, integration, or entity is failing, erroring, or misbehaving.
 - The user asks to debug, diagnose, or investigate a problem.
-- `GetLiveContext` fails, or its output lacks an entity the user names: go to [MCP connection problems](#mcp-connection-problems).
+- `GetLiveContext` fails, its output lacks an entity the user names, or the log, statistics, or ESPHome tools the user expects are missing: go to [MCP connection problems](#mcp-connection-problems).
 
 ## Prerequisites
 
@@ -26,7 +26,7 @@ description: >-
 Run these in order, stopping when the cause is found:
 
 1. **Validate configuration** — Settings → System → Repairs → Check configuration.
-2. **Review logs** — Settings → System → Logs; for raw logs invoke the `ha-config-fetch` skill and read `core.log` / `supervisor.log` from the refreshed snapshots.
+2. **Review logs** — with the MCP's Home Assistant tool set, call `system_log__get_entries` for errors and warnings, then `hassio__get_logs` around the failure time (add `source` for add-ons such as Zigbee2MQTT). Without it, invoke the `ha-config-fetch` skill and read `core.log` / `supervisor.log` from the refreshed snapshots.
 3. **Inspect automation traces** — Automations → select automation → Traces.
 4. **Use Developer Tools** — States, Services; Template editor to test Jinja.
 5. **Enable debug logging** for the specific integration per the official docs.
@@ -37,6 +37,7 @@ When `GetLiveContext` fails or misses an entity, the cause sits in Home Assistan
 
 1. **Entity missing from the output** — it is not exposed to Assist. The user exposes it under Settings → Voice assistants → Expose. Cite <https://www.home-assistant.io/voice_control/voice_remote_expose_devices/>.
 2. **Call fails, times out, or is unauthorized** — check that the integration is set up, its options (tool sets, administrator account, read-only), and the client's sign-in or token. Cite <https://www.home-assistant.io/integrations/mcp_server/>, including its Troubleshooting section.
+3. **Log, statistics, or ESPHome tools missing** — the extra tool sets are off. They need **Expose all AI tools** on (or the set picked under **AI tools**) in the integration's options, an administrator account, and, for the ESPHome tools, the ESPHome Device Builder add-on. The client then has to reconnect to load the new tools. Cite <https://www.home-assistant.io/integrations/mcp_server/#configuration-options>.
 
 Done when the user knows which symptom applies and the step that fixes it.
 

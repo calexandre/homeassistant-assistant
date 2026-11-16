@@ -36,12 +36,14 @@ Claude Code in a plain clone loads the skills but not the guard; `claude --plugi
 
 - Changes to `.claude/skills/homeassistant/SKILL.md` — this is the core Home Assistant definition (live-context gate and skill routing table)
 - Adding hooks to `.claude/settings.json` — VS Code's Copilot mode reads it alongside `.github/hooks/`, so the guard may run twice
+- Calling an MCP tool that changes Home Assistant or a device: `homeassistant__call_action`, `config__reload_config_entry`, and the ESPHome Device Builder's `update_config`, `add_component`, `upsert_automation`, `delete_automation`, `create_device`, `set_secret`, `compile`, and `install` — a flash has no undo
 
 🚫 Never:
 
 - Assume entity IDs — always call `GetLiveContext` first
-- Query automations, scenes, scripts, `configuration.yaml`, or logs via MCP — **these are not exposed by the MCP server**.
+- Query automation, scene, or script definitions, `configuration.yaml`, or `customize.yaml` via MCP — **no MCP tool set exposes them**.
   Run `.claude/skills/ha-config-fetch/fetch-ha-data.sh` instead, then read from `ha-data/`
+- Pass `secrets.yaml` to the ESPHome Device Builder's `get_config` — its values would enter the conversation; pass only filenames from `list_devices`
 - Commit anything in `ha-data/`, `ha-release-notes/`, or `.temp/`
 - Hand-edit files in `ha-data/` — `fetch-ha-data.sh` owns those snapshots
 - Read local output (`ha-data/`, `ha-release-notes/`, `.temp/`) that the task or the running skill doesn't need — it holds personal data
@@ -54,13 +56,16 @@ Claude Code in a plain clone loads the skills but not the guard; `claude --plugi
 | Live entity states, devices, areas | MCP server → `GetLiveContext` tool |
 | Automations, scenes, scripts, configuration YAML | `.claude/skills/ha-config-fetch/fetch-ha-data.sh` → read `ha-data/*.yaml` |
 | Entity customizations (`customize.yaml`) | `.claude/skills/ha-config-fetch/fetch-ha-data.sh` → read `ha-data/customize.yaml` |
-| ESPHome device YAMLs | `.claude/skills/ha-config-fetch/fetch-ha-data.sh` → read `ha-data/esphome/*.yaml` (`secrets.yaml` is never fetched) |
+| ESPHome device YAMLs | ESPHome Device Builder set → `list_devices`, `get_config`, `validate_config`; otherwise `.claude/skills/ha-config-fetch/fetch-ha-data.sh` → read `ha-data/esphome/*.yaml` (`secrets.yaml` is never fetched) |
 | Zigbee2MQTT config / devices / groups / state | `.claude/skills/ha-config-fetch/fetch-ha-data.sh` → read `ha-data/zigbee2mqtt/{configuration,devices,groups}.yaml` + `state.json` |
 | Files `configuration.yaml` includes (packages, automation and script folders) | `.claude/skills/ha-config-fetch/fetch-ha-data.sh` → read them under `ha-data/` at their path on the host |
+| Labels, areas, or hidden status of specific entities | Home Assistant set → `homeassistant__render_template` (`label_entities`, `area_name`, `is_hidden_entity`) or `search__search` |
 | Area, device, entity, and integration registries | `.claude/skills/ha-config-fetch/fetch-ha-data.sh` → read `ha-data/registry/*.json`, trimmed by `trim_registry.py` so no credentials reach the disk |
-| Home Assistant logs (for debugging) | `.claude/skills/ha-config-fetch/fetch-ha-data.sh` → read `ha-data/logs/{core,supervisor}.log` |
+| Integration status | Home Assistant set → `config__get_config_entries` |
+| Long-term statistics of numeric sensors | Home Assistant set → `history__get_history` |
+| Home Assistant logs (for debugging) | Home Assistant set → `system_log__get_entries` for errors and warnings, then `hassio__get_logs` for the full timeline, add-ons included; otherwise `.claude/skills/ha-config-fetch/fetch-ha-data.sh` → read `ha-data/logs/{core,supervisor}.log` |
 
-The fetch script uses SSH (host alias: `homeassistant`, passwordless login assumed).
+Rows that name the **Home Assistant** or **ESPHome Device Builder** set apply only when the client has those tools; the README's [Optional: extra tool sets](README.md#optional-extra-tool-sets) lists what Home Assistant needs to expose them. The fetch script uses SSH (host alias: `homeassistant`, passwordless login assumed).
 
 ## Commands
 
