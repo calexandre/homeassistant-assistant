@@ -242,7 +242,7 @@
     <img src="logo.webp" width="1120" height="625" alt="Pixel-art robot next to the Home Assistant house logo, wired to lights, sensors, and locks">
     <div class="release">Plugin <strong>v__PLUGIN_VERSION__</strong></div>
     <h1>Home Assistant Assistant</h1>
-    <p>Skills for Claude Code, GitHub Copilot CLI, and VS Code that build automations, scripts, and ESPHome configs grounded in your live entities and the official docs.</p>
+    <p>Skills for Claude Code, GitHub Copilot CLI, and VS Code that work alongside ha-mcp: ESPHome configs, troubleshooting, a map of your home, and release notes checked against it.</p>
     <div class="actions">
       <a class="btn primary" href="#demos">See the demos</a>
       <a class="btn ghost" href="#install">Install</a>
@@ -322,7 +322,7 @@
         <li class="step">
           <div class="step-body">
             <h3>Turn on the MCP server in Home Assistant</h3>
-            <p>Go to <strong>Settings → Devices &amp; services → Add Integration</strong> and add <strong>Model Context Protocol Server</strong>. Then pick the entities the agent may see under <strong>Settings → Voice assistants → Expose</strong>.</p>
+            <p>Go to <strong>Settings → Devices &amp; services → Add Integration</strong> and add <strong>Model Context Protocol Server</strong>. Then install the <strong>HA-MCP</strong> integration from the Marketplace and turn on its LLM API, so <a href="https://github.com/homeassistant-ai/ha-mcp">ha-mcp</a>'s tools join the same MCP URL (<a href="https://github.com/calexandre/homeassistant-assistant#add-ha-mcp">details</a>).</p>
             <div class="field">
               <label for="ha-url">Your Home Assistant URL</label>
               <input id="ha-url" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://example.ui.nabu.casa">
@@ -346,6 +346,8 @@
                 <div class="term-head"><span>Terminal</span><button class="copy" type="button" hidden>Copy</button></div>
                 <pre><code>claude plugin marketplace add calexandre/homeassistant-assistant
 claude plugin install homeassistant-assistant@homeassistant
+claude plugin marketplace add homeassistant-ai/skills
+claude plugin install home-assistant-skills@home-assistant-skills
 claude mcp add --scope user --transport http homeassistant <span class="ha-url">https://YOUR-HOME-ASSISTANT</span>/api/mcp
 claude mcp login homeassistant</code></pre>
               </div>
@@ -358,9 +360,10 @@ claude mcp login homeassistant</code></pre>
                 <div class="term-head"><span>Terminal</span><button class="copy" type="button" hidden>Copy</button></div>
                 <pre><code>copilot plugin marketplace add calexandre/homeassistant-assistant
 copilot plugin install homeassistant-assistant@homeassistant
-copilot mcp add --transport http homeassistant <span class="ha-url">https://YOUR-HOME-ASSISTANT</span>/api/mcp</code></pre>
+copilot mcp add --transport http homeassistant <span class="ha-url">https://YOUR-HOME-ASSISTANT</span>/api/mcp
+npx skills add homeassistant-ai/skills -g</code></pre>
               </div>
-              <p>Copilot CLI opens your browser to sign in to Home Assistant, so there is no token to copy.</p>
+              <p>Copilot CLI opens your browser to sign in to Home Assistant, so there is no token to copy. The <code>npx skills</code> installer needs Node.js 22.20 or later.</p>
             </div>
 
             <div class="panel" role="tabpanel" id="panel-vscode" aria-labelledby="tab-vscode">
@@ -368,9 +371,10 @@ copilot mcp add --transport http homeassistant <span class="ha-url">https://YOUR
               <div class="term">
                 <div class="term-head"><span>Terminal</span><button class="copy" type="button" hidden>Copy</button></div>
                 <pre><code>git clone https://github.com/calexandre/homeassistant-assistant.git
+npx skills add homeassistant-ai/skills -g
 code homeassistant-assistant</code></pre>
               </div>
-              <p>The skills and the SSH guard load from the clone. Run <strong>MCP: Add Server</strong>, choose <strong>HTTP</strong>, enter <code><span class="ha-url">https://YOUR-HOME-ASSISTANT</span>/api/mcp</code>, use the ID <code>homeassistant</code>, and sign in when VS Code opens your browser.</p>
+              <p>The skills and the SSH guard load from the clone, and the best-practices skill from your user folder. Run <strong>MCP: Add Server</strong>, choose <strong>HTTP</strong>, enter <code><span class="ha-url">https://YOUR-HOME-ASSISTANT</span>/api/mcp</code>, use the ID <code>homeassistant</code>, and sign in when VS Code opens your browser.</p>
             </div>
           </div>
         </li>
@@ -383,7 +387,7 @@ code homeassistant-assistant</code></pre>
               <div class="term-head"><span>Prompt</span><button class="copy" type="button" hidden>Copy</button></div>
               <pre><code>Which lights are on right now?</code></pre>
             </div>
-            <p>The answer should name your real entities. For automations, logs, and your own home map, add the optional <a href="https://github.com/calexandre/homeassistant-assistant#-optional-ssh-snapshots">SSH snapshots</a>. Stuck? See <a href="https://github.com/calexandre/homeassistant-assistant#-troubleshooting">Troubleshooting</a>.</p>
+            <p>The answer should name your real entities. For config files, Zigbee2MQTT data, and your own home map, add the optional <a href="https://github.com/calexandre/homeassistant-assistant#-optional-ssh-snapshots">SSH snapshots</a>. Stuck? See <a href="https://github.com/calexandre/homeassistant-assistant#-troubleshooting">Troubleshooting</a>.</p>
           </div>
         </li>
       </ol>

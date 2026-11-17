@@ -22,7 +22,7 @@ description: >-
 
 ## When NOT to use
 
-- Home Assistant-side integration YAML (e.g. `mqtt:` broker config, `api:` on the HA side, dashboard setup) — defer to the `ha-docs-sitemap` skill.
+- Home Assistant-side integration YAML (e.g. `mqtt:` broker config, `api:` on the HA side, dashboard setup) — defer to the `home-assistant-best-practices` skill.
 - Reading the user's actual ESPHome device files without the MCP's ESPHome Device Builder tool set — use the `ha-config-fetch` skill (snapshots land in `ha-data/esphome/`); see [The user's device YAMLs](#the-users-device-yamls).
 - Flashing/installing the ESPHome add-on itself — that's HA add-on management.
 

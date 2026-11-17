@@ -14,9 +14,9 @@
 
 > Your Home Assistant setup, understood by AI — grounded in your **live entities** and the **official docs**, not guesses.
 
-Skills and a safety hook for **Claude Code**, **GitHub Copilot CLI**, and **VS Code with GitHub Copilot** that help you build automations, scripts, scenes, and ESPHome configs for your existing Home Assistant installation. It is not for Home Assistant core development.
+Skills and a safety hook for **Claude Code**, **GitHub Copilot CLI**, and **VS Code with GitHub Copilot** that help you run your existing Home Assistant installation: ESPHome configs, troubleshooting, read-only config snapshots, a map of your home, and release notes checked against it. It is not for Home Assistant core development.
 
-Before answering, the agent checks what you actually have (via MCP) and how Home Assistant says to do it (via the official docs). That combination keeps it from inventing entity IDs or suggesting deprecated YAML.
+It builds on two projects you install alongside it: [ha-mcp](https://github.com/homeassistant-ai/ha-mcp), whose tools let the agent read and change your home, and the [Home Assistant best-practices skill](https://github.com/homeassistant-ai/skills), which tells it how to write automations, scripts, scenes, helpers, and dashboards. This plugin covers what they leave out.
 
 Try what the skills make, on a made-up home, in the [live demos](https://calexandre.github.io/homeassistant-assistant/).
 
@@ -40,13 +40,11 @@ Try what the skills make, on a made-up home, in the [live demos](https://calexan
 
 ## ✨ Features
 
-- 🔌 **Live entity context** — pulls your real devices, entities, and areas via `GetLiveContext` before suggesting anything.
-- 📚 **Docs-grounded answers** — looks up the official Home Assistant and ESPHome docs and cites the exact section used.
-- 🩺 **Troubleshooting playbook** — a guided flow through config checks, logs, traces, and Developer Tools when something misbehaves.
-- 🔧 **ESPHome support** — device YAML authoring backed by an esphome.io sitemap.
+- 🔧 **ESPHome support** — device YAML authoring backed by an esphome.io sitemap, with live reads, validation, and flashing through the ESPHome Device Builder.
+- 🩺 **Troubleshooting playbook** — follows the evidence through logs, automation traces, and integration diagnostics before proposing a fix.
 - 📰 **Personalized release notes** — `/ha-release-notes` checks every release between your version and the newest against your integrations and automations, and gives an upgrade verdict. [See it](#-release-notes).
 - 🏡 **Home map** — `/ha-home-map` draws an interactive map of your areas, devices, and the automations, scripts, and scenes that link them, as one HTML file that works offline. [See the demo](#-home-map).
-- 📂 **Config snapshots** — optional read-only SSH snapshots of automations, scripts, scenes, ESPHome YAMLs, Zigbee2MQTT data, and logs.
+- 📂 **Config snapshots** — optional read-only SSH snapshots of what no MCP tool reads: `configuration.yaml` and the files it includes, `customize.yaml`, and Zigbee2MQTT data.
 - 🔐 **Read-only SSH guard** — a hook that blocks destructive SSH commands against your Home Assistant host, whether they run in Bash or PowerShell.
 - 🧩 **Cross-tool plugin** — the same skills and hook work in Claude Code, GitHub Copilot CLI, and VS Code.
 
@@ -55,23 +53,20 @@ Try what the skills make, on a made-up home, in the [live demos](https://calexan
 ```mermaid
 flowchart LR
   user([You]) --> agent["Your AI agent + skills<br/>Claude Code · Copilot CLI · VS Code"]
-  agent -->|"MCP · GetLiveContext"| ha[("Home Assistant")]
+  agent -->|"MCP · ha-mcp and MCP Server tools"| ha[("Home Assistant")]
+  agent -->|"follows"| bp["home-assistant-best-practices<br/>skill"]
   agent -->|"looks up"| docs["Official docs<br/>home-assistant.io · esphome.io"]
   agent -->|"reads"| snap["ha-data/ snapshots"]
   ha -->|"SSH, read-only · optional"| snap
   guard{{"SSH read-only guard"}} -.->|"checks every shell command"| agent
 ```
 
-Every request starts at the `homeassistant` skill, which calls `GetLiveContext` and then routes to the skill that fits:
+ha-mcp and the best-practices skill handle everyday requests: finding entities, and writing or fixing automations, scripts, scenes, helpers, and dashboards. This plugin's skills load when a request reaches past them:
 
 | Skill | What it does |
 |---|---|
-| `homeassistant` | Entry point: grounds the request in live entities and picks the skills below |
-| `ha-implementation-format` | Answers automation, script, scene, and blueprint requests as YAML, an explanation, and customization ideas |
-| `ha-troubleshooting` | Walks config validation, logs, traces, Developer Tools, and debug logging |
-| `ha-state-presentation` | Summarizes live states grouped by area or function |
-| `ha-config-fetch` | Refreshes `ha-data/` snapshots over SSH when they are older than 24 hours, and always before debugging |
-| `ha-docs-sitemap` | Maps a topic to the right home-assistant.io page instead of crawling the docs |
+| `ha-troubleshooting` | Follows the evidence through logs, traces, and integration diagnostics when something fails, and sorts out MCP connection problems |
+| `ha-config-fetch` | Refreshes `ha-data/` snapshots over SSH for the files no MCP tool reads, when they are older than 24 hours and always before debugging |
 | `ha-release-notes` | On demand only (`/ha-release-notes`): checks every release from your version up to the target against your setup, and saves an HTML and Markdown report with an upgrade verdict |
 | `ha-home-map` | On demand only (`/ha-home-map`): draws your areas, devices, automations, scripts, and scenes as an offline, interactive map |
 | `esphome` | Authors ESPHome device YAML with an esphome.io sitemap |
@@ -83,8 +78,10 @@ Every request starts at the `homeassistant` skill, which calls `GetLiveContext` 
 | Home Assistant 2026.11 or later with the [Model Context Protocol Server](https://www.home-assistant.io/integrations/mcp_server/) integration (the first release with the complete OAuth support browser sign-in relies on: Client ID Metadata Documents, PKCE, and discovery for public clients) | Everything |
 | One client: [Claude Code](https://claude.com/product/claude-code), [GitHub Copilot CLI](https://docs.github.com/en/copilot/concepts/agents/about-plugins), or VS Code with GitHub Copilot | Everything |
 | Python 3 | The SSH read-only guard hook, which every client runs |
-| A Home Assistant administrator account, and the **ESPHome Device Builder** add-on for the ESPHome tools | Optional: the [extra tool sets](#optional-extra-tool-sets) for logs, statistics, templates, and live ESPHome YAMLs over MCP |
-| SSH access to the Home Assistant host through a passwordless host alias named exactly `homeassistant` in `~/.ssh/config` | Optional: [snapshots](#-optional-ssh-snapshots) of automations, scripts, scenes, config files, and logs, and the home map |
+| [ha-mcp](https://github.com/homeassistant-ai/ha-mcp), installed as the **HA-MCP** integration | Recommended: [reading and changing](#add-ha-mcp) automations, scripts, scenes, dashboards, helpers, and integrations, and reading logs, traces, and history |
+| The [`home-assistant-best-practices`](https://github.com/homeassistant-ai/skills) skill | Recommended: writing automations, scripts, scenes, helpers, and dashboards the way Home Assistant recommends; the [Installation](#-installation) commands add it |
+| A Home Assistant administrator account, and the **ESPHome Device Builder** add-on for the ESPHome tools | ha-mcp, and the optional [extra tool sets](#optional-extra-tool-sets) for live ESPHome YAMLs and a merged log timeline over MCP |
+| SSH access to the Home Assistant host through a passwordless host alias named exactly `homeassistant` in `~/.ssh/config` | Optional: [snapshots](#-optional-ssh-snapshots) of config files and Zigbee2MQTT data, and your own home map |
 | [PyYAML](https://pypi.org/project/PyYAML/) or [uv](https://docs.astral.sh/uv/) | Optional: the home map |
 
 Claude Code runs the hook as `python3` on every platform, including Windows. The Copilot clients run it as `python3` on Linux/macOS and as `python` on Windows.
@@ -92,16 +89,26 @@ Claude Code runs the hook as `python3` on every platform, including Windows. The
 ## 🔗 Set up the Home Assistant MCP server
 
 1. In Home Assistant, go to **Settings → Devices & services → Add Integration**, search for **Model Context Protocol Server**, and finish the setup flow.
-2. Go to **Settings → Voice assistants → Expose** and expose the entities you want the agent to see. The default **Device control** tools only see exposed entities, so anything you leave out is invisible to the agent.
+2. Go to **Settings → Voice assistants → Expose** and expose the entities you want the default **Device control** tools to see. Those tools see only exposed entities; ha-mcp's tools see all of them.
 3. Note your MCP URL: your Home Assistant URL followed by `/api/mcp`, for example `https://example.ui.nabu.casa/api/mcp`.
 
 All three clients sign in through Home Assistant's own login page in your browser (OAuth), so there is no token to create or copy. Use an HTTPS URL that matches the **Internal URL** or **External URL** configured in Home Assistant (Home Assistant Cloud, a reverse proxy, or Home Assistant's own TLS): the Home Assistant docs note that Claude Code only connects to MCP servers over HTTPS.
 
 The integration's options control which tools it exposes and whether it requires an administrator account (on by default). See the [integration docs](https://www.home-assistant.io/integrations/mcp_server/) for the details.
 
+### Add ha-mcp
+
+[ha-mcp](https://github.com/homeassistant-ai/ha-mcp) gives the agent tools to read and change automations, scripts, scenes, dashboards, helpers, and integrations, and to read logs, traces, and history, for every entity rather than only the exposed ones.
+
+1. Install the **HA-MCP** integration from the Marketplace and add it under **Settings → Devices & services**, as the [ha-mcp README](https://github.com/homeassistant-ai/ha-mcp) describes.
+2. In its options, turn on its LLM API (`enable_llm_api`). The Model Context Protocol Server integration then serves ha-mcp's tools on the same `/api/mcp` URL as its own, as long as **Expose all AI tools** is on or HA-MCP is picked under **AI tools** (see the next section).
+3. Reconnect your client so it loads the new tools: `/mcp` → **Reconnect** in Claude Code, or restart the client.
+
+ha-mcp lists its most-used tools directly and finds the rest through `ha_search_tools`. It has its own read-only mode and per-tool approval settings; see its README.
+
 ### Optional: extra tool sets
 
-The skills need only the default **Device control** set. Two more sets let the agent read logs, statistics, and live ESPHome YAMLs over MCP instead of [SSH snapshots](#-optional-ssh-snapshots):
+The Model Context Protocol Server integration has two more tool sets of its own. ha-mcp covers most of the **Home Assistant** set, but the **ESPHome Device Builder** set is the only way to read, validate, and flash ESPHome YAMLs over MCP:
 
 | Tool set | What the agent gets | Needs in Home Assistant |
 |---|---|---|
@@ -120,13 +127,15 @@ Each set also has its own URL under `/api/mcp/`. Those URLs ignore the options a
 
 ## 📦 Installation
 
-Pick your client. All three load the same skills and hook.
+Pick your client. All three load the same skills and hook, and add the best-practices skill next to them.
 
 ### 🤖 Claude Code
 
 ```bash
 claude plugin marketplace add calexandre/homeassistant-assistant
 claude plugin install homeassistant-assistant@homeassistant
+claude plugin marketplace add homeassistant-ai/skills
+claude plugin install home-assistant-skills@home-assistant-skills
 claude mcp add --scope user --transport http homeassistant https://YOUR-HOME-ASSISTANT/api/mcp
 claude mcp login homeassistant
 ```
@@ -139,18 +148,20 @@ claude mcp login homeassistant
 copilot plugin marketplace add calexandre/homeassistant-assistant
 copilot plugin install homeassistant-assistant@homeassistant
 copilot mcp add --transport http homeassistant https://YOUR-HOME-ASSISTANT/api/mcp
+npx skills add homeassistant-ai/skills -g
 ```
 
-Copilot CLI signs in to Home Assistant through your browser, like Claude Code.
+Copilot CLI signs in to Home Assistant through your browser, like Claude Code. The `npx skills` installer needs [Node.js](https://nodejs.org/) 22.20 or later.
 
 ### 🖥️ VS Code
 
 ```bash
 git clone https://github.com/calexandre/homeassistant-assistant.git
+npx skills add homeassistant-ai/skills -g
 code homeassistant-assistant
 ```
 
-Skills load automatically from [.claude/skills/](.claude/skills/) and the SSH guard hook from [.github/hooks/](.github/hooks/). Run **MCP: Add Server**, choose **HTTP**, enter `https://YOUR-HOME-ASSISTANT/api/mcp`, use the ID `homeassistant`, and sign in to Home Assistant when VS Code opens your browser.
+Skills load automatically from [.claude/skills/](.claude/skills/), the best-practices skill from your user folder, and the SSH guard hook from [.github/hooks/](.github/hooks/). Run **MCP: Add Server**, choose **HTTP**, enter `https://YOUR-HOME-ASSISTANT/api/mcp`, use the ID `homeassistant`, and sign in to Home Assistant when VS Code opens your browser.
 
 ## ✅ Check that it works
 
@@ -164,7 +175,7 @@ The answer should name your real entities. If the agent says it cannot reach Hom
 
 ## 📂 Optional: SSH snapshots
 
-The MCP server exposes live entity state, but not your automation, script, or scene definitions or config files, and it exposes logs and ESPHome YAMLs only through the [extra tool sets](#optional-extra-tool-sets). With SSH access, the agent pulls read-only snapshots of all of these into `ha-data/` in your working directory (gitignored in this repo).
+ha-mcp reads automations, scripts, scenes, logs, and the registries live, but no MCP tool reads `configuration.yaml`, the files it includes, `customize.yaml`, or Zigbee2MQTT's files. With SSH access, the agent pulls read-only snapshots of these into `ha-data/` in your working directory (gitignored in this repo), along with the registries and YAML the home map and release notes read, and ESPHome YAMLs and logs for clients without the MCP tools for them.
 
 > [!IMPORTANT]
 > SSH access requires a host alias named exactly `homeassistant` in `~/.ssh/config`. The fetch script connects to that name, and the read-only guard only protects commands that target it: under any other alias, snapshots fail and the guard can't block writes to your host.
@@ -205,7 +216,7 @@ The script reads `/config` by default. If your add-on mounts the config elsewher
 
 ## 💡 Usage examples
 
-Just ask, in any client: the `homeassistant` skill picks up any Home Assistant request. In VS Code, use Chat in Agent mode.
+Just ask, in any client. In VS Code, use Chat in Agent mode.
 
 ### 🤖 Creating automations
 
@@ -216,7 +227,7 @@ Just ask, in any client: the `homeassistant` skill picks up any Home Assistant r
 > Turn my kitchen ceiling switch into a scene that also dims the hall lights.
 ```
 
-Answers come as ready-to-paste YAML, a short "How This Works" with links to the docs used, and customization ideas.
+With ha-mcp, the agent writes the automation into Home Assistant once you approve the tool call, following the best-practices skill. Without it, you get the config to paste into the automation editor.
 
 ### 🩺 Debugging
 
@@ -226,7 +237,7 @@ Answers come as ready-to-paste YAML, a short "How This Works" with links to the 
 > Why does this template return unknown? {{ states('sensor.temperature') | float }}
 ```
 
-The troubleshooting skill walks through config checks, automation traces, and logs before proposing a fix.
+The troubleshooting skill reads the logs, the automation's traces, and the integration's diagnostics before proposing a fix.
 
 ### 📊 Checking your home
 
@@ -324,8 +335,8 @@ The page leads with the verdict, then what needs your action, what you'll notice
 ## 🔒 Safety and privacy
 
 - **Read-only SSH guard.** A `PreToolUse` hook inspects every Bash and PowerShell command. Commands that reach the `homeassistant` host must match a read-only allowlist; interactive SSH, uploads (`scp`, `sftp`, `rsync`), and everything else are denied. It guards against mistakes; it is not a sandbox.
-- **Device control stays with you.** The skills only need `GetLiveContext` to read your home, and your client asks before each MCP tool call. The [extra tool sets](#optional-extra-tool-sets) can change anything, from calling any action to flashing an ESPHome device, so the skills ask before using a tool that changes something. For a hard guarantee, turn on the integration's **Read-only** option.
-- **What leaves your machine.** Entity names and states from `GetLiveContext`, any log, statistic, or ESPHome YAML read through the extra tool sets, and any snapshot the agent reads (automations, logs, Zigbee2MQTT state, the home map's `graph.json`, the release notes to-do with your matching automations), are sent to your AI provider as part of the conversation. `secrets.yaml` is never fetched, and the registries are trimmed before they are saved, so integration credentials never reach the disk. The home map page stays on your machine; building it fetches only area icons it doesn't bundle, by icon name, from the jsdelivr CDN. Release notes fetch only the public release posts, from GitHub and the Home Assistant blog feed, and send nothing about your home.
+- **Changes stay with you.** ha-mcp and the [extra tool sets](#optional-extra-tool-sets) can change anything, from editing an automation to flashing an ESPHome device. Your client asks before each MCP tool call, and the skills ask before any tool that changes something. For a hard guarantee, turn on ha-mcp's read-only mode and the Model Context Protocol Server integration's **Read-only** option.
+- **What leaves your machine.** Anything the agent reads through MCP (entity states, automations, logs, history, ESPHome YAML), and any snapshot the agent reads (automations, logs, Zigbee2MQTT state, the home map's `graph.json`, the release notes to-do with your matching automations), are sent to your AI provider as part of the conversation. `secrets.yaml` is never fetched, and the registries are trimmed before they are saved, so integration credentials never reach the disk. The home map page stays on your machine; building it fetches only area icons it doesn't bundle, by icon name, from the jsdelivr CDN. Release notes fetch only the public release posts, from GitHub and the Home Assistant blog feed, and send nothing about your home.
 - **No tokens to handle.** Every client signs in through Home Assistant's own login page, so there is no access token to copy, paste, or leak.
 
 ## 🧱 Project structure
@@ -336,14 +347,10 @@ The page leads with the verdict, then what needs your action, what you'll notice
 ├── marketplace.json             # Marketplace entry used by `plugin marketplace add`
 └── icon.png                     # Plugin icon
 .claude/skills/                  # Every skill, in the one folder all three clients read
-├── homeassistant/               # Entry point: live-context gate and skill routing
 ├── ha-config-fetch/             # fetch-ha-data.sh (SSH snapshots) and its helpers
 ├── ha-home-map/                 # /ha-home-map, on demand only: graph builder and page template
-├── ha-docs-sitemap/             # SITEMAP.md of home-assistant.io
-├── ha-implementation-format/    # YAML / How This Works / Customization Ideas output
 ├── ha-release-notes/            # /ha-release-notes, on demand only: release post parser, matcher, and report page
-├── ha-state-presentation/       # Live states grouped by area or function
-├── ha-troubleshooting/          # Config, logs, traces, Developer Tools
+├── ha-troubleshooting/          # Logs, traces, diagnostics, and MCP connection problems
 └── esphome/                     # ESPHome YAML guidance and SITEMAP.md of esphome.io
 hooks/hooks.json                 # SSH read-only guard config for plugin installs
 .github/
@@ -378,9 +385,9 @@ ha-release-notes/                # Generated release reports (gitignored)
 3. If sign-in fails or you get `401 Unauthorized`, check that the URL matches the **Internal URL** or **External URL** configured in Home Assistant, then sign in again (`claude mcp login homeassistant` in Claude Code). The integration docs' [troubleshooting section](https://www.home-assistant.io/integrations/mcp_server/#troubleshooting) covers the remaining OAuth cases.
 4. The integration requires an administrator account by default, so signing in as a non-admin user fails. Sign in as an administrator or change that option in the integration.
 
-**The agent says a device doesn't exist:** expose it under **Settings → Voice assistants → Expose**. The **Device control** tools only see exposed entities.
+**The agent says a device doesn't exist:** ha-mcp's tools see every entity, so check that they're connected (next item). Without ha-mcp, expose the device under **Settings → Voice assistants → Expose**: the **Device control** tools see only exposed entities.
 
-**Log, statistics, or ESPHome tools are missing:** check the integration's options and add-ons against [Optional: extra tool sets](#optional-extra-tool-sets), then reconnect your client. Clients load the tool list when they connect, so new sets appear only after a reconnect.
+**ha-mcp, log, statistics, or ESPHome tools are missing:** check ha-mcp's LLM API option ([Add ha-mcp](#add-ha-mcp)) and the integration's options and add-ons against [Optional: extra tool sets](#optional-extra-tool-sets), then reconnect your client. Clients load the tool list when they connect, so new sets appear only after a reconnect.
 
 **The plugin doesn't load in Claude Code or Copilot CLI:**
 
@@ -411,6 +418,8 @@ Questions and ideas are welcome in [Discussions](https://github.com/calexandre/h
 
 - [Home Assistant docs](https://www.home-assistant.io/docs/)
 - [Model Context Protocol Server integration](https://www.home-assistant.io/integrations/mcp_server/)
+- [ha-mcp](https://github.com/homeassistant-ai/ha-mcp)
+- [Home Assistant agent skills](https://github.com/homeassistant-ai/skills)
 - [ESPHome docs](https://esphome.io/)
 - [Claude Code plugins](https://code.claude.com/docs/en/plugins-reference)
 - [GitHub Copilot](https://docs.github.com/en/copilot)
