@@ -1,20 +1,22 @@
 ---
 name: ha-config-fetch
 description: >-
-  Fetches Home Assistant snapshots from ha-data/ via fetch-ha-data.sh,
-  checking freshness before reading automations, scenes, scripts,
-  configuration.yaml, customize.yaml, logs, or other saved config files.
-  Use when the MCP server does not expose these files and you need the
-  local snapshot to inspect the current setup.
+  Fetches read-only SSH snapshots of Home Assistant config files into ha-data/
+  with fetch-ha-data.sh, checking freshness first. Use when a request needs
+  configuration.yaml or a file it includes, customize.yaml, or Zigbee2MQTT's
+  files, which no MCP tool reads, or ESPHome YAMLs and logs when the client
+  lacks the MCP tools for them.
 ---
 
 # HA Config Fetch
 
 ## When to use
 
-- The request involves existing automations, scenes, scripts, `configuration.yaml`, or logs.
-- No MCP tool set exposes automation, scene, or script definitions, config files, or Zigbee2MQTT data — `ha-data/` snapshots are the only source.
-- Logs and ESPHome device YAMLs come from the MCP's Home Assistant and ESPHome Device Builder tool sets when the client has them (see the `homeassistant` skill); fetch them here only when it doesn't.
+- The request needs `configuration.yaml`, a file it includes (packages, automation and script folders), `customize.yaml`, or Zigbee2MQTT's `configuration.yaml`, `devices.yaml`, `groups.yaml`, or `state.json`. No MCP tool reads these files, so the snapshot is their only source.
+- The `ha-home-map` or `ha-release-notes` skill needs the registries and YAML as files.
+- The client lacks the MCP tools for ESPHome device YAMLs (the ESPHome Device Builder set) or for logs (ha-mcp's `ha_get_logs` or the Home Assistant set).
+
+Read automations, scripts, scenes, helpers, and registry entries live through ha-mcp (`ha_config_get_automation`, `ha_config_get_script`, `ha_config_get_scene`, `ha_get_entity`); their snapshot copies exist for the two skills above.
 
 ## Freshness gate
 
@@ -47,7 +49,7 @@ Optional: override the config directory (default `/config`):
 .claude/skills/ha-config-fetch/fetch-ha-data.sh /custom/path
 ```
 
-If the script exits with `Cannot reach 'homeassistant' over passwordless SSH`, tell the user SSH snapshots are not set up, point them at the README's "Optional: SSH snapshots" section, and continue with `GetLiveContext` data only.
+If the script exits with `Cannot reach 'homeassistant' over passwordless SSH`, tell the user SSH snapshots are not set up, point them at the README's "Optional: SSH snapshots" section, and continue with what the MCP tools can read.
 
 ## File map
 

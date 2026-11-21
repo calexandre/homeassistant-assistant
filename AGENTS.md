@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Skills and a safety hook for building Home Assistant automations, scripts, and configurations with Claude Code, GitHub Copilot CLI, and VS Code with GitHub Copilot — not for HA core development. The same files ship as a plugin through `.claude-plugin/`.
+Skills and a safety hook for working on an existing Home Assistant installation with Claude Code, GitHub Copilot CLI, and VS Code with GitHub Copilot — not for HA core development. They complement two projects: [ha-mcp](https://github.com/homeassistant-ai/ha-mcp), whose tools read and change the home, and the [`home-assistant-best-practices`](https://github.com/homeassistant-ai/skills) skill, which governs how automations, scripts, scenes, helpers, and dashboards get written. This repo adds what they leave out: ESPHome authoring, troubleshooting, read-only SSH snapshots of config files, the home map, personalized release notes, and the SSH guard. The same files ship as a plugin through `.claude-plugin/`.
 
 ## Layout
 
@@ -22,10 +22,11 @@ Claude Code in a plain clone loads the skills but not the guard; `claude --plugi
 
 ✅ Always:
 
-- Query live entities via the Home Assistant MCP server (`GetLiveContext`)
+- Take entity IDs from a live lookup: `ha_search` or `ha_get_state` see every entity, `GetLiveContext` only the ones exposed to Assist
+- Read the `home-assistant-best-practices` skill before writing an automation, script, scene, helper, or dashboard — installed, or through `ha_get_skill_guide`
 - Write local output to the folders listed under [File Output Conventions](#file-output-conventions), even though git ignores them
 - Keep skills only in `.claude/skills/` — the one folder Claude Code, Copilot CLI, and VS Code all read, so each skill is listed once; VS Code lists a second copy in `.github/skills/` or `.agents/skills/` twice
-- Run `fetch-ha-data.sh` (in `.claude/skills/ha-config-fetch/`) to refresh local config snapshots and logs
+- Run `fetch-ha-data.sh` (in `.claude/skills/ha-config-fetch/`) to refresh local config snapshots
 - Treat the `homeassistant` SSH host as read-only, whether or not the guard hook is loaded in this session
 - Change the guard's launch command in both hook configs (`hooks/hooks.json` and `.github/hooks/ssh-ha-readonly-guard.json`)
 - Put a skill's tests in `tests/<skill>/`, outside the skill folder, so plugin users get only what the skill runs; add every new test suite to `.github/workflows/tests.yml`
@@ -34,43 +35,37 @@ Claude Code in a plain clone loads the skills but not the guard; `claude --plugi
 
 ⚠️ Ask first:
 
-- Changes to `.claude/skills/homeassistant/SKILL.md` — this is the core Home Assistant definition (live-context gate and skill routing table)
 - Adding hooks to `.claude/settings.json` — VS Code's Copilot mode reads it alongside `.github/hooks/`, so the guard may run twice
-- Calling an MCP tool that changes Home Assistant or a device: `homeassistant__call_action`, `config__reload_config_entry`, and the ESPHome Device Builder's `update_config`, `add_component`, `upsert_automation`, `delete_automation`, `create_device`, `set_secret`, `compile`, and `install` — a flash has no undo
+- Calling an MCP tool that changes Home Assistant or a device, directly or through `ha_call_tool`. In ha-mcp that is every tool except the readers: `ha_get_*`, `ha_search`, `ha_search_tools`, `ha_list_*`, `ha_config_get_*`, `ha_config_list_*`, and the `list`, `get`, and `details` actions of the `ha_manage_*` tools. In the MCP Server's own sets it is `homeassistant__call_action`, `config__reload_config_entry`, and the ESPHome Device Builder's `update_config`, `add_component`, `upsert_automation`, `delete_automation`, `create_device`, `set_secret`, `compile`, and `install` — a flash has no undo
 
 🚫 Never:
 
-- Assume entity IDs — always call `GetLiveContext` first
-- Query automation, scene, or script definitions, `configuration.yaml`, or `customize.yaml` via MCP — **no MCP tool set exposes them**.
-  Run `.claude/skills/ha-config-fetch/fetch-ha-data.sh` instead, then read from `ha-data/`
 - Pass `secrets.yaml` to the ESPHome Device Builder's `get_config` — its values would enter the conversation; pass only filenames from `list_devices`
 - Commit anything in `ha-data/`, `ha-release-notes/`, or `.temp/`
 - Hand-edit files in `ha-data/` — `fetch-ha-data.sh` owns those snapshots
 - Read local output (`ha-data/`, `ha-release-notes/`, `.temp/`) that the task or the running skill doesn't need — it holds personal data
 - Bypass git hooks or use `--no-verify`
 
-## Two Data Sources
+## Data Sources
 
 | What you need | Where to get it |
 |---|---|
-| Live entity states, devices, areas | MCP server → `GetLiveContext` tool |
-| Automations, scenes, scripts, configuration YAML | `.claude/skills/ha-config-fetch/fetch-ha-data.sh` → read `ha-data/*.yaml` |
-| Entity customizations (`customize.yaml`) | `.claude/skills/ha-config-fetch/fetch-ha-data.sh` → read `ha-data/customize.yaml` |
-| ESPHome device YAMLs | ESPHome Device Builder set → `list_devices`, `get_config`, `validate_config`; otherwise `.claude/skills/ha-config-fetch/fetch-ha-data.sh` → read `ha-data/esphome/*.yaml` (`secrets.yaml` is never fetched) |
-| Zigbee2MQTT config / devices / groups / state | `.claude/skills/ha-config-fetch/fetch-ha-data.sh` → read `ha-data/zigbee2mqtt/{configuration,devices,groups}.yaml` + `state.json` |
-| Files `configuration.yaml` includes (packages, automation and script folders) | `.claude/skills/ha-config-fetch/fetch-ha-data.sh` → read them under `ha-data/` at their path on the host |
-| Labels, areas, or hidden status of specific entities | Home Assistant set → `homeassistant__render_template` (`label_entities`, `area_name`, `is_hidden_entity`) or `search__search` |
-| Area, device, entity, and integration registries | `.claude/skills/ha-config-fetch/fetch-ha-data.sh` → read `ha-data/registry/*.json`, trimmed by `trim_registry.py` so no credentials reach the disk |
-| Integration status | Home Assistant set → `config__get_config_entries` |
-| Long-term statistics of numeric sensors | Home Assistant set → `history__get_history` |
-| Home Assistant logs (for debugging) | Home Assistant set → `system_log__get_entries` for errors and warnings, then `hassio__get_logs` for the full timeline, add-ons included; otherwise `.claude/skills/ha-config-fetch/fetch-ha-data.sh` → read `ha-data/logs/{core,supervisor}.log` |
+| Entities, states, devices, areas, floors, and labels | ha-mcp → `ha_search`, `ha_get_state`, `ha_get_device`, `ha_get_entity`, `ha_list_floors_areas` |
+| Automations, scripts, scenes, helpers, dashboards, and blueprints | ha-mcp → `ha_config_get_automation`, `ha_config_get_script`, `ha_config_get_scene`, `ha_config_list_helpers`, `ha_config_get_dashboard`, `ha_manage_blueprints` (`list`, `get`) |
+| Logs and automation traces | ha-mcp → `ha_get_logs`, `ha_get_automation_traces`; the Home Assistant set's `hassio__get_logs` merges Core, Supervisor, and app logs for a time window |
+| History and long-term statistics | ha-mcp → `ha_get_history`, or the Home Assistant set's `history__get_history` |
+| Integration status and diagnostics | ha-mcp → `ha_get_integration` |
+| ESPHome device YAMLs | ESPHome Device Builder set → `list_devices`, `get_config`, `validate_config`; without it, `fetch-ha-data.sh` → read `ha-data/esphome/*.yaml` (`secrets.yaml` is never fetched) |
+| `configuration.yaml`, the files it includes (packages, automation and script folders), and `customize.yaml` | `fetch-ha-data.sh` → read them under `ha-data/` at their path on the host; no MCP tool reads config files |
+| Zigbee2MQTT config, devices, groups, and state | `fetch-ha-data.sh` → read `ha-data/zigbee2mqtt/{configuration,devices,groups}.yaml` + `state.json` |
+| Registries and YAML as files, for `ha-home-map` and `ha-release-notes` | `fetch-ha-data.sh` → `ha-data/registry/*.json`, trimmed by `trim_registry.py` so no credentials reach the disk, and `ha-data/*.yaml` |
 
-Rows that name the **Home Assistant** or **ESPHome Device Builder** set apply only when the client has those tools; the README's [Optional: extra tool sets](README.md#optional-extra-tool-sets) lists what Home Assistant needs to expose them. The fetch script uses SSH (host alias: `homeassistant`, passwordless login assumed).
+ha-mcp lists its most-used tools directly; find the rest with `ha_search_tools` and run them through `ha_call_tool`. Rows that name the **Home Assistant** or **ESPHome Device Builder** set apply only when the client has those tools; the README's [Optional: extra tool sets](README.md#optional-extra-tool-sets) lists what Home Assistant needs to expose them. The fetch script uses SSH (host alias: `homeassistant`, passwordless login assumed).
 
 ## Commands
 
 ```bash
-# Refresh local HA config snapshots and logs (requires SSH)
+# Refresh local HA config snapshots (requires SSH)
 .claude/skills/ha-config-fetch/fetch-ha-data.sh
 
 # Optional: override config directory (default: /config)
